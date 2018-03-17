@@ -67,7 +67,11 @@
 #undef TEMP_0_PIN
 #undef TEMP_1_PIN
 #undef TEMP_BED_PIN
+#ifdef THERMISTOR_MOVED
+#define TEMP_0_PIN         11
+#else
 #define TEMP_0_PIN         14   // Analog Input
+#endif
 #define TEMP_1_PIN         13   // Analog Input
 #define TEMP_BED_PIN       15   // Analog Input
 
