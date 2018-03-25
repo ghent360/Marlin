@@ -921,31 +921,6 @@ void Stepper::init() {
     microstep_init();
   #endif
 
-  // Init TMC Steppers
-  #if ENABLED(HAVE_TMC26X)
-    tmc26x_init();
-  #endif
-
-  // Init TMC2130 Steppers
-  #if ENABLED(HAVE_TMC2130)
-    tmc2130_init();
-  #endif
-
-  // Init TMC2208 Steppers
-  #if ENABLED(HAVE_TMC2208)
-    tmc2208_init();
-  #endif
-
-  // TRAMS, TMC2130 and TMC2208 advanced settings
-  #if HAS_TRINAMIC
-    TMC_ADV()
-  #endif
-
-  // Init L6470 Steppers
-  #if ENABLED(HAVE_L6470DRIVER)
-    L6470_init();
-  #endif
-
   // Init Dir Pins
   #if HAS_X_DIR
     X_DIR_INIT;
@@ -1116,7 +1091,7 @@ void Stepper::init() {
 /**
  * Block until all buffered steps are executed / cleaned
  */
-void Stepper::synchronize() { while (planner.blocks_queued() || cleaning_buffer_counter) idle(); }
+void Stepper::synchronize() { while (planner.has_blocks_queued() || cleaning_buffer_counter) idle(); }
 
 /**
  * Set the stepper positions directly in steps
@@ -1216,7 +1191,7 @@ void Stepper::finish_and_disable() {
 void Stepper::quick_stop() {
   cleaning_buffer_counter = 5000;
   DISABLE_STEPPER_DRIVER_INTERRUPT();
-  while (planner.blocks_queued()) planner.discard_current_block();
+  while (planner.has_blocks_queued()) planner.discard_current_block();
   current_block = NULL;
   ENABLE_STEPPER_DRIVER_INTERRUPT();
   #if ENABLED(ULTRA_LCD)
@@ -1304,16 +1279,16 @@ void Stepper::report_positions() {
     #endif
   #endif
 
-  #define BABYSTEP_AXIS(AXIS, INVERT) {                     \
-      const uint8_t old_dir = _READ_DIR(AXIS);              \
-      _ENABLE(AXIS);                                        \
-      _SAVE_START;                                          \
-      _APPLY_DIR(AXIS, _INVERT_DIR(AXIS)^direction^INVERT); \
-      _PULSE_WAIT;                                          \
-      _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS), true);     \
-      _PULSE_WAIT;                                          \
-      _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS), true);      \
-      _APPLY_DIR(AXIS, old_dir);                            \
+  #define BABYSTEP_AXIS(AXIS, INVERT, DIR) {            \
+      const uint8_t old_dir = _READ_DIR(AXIS);          \
+      _ENABLE(AXIS);                                    \
+      _SAVE_START;                                      \
+      _APPLY_DIR(AXIS, _INVERT_DIR(AXIS)^DIR^INVERT);   \
+      _PULSE_WAIT;                                      \
+      _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS), true); \
+      _PULSE_WAIT;                                      \
+      _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS), true);  \
+      _APPLY_DIR(AXIS, old_dir);                        \
     }
 
   // MUST ONLY BE CALLED BY AN ISR,
@@ -1326,20 +1301,43 @@ void Stepper::report_positions() {
       #if ENABLED(BABYSTEP_XY)
 
         case X_AXIS:
-          BABYSTEP_AXIS(X, false);
+          #if CORE_IS_XY
+            BABYSTEP_AXIS(X, false, direction);
+            BABYSTEP_AXIS(Y, false, direction);
+          #elif CORE_IS_XZ
+            BABYSTEP_AXIS(X, false, direction);
+            BABYSTEP_AXIS(Z, false, direction);
+          #else
+            BABYSTEP_AXIS(X, false, direction);
+          #endif
           break;
 
         case Y_AXIS:
-          BABYSTEP_AXIS(Y, false);
+          #if CORE_IS_XY
+            BABYSTEP_AXIS(X, false, direction);
+            BABYSTEP_AXIS(Y, false, direction^(CORESIGN(1)<0));
+          #elif CORE_IS_YZ
+            BABYSTEP_AXIS(Y, false, direction);
+            BABYSTEP_AXIS(Z, false, direction^(CORESIGN(1)<0));
+          #else
+            BABYSTEP_AXIS(Y, false, direction);
+          #endif
           break;
 
       #endif
 
       case Z_AXIS: {
 
-        #if DISABLED(DELTA)
+        #if CORE_IS_XZ
+          BABYSTEP_AXIS(X, BABYSTEP_INVERT_Z, direction);
+          BABYSTEP_AXIS(Z, BABYSTEP_INVERT_Z, direction^(CORESIGN(1)<0));
 
-          BABYSTEP_AXIS(Z, BABYSTEP_INVERT_Z);
+        #elif CORE_IS_YZ
+          BABYSTEP_AXIS(Y, BABYSTEP_INVERT_Z, direction);
+          BABYSTEP_AXIS(Z, BABYSTEP_INVERT_Z, direction^(CORESIGN(1)<0));
+
+        #elif DISABLED(DELTA)
+          BABYSTEP_AXIS(Z, BABYSTEP_INVERT_Z, direction);
 
         #else // DELTA
 

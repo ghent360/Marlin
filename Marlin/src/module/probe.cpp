@@ -465,7 +465,7 @@ bool set_probe_deployed(const bool deploy) {
   return false;
 }
 
-#ifdef Z_AFTER_PROBING
+#if Z_AFTER_PROBING
   // After probing move to a preferred Z position
   void move_z_after_probing() {
     if (current_position[Z_AXIS] != Z_AFTER_PROBING) {
@@ -544,9 +544,6 @@ static float run_z_probe() {
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) DEBUG_POS(">>> run_z_probe", current_position);
   #endif
-
-  // Prevent stepper_inactive_time from running out and EXTRUDER_RUNOUT_PREVENT from extruding
-  gcode.refresh_cmd_timeout();
 
   // Double-probing does a fast probe followed by a slow probe
   #if MULTIPLE_PROBING == 2
@@ -631,13 +628,15 @@ static float run_z_probe() {
  *   - Raise to the BETWEEN height
  * - Return the probed Z position
  */
-float probe_pt(const float &rx, const float &ry, const bool stow, const uint8_t verbose_level, const bool probe_relative/*=true*/) {
+float probe_pt(const float &rx, const float &ry, const ProbePtRaise raise_after/*=PROBE_PT_NONE*/, const uint8_t verbose_level/*=0*/, const bool probe_relative/*=true*/) {
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) {
       SERIAL_ECHOPAIR(">>> probe_pt(", LOGICAL_X_POSITION(rx));
       SERIAL_ECHOPAIR(", ", LOGICAL_Y_POSITION(ry));
-      SERIAL_ECHOPAIR(", ", stow ? "" : "no ");
-      SERIAL_ECHOLNPGM("stow)");
+      SERIAL_ECHOPAIR(", ", raise_after == PROBE_PT_RAISE ? "raise" : raise_after == PROBE_PT_STOW ? "stow" : "none");
+      SERIAL_ECHOPAIR(", ", int(verbose_level));
+      SERIAL_ECHOPAIR(", ", probe_relative ? "probe" : "nozzle");
+      SERIAL_ECHOLNPGM("_relative)");
       DEBUG_POS("", current_position);
     }
   #endif
@@ -670,9 +669,9 @@ float probe_pt(const float &rx, const float &ry, const bool stow, const uint8_t 
   if (!DEPLOY_PROBE()) {
     measured_z = run_z_probe() + zprobe_zoffset;
 
-    if (!stow)
+    if (raise_after == PROBE_PT_RAISE)
       do_blocking_move_to_z(current_position[Z_AXIS] + Z_CLEARANCE_BETWEEN_PROBES, MMM_TO_MMS(Z_PROBE_SPEED_FAST));
-    else
+    else if (raise_after == PROBE_PT_STOW)
       if (STOW_PROBE()) measured_z = NAN;
   }
 
