@@ -43,6 +43,8 @@
 
   #ifdef STM32F7
     #include "../HAL/HAL_STM32F7/TMC2660.h"
+  #elif defined(STM32F4xx)
+    #include "../HAL/HAL_STM32F4/TMC2660.h"
   #else
     #include <TMC26XStepper.h>
   #endif

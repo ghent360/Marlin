@@ -40,6 +40,9 @@
   #elif defined(STM32F7)
     #include "HAL_STM32F7/SanityCheck_STM32F7.h"
 
+  #elif defined(STM32F4xx)
+    #include "HAL_STM32F4/SanityCheck_STM32F4.h"
+
 #else
   #error Unsupported Platform!
 #endif

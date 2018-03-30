@@ -423,7 +423,7 @@ class Temperature {
         #endif
         target_temperature_bed =
           #ifdef BED_MAXTEMP
-            min(celsius, BED_MAXTEMP)
+            min(celsius, (int16_t)BED_MAXTEMP)
           #else
             celsius
           #endif
