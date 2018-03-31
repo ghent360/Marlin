@@ -25,7 +25,7 @@
 
 #include "../../inc/MarlinConfig.h"
 
-extern IWDG_HandleTypeDef hiwdg;
+//extern IWDG_HandleTypeDef hiwdg;
 
 void watchdog_init();
 void watchdog_reset();
