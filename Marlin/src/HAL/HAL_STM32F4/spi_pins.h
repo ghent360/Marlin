@@ -20,6 +20,15 @@
 #ifndef SPI_PINS_H_
 #define SPI_PINS_H_
 
+#define PORTA 0
+#define PORTB 1
+#define PORTC 2
+#define PORTD 3
+#define PORTE 4
+#define PORTF 5
+#define PORTG 6
+
+#define _STM32_PIN(_PORT,_PIN) ((_PORT * 16) + _PIN)
 
 /**
  * Define SPI Pins: SCK, MISO, MOSI, SS

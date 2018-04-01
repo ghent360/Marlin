@@ -333,6 +333,8 @@
   #include "pins_STM32F1R.h"
 #elif MB(STM3R_MINI)
   #include "pins_STM3R_MINI.h"
+#elif MB(PRINTR_V1)
+  #include "pins_PRINTR_V1.h"
 #elif MB(MALYAN_M200)
   #include "pins_MALYAN_M200.h"
 #elif MB(BEAST)
