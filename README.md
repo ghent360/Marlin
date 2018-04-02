@@ -5,6 +5,26 @@
 
 <img align="top" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
 
+## This is a fork of the official Marlin code.
+Original code location: https://github.com/MarlinFirmware/Marlin.git 
+
+This repo is an attempt to port Marlin to STM32 F4 based board. I'm using Nucleo-F446RE as a test platform. My current plan is to develop a cape or a shield for the Nucleo board. Plans for the board: https://github.com/ghent360/PrntrBoard.git
+
+Forst thing first - this code does not yet work. I was recently only able to compile it without errors, so don't get your hopes up.
+
+I'm using Arduino 1.8.5 with a slightly modified version of the official STM32 support library.
+My modified core support library can be found here: https://github.com/ghent360/Arduino_Core_STM32
+
+I have opened a PR to merge the changes in the official STM32 repo. The original STM32 core support can be found here: https://github.com/stm32duino/Arduino_Core_STM32
+
+You can compile the code with the Arduino IDE, but I found that process to be quite unfriendly, so I use the
+stm32f4.sh script to invoke the arduino compiler from the command line. The script is coded to my linux machine folders, so you'll have to adapt it to your environment.
+
+## ~Happy hacking
+
+The following is the original Marlin README text:
+================================
+
 Additional documentation can be found at the [Marlin Home Page](http://marlinfw.org/).
 Please test this firmware and let us know if it misbehaves in any way. Volunteers are standing by!
 
