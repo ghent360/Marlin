@@ -62,7 +62,7 @@ void GcodeSuite::M106() {
       }
     #endif // EXTRA_FAN_SPEED
     const uint16_t s = parser.ushortval('S', 255);
-    fanSpeeds[p] = min(s, 255);
+    fanSpeeds[p] = min(s, (uint16_t)255);
   }
 }
 

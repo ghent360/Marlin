@@ -27,6 +27,7 @@
 #if ENABLED(USE_WATCHDOG)
 
   #include "watchdog_STM32F4.h"
+  #include "stm32f4xx_hal_iwdg.h"
 
   IWDG_HandleTypeDef hiwdg;
 

@@ -55,6 +55,7 @@
 // --------------------------------------------------------------------------
 
 tTimerConfig timerConfig[NUM_HARDWARE_TIMERS];
+bool timerInterruptEnabled[NUM_HARDWARE_TIMERS] = {false};
 
 // --------------------------------------------------------------------------
 // Function prototypes
@@ -67,7 +68,6 @@ tTimerConfig timerConfig[NUM_HARDWARE_TIMERS];
 // --------------------------------------------------------------------------
 // Public functions
 // --------------------------------------------------------------------------
-
 
 bool timers_initialised[NUM_HARDWARE_TIMERS] = {false};
 
@@ -101,6 +101,7 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       break;
     }
     timers_initialised[timer_num] = true;
+    timerInterruptEnabled[timer_num] = false;
   }
 
   timerConfig[timer_num].timerdef.Init.Period = (((HAL_TIMER_RATE) / timerConfig[timer_num].timerdef.Init.Prescaler) / frequency) - 1;
@@ -123,10 +124,16 @@ void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
 
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
   HAL_NVIC_EnableIRQ(timerConfig[timer_num].IRQ_Id);
+  timerInterruptEnabled[timer_num] = true;
 }
 
 void HAL_timer_disable_interrupt(const uint8_t timer_num) {
   HAL_NVIC_DisableIRQ(timerConfig[timer_num].IRQ_Id);
+  timerInterruptEnabled[timer_num] = false;
+}
+
+bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
+  return timerInterruptEnabled[timer_num];
 }
 
 hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {

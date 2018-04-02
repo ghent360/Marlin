@@ -110,9 +110,9 @@
 //default values
 #define INITIAL_MICROSTEPPING 0x3ul //32th microstepping
 
-SPIClass SPI_6(SPI6, SPI6_MOSI_PIN, SPI6_MISO_PIN, SPI6_SCK_PIN);
+SPIClass stepperSPI(STEPPER_SPI_MOSI, STEPPER_SPI_MISO, STEPPER_SPI_SCK, NC);
 
-#define STEPPER_SPI SPI_6
+#define STEPPER_SPI stepperSPI
 
 //debuging output
 
@@ -448,7 +448,9 @@ void TMC26XStepper::setMicrosteps(int number_of_steps) {
 /**
  * returns the effective number of microsteps at the moment
  */
-int TMC26XStepper::getMicrosteps(void) { return microsteps }
+int TMC26XStepper::getMicrosteps(void) {
+  return microsteps;
+}
 
 /**
  * constant_off_time: The off time setting controls the minimum chopper frequency.

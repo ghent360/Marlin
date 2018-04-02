@@ -239,7 +239,7 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
     long bias, d;
     float Ku, Tu,
           workKp = 0, workKi = 0, workKd = 0,
-          max = 0, min = 10000;
+          maxT = 0, minT = 10000;
 
     #define HAS_TP_BED (ENABLED(THERMAL_PROTECTION_BED) && ENABLED(PIDTEMPBED))
     #if HAS_TP_BED && ENABLED(THERMAL_PROTECTION_HOTENDS) && ENABLED(PIDTEMP)
@@ -314,8 +314,8 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
             current_temperature_bed
           #endif
         ;
-        NOLESS(max, current);
-        NOMORE(min, current);
+        NOLESS(maxT, current);
+        NOMORE(minT, current);
 
         #if HAS_AUTO_FAN
           if (ELAPSED(ms, next_auto_fan_check_ms)) {
@@ -339,7 +339,7 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
             #endif
             t1 = ms;
             t_high = t1 - t2;
-            max = target;
+            maxT = target;
           }
         }
 
@@ -364,10 +364,10 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
 
               SERIAL_PROTOCOLPAIR(MSG_BIAS, bias);
               SERIAL_PROTOCOLPAIR(MSG_D, d);
-              SERIAL_PROTOCOLPAIR(MSG_T_MIN, min);
-              SERIAL_PROTOCOLPAIR(MSG_T_MAX, max);
+              SERIAL_PROTOCOLPAIR(MSG_T_MIN, minT);
+              SERIAL_PROTOCOLPAIR(MSG_T_MAX, maxT);
               if (cycles > 2) {
-                Ku = (4.0 * d) / (M_PI * (max - min) * 0.5);
+                Ku = (4.0 * d) / (M_PI * (maxT - minT) * 0.5);
                 Tu = ((float)(t_low + t_high) * 0.001);
                 SERIAL_PROTOCOLPAIR(MSG_KU, Ku);
                 SERIAL_PROTOCOLPAIR(MSG_TU, Tu);
@@ -407,7 +407,7 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
               soft_pwm_amount_bed = (bias + d) >> 1;
             #endif
             cycles++;
-            min = target;
+            minT = target;
           }
         }
       }

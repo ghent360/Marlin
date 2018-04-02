@@ -38,6 +38,7 @@
 
 #include "../HAL.h"
 #include "../HAL_SPI.h"
+#include "SPI.h"
 #include "pins_arduino.h"
 #include "spi_pins.h"
 #include "../../core/macros.h"
@@ -128,7 +129,7 @@ uint8_t spiRec(void) {
  */
 void spiRead(uint8_t* buf, uint16_t nbyte) {
   SPI.beginTransaction(spiConfig);
-  SPI.dmaTransfer(0, const_cast<uint8_t*>(buf), nbyte);
+  SPI.transfer(buf, nbyte);
   SPI.endTransaction();
 }
 
@@ -156,7 +157,7 @@ void spiSend(uint8_t b) {
 void spiSendBlock(uint8_t token, const uint8_t* buf) {
   SPI.beginTransaction(spiConfig);
   SPI.transfer(token);
-  SPI.dmaSend(const_cast<uint8_t*>(buf), 512);
+  SPI.transfer((void*)buf, 512);
   SPI.endTransaction();
 }
 

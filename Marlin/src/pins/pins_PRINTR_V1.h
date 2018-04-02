@@ -42,21 +42,23 @@
 //
 // Steppers
 //
+#define STEPPER_ENABLE_PIN PA5
+
 #define X_STEP_PIN         PA4
 #define X_DIR_PIN          PC4
-#define X_ENABLE_PIN       PA5
+#define X_ENABLE_PIN       STEPPER_ENABLE_PIN
 #define X_MIN_PIN          PC10
 #define X_MAX_PIN          PD2
 
 #define Y_STEP_PIN         PC5
 #define Y_DIR_PIN          PB12
-#define Y_ENABLE_PIN       PA5
+#define Y_ENABLE_PIN       STEPPER_ENABLE_PIN
 #define Y_MIN_PIN          PC11
 #define Y_MAX_PIN          PB4
 
 #define Z_STEP_PIN         PB13
 #define Z_DIR_PIN          PB15
-#define Z_ENABLE_PIN       PA5
+#define Z_ENABLE_PIN       STEPPER_ENABLE_PIN
 #define Z_MIN_PIN          PC12
 #define Z_MAX_PIN          PB5
 
@@ -70,11 +72,11 @@
 
 #define E0_STEP_PIN        PC7
 #define E0_DIR_PIN         PC8
-#define E0_ENABLE_PIN      PA5
+#define E0_ENABLE_PIN      STEPPER_ENABLE_PIN
 
 #define E1_STEP_PIN        PC9
 #define E1_DIR_PIN         PA9
-#define E1_ENABLE_PIN      PA5
+#define E1_ENABLE_PIN      STEPPER_ENABLE_PIN
 
 #define E2_STEP_PIN        -1
 #define E2_DIR_PIN         -1
@@ -294,3 +296,7 @@
 #define U_MIN_PIN          PB6
 #define V_MIN_PIN          PB7
 #define W_MIN_PIN          -1
+
+#define STEPPER_SPI_MOSI   PC1
+#define STEPPER_SPI_MISO   PC2
+#define STEPPER_SPI_SCK    PB10
