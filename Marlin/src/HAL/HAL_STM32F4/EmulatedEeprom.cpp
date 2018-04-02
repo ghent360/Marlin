@@ -72,7 +72,7 @@ static bool eeprom_initialised = false;
 
 // FLASH_FLAG_PGSERR (Programming Sequence Error) was renamed to
 // FLASH_FLAG_ERSERR (Erasing Sequence Error) in STM32F4
-#define FLASH_FLAG_PGSERR FLASH_FLAG_ERSERR
+//#define FLASH_FLAG_PGSERR FLASH_FLAG_ERSERR
 
 // --------------------------------------------------------------------------
 // EEPROM

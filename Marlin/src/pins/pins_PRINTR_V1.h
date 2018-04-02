@@ -20,16 +20,16 @@
  *
  */
 
-#if !defined(__STM32F1__) && !defined(__STM32F4__) && !defined(STM32F4xx)
-  #error "Oops!  Make sure you have an STM32F1/4 board selected from the 'Tools -> Boards' menu."
+#if !defined(__STM32F4__) && !defined(STM32F4xx)
+  #error "Oops!  Make sure you have an STM32F4 board selected from the 'Tools -> Boards' menu."
 #endif
 
 /**
- * 21017 Victor Perez Marlin for stm32f1 test
+ * 21017 Venelin Efremov Marlin for stm32f4 test
  */
 
-#define DEFAULT_MACHINE_NAME "STM3R Mini"
-#define BOARD_NAME "Marlin for STM32"
+#define DEFAULT_MACHINE_NAME "STM32F4"
+#define BOARD_NAME "Marlin for STM32F4"
 
 // Enable I2C_EEPROM for testing
 #define I2C_EEPROM
@@ -37,26 +37,28 @@
 // Ignore temp readings during develpment.
 #define BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
 
+#define NUM_SERIAL 1
+
 //
 // Steppers
 //
-#define X_STEP_PIN         PE1
-#define X_DIR_PIN          PE0
-#define X_ENABLE_PIN       PC0
-#define X_MIN_PIN          PD0
-#define X_MAX_PIN          -1
+#define X_STEP_PIN         PA4
+#define X_DIR_PIN          PC4
+#define X_ENABLE_PIN       PA5
+#define X_MIN_PIN          PC10
+#define X_MAX_PIN          PD2
 
-#define Y_STEP_PIN         PE3
-#define Y_DIR_PIN          PE2
-#define Y_ENABLE_PIN       PC1
-#define Y_MIN_PIN          PD1
-#define Y_MAX_PIN
+#define Y_STEP_PIN         PC5
+#define Y_DIR_PIN          PB12
+#define Y_ENABLE_PIN       PA5
+#define Y_MIN_PIN          PC11
+#define Y_MAX_PIN          PB4
 
-#define Z_STEP_PIN         PE5
-#define Z_DIR_PIN          PE4
-#define Z_ENABLE_PIN       PC2
-#define Z_MIN_PIN          PD4
-#define Z_MAX_PIN          -1
+#define Z_STEP_PIN         PB13
+#define Z_DIR_PIN          PB15
+#define Z_ENABLE_PIN       PA5
+#define Z_MIN_PIN          PC12
+#define Z_MAX_PIN          PB5
 
 #define Y2_STEP_PIN        -1
 #define Y2_DIR_PIN         -1
@@ -66,24 +68,24 @@
 #define Z2_DIR_PIN         -1
 #define Z2_ENABLE_PIN      -1
 
-#define E0_STEP_PIN        PE7
-#define E0_DIR_PIN         PE6
-#define E0_ENABLE_PIN      PC3
+#define E0_STEP_PIN        PC7
+#define E0_DIR_PIN         PC8
+#define E0_ENABLE_PIN      PA5
 
-#define E1_STEP_PIN        PE9
-#define E1_DIR_PIN         PE8
-#define E1_ENABLE_PIN      PC4
+#define E1_STEP_PIN        PC9
+#define E1_DIR_PIN         PA9
+#define E1_ENABLE_PIN      PA5
 
-#define E2_STEP_PIN        PE11
-#define E2_DIR_PIN         PE10
-#define E2_ENABLE_PIN      PC5
+#define E2_STEP_PIN        -1
+#define E2_DIR_PIN         -1
+#define E2_ENABLE_PIN      -1
 
 //
 // Misc. Functions
 //
 //#define SDPOWER            -1
-#define SDSS               PA15
-#define LED_PIN            PB2
+#define SDSS               -1
+#define LED_PIN            -1
 
 //#define PS_ON_PIN          -1
 //#define KILL_PIN           -1
@@ -91,26 +93,28 @@
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN       PD12   // EXTRUDER 1
-//#define HEATER_1_PIN       PD13
+#define HEATER_0_PIN       PA6   // EXTRUDER 0
+#define HEATER_1_PIN       PA7   // EXTRUDER 1
 //#define HEATER_2_PIN       -1
 
-#define HEATER_BED_PIN     PB9   // BED
+#define HEATER_BED_PIN     PB0   // BED
 //#define HEATER_BED2_PIN    -1   // BED2
 //#define HEATER_BED3_PIN    -1   // BED3
 
-#define FAN_PIN            PD14
-#define FAN1_PIN           PD13
+#define FAN_PIN            PB2
+#define FAN1_PIN           PC6
+#define FAN2_PIN           PB14
+#define FAN3_PIN           PA8
 
-#define FAN_SOFT_PWM
+//#define FAN_SOFT_PWM
 
 //
 // Temperature Sensors
 //
-#define TEMP_BED_PIN       PA0
-#define TEMP_0_PIN         PA1
-#define TEMP_1_PIN         PA2
-#define TEMP_2_PIN         PA3
+#define TEMP_BED_PIN       PC0
+#define TEMP_0_PIN         PA0
+#define TEMP_1_PIN         PA1
+#define TEMP_2_PIN         -1
 
 // Laser control
 #if ENABLED(SPINDLE_LASER_ENABLE)
@@ -286,6 +290,7 @@
 
 #endif // ULTRA_LCD
 
-#define U_MIN_PIN          -1
-#define V_MIN_PIN          -1
+// Extruder filament end detectors
+#define U_MIN_PIN          PB6
+#define V_MIN_PIN          PB7
 #define W_MIN_PIN          -1
