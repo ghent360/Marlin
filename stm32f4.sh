@@ -1,6 +1,6 @@
 #!/bin/sh
-if [ ! -d /tmp/arduino_cache_506886 ]; then
-	mkdir /tmp/arduino_cache_506886
+if [ ! -d /tmp/arduino_build_624108 ]; then
+	mkdir /tmp/arduino_build_624108
 fi
 if [ ! -d /tmp/arduino_cache_506886 ]; then
 	mkdir /tmp/arduino_cache_506886
