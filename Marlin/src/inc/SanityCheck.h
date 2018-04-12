@@ -99,8 +99,6 @@
   #error "Z_ENDSTOP_SERVO_NR is now Z_PROBE_SERVO_NR. Please update your configuration."
 #elif defined(DEFAULT_XYJERK)
   #error "DEFAULT_XYJERK is deprecated. Use DEFAULT_XJERK and DEFAULT_YJERK instead."
-#elif ENABLED(BEZIER_JERK_CONTROL) && !defined(CPU_32_BIT)
-  #error "BEZIER_JERK_CONTROL is computationally intensive and requires a 32-bit board."
 #elif defined(XY_TRAVEL_SPEED)
   #error "XY_TRAVEL_SPEED is deprecated. Use XY_PROBE_SPEED instead."
 #elif defined(PROBE_SERVO_DEACTIVATION_DELAY)
@@ -133,8 +131,12 @@
   #error "FILAMENT_CHANGE_RETRACT_LENGTH is now PAUSE_PARK_RETRACT_LENGTH. Please update your configuration."
 #elif defined(FILAMENT_CHANGE_EXTRUDE_FEEDRATE)
   #error "FILAMENT_CHANGE_EXTRUDE_FEEDRATE is now ADVANCED_PAUSE_EXTRUDE_FEEDRATE. Please update your configuration."
+#elif defined(ADVANCED_PAUSE_EXTRUDE_FEEDRATE)
+  #error "ADVANCED_PAUSE_EXTRUDE_FEEDRATE is now ADVANCED_PAUSE_PURGE_FEEDRATE. Please update your configuration."
 #elif defined(FILAMENT_CHANGE_EXTRUDE_LENGTH)
-  #error "FILAMENT_CHANGE_EXTRUDE_LENGTH is now ADVANCED_PAUSE_EXTRUDE_LENGTH. Please update your configuration."
+  #error "FILAMENT_CHANGE_EXTRUDE_LENGTH is now ADVANCED_PAUSE_PURGE_LENGTH. Please update your configuration."
+#elif defined(ADVANCED_PAUSE_EXTRUDE_LENGTH)
+  #error "ADVANCED_PAUSE_EXTRUDE_LENGTH is now ADVANCED_PAUSE_PURGE_LENGTH. Please update your configuration."
 #elif defined(FILAMENT_CHANGE_NOZZLE_TIMEOUT)
   #error "FILAMENT_CHANGE_NOZZLE_TIMEOUT is now PAUSE_PARK_NOZZLE_TIMEOUT. Please update your configuration."
 #elif defined(FILAMENT_CHANGE_NUMBER_OF_ALERT_BEEPS)
@@ -264,6 +266,8 @@
   #error "[AXIS]_IS_TMC is now [AXIS]_IS_TMC26X. Please update your Configuration_adv.h."
 #elif defined(AUTOMATIC_CURRENT_CONTROL)
   #error "AUTOMATIC_CURRENT_CONTROL is now MONITOR_DRIVER_STATUS. Please update your configuration."
+#elif defined(FILAMENT_CHANGE_LOAD_LENGTH)
+  #error "FILAMENT_CHANGE_LOAD_LENGTH is now FILAMENT_CHANGE_FAST_LOAD_LENGTH. Please update your configuration."
 #endif
 
 /**
@@ -493,8 +497,10 @@ static_assert(X_MAX_LENGTH >= X_BED_SIZE && Y_MAX_LENGTH >= Y_BED_SIZE,
     #error "ADVANCED_PAUSE_FEATURE requires NOZZLE_PARK_FEATURE."
   #elif ENABLED(PREVENT_LENGTHY_EXTRUDE) && FILAMENT_CHANGE_UNLOAD_LENGTH > EXTRUDE_MAXLENGTH
     #error "FILAMENT_CHANGE_UNLOAD_LENGTH must be less than or equal to EXTRUDE_MAXLENGTH."
-  #elif ENABLED(PREVENT_LENGTHY_EXTRUDE) && FILAMENT_CHANGE_LOAD_LENGTH > EXTRUDE_MAXLENGTH
-    #error "FILAMENT_CHANGE_LOAD_LENGTH must be less than or equal to EXTRUDE_MAXLENGTH."
+  #elif ENABLED(PREVENT_LENGTHY_EXTRUDE) && FILAMENT_CHANGE_SLOW_LOAD_LENGTH > EXTRUDE_MAXLENGTH
+    #error "FILAMENT_CHANGE_SLOW_LOAD_LENGTH must be less than or equal to EXTRUDE_MAXLENGTH."
+  #elif ENABLED(PREVENT_LENGTHY_EXTRUDE) && FILAMENT_CHANGE_FAST_LOAD_LENGTH > EXTRUDE_MAXLENGTH
+    #error "FILAMENT_CHANGE_FAST_LOAD_LENGTH must be less than or equal to EXTRUDE_MAXLENGTH."
   #endif
 #endif
 
