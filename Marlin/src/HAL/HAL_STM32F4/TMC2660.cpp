@@ -33,7 +33,7 @@
 #include <SPI.h>
 #include "TMC2660.h"
 
-#include "../../HAL/HAL_STM32F4/HAL_STM32F4.h"
+#include "../../HAL/HAL_STM32F4/HAL.h"
 #include "../../core/serial.h"
 #include "../../inc/MarlinConfig.h"
 #include "../../Marlin.h"

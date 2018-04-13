@@ -36,7 +36,7 @@
 // Includes
 // --------------------------------------------------------------------------
 
-#include "../HAL.h"
+#include "HAL.h"
 #include "../HAL_SPI.h"
 #include "SPI.h"
 #include "pins_arduino.h"
