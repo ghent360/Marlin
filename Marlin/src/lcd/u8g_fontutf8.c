@@ -7,6 +7,8 @@
  * @copyright GPL/BSD
  */
 
+#if defined(U8GLIB_SH1106) || defined(U8GLIB_SSD1306) || defined(U8GLIB_ST7920)
+
 #include <string.h>
 #include "u8g.h"
 #include "fontutils.h"
@@ -371,3 +373,5 @@ int uxg_GetUtf8StrPixelWidthP(u8g_t *pu8g, const char *utf8_msg) {
   u8g_SetFont(pu8g, fnt_default);
   return data.adv;
 }
+
+#endif // defined(U8GLIB_xxxx)

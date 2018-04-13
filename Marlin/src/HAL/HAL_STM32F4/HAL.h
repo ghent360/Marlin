@@ -26,6 +26,7 @@
 #ifndef _HAL_STM32F4_H
 #define _HAL_STM32F4_H
 
+#define CPU_32_BIT
 #undef DEBUG_NONE
 
 #ifndef vsnprintf_P
@@ -39,6 +40,9 @@
 #include <stdint.h>
 
 #include "Arduino.h"
+
+#include "../math_32bit.h"
+#include "../HAL_SPI.h"
 
 #include "fastio_STM32F4.h"
 #include "watchdog_STM32F4.h"
