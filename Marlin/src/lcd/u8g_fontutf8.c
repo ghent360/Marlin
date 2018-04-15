@@ -10,7 +10,7 @@
 #if defined(U8GLIB_SH1106) || defined(U8GLIB_SSD1306) || defined(U8GLIB_ST7920)
 
 #include <string.h>
-#include "clib/u8g.h"
+#include <clib/u8g.h>
 #include "fontutils.h"
 #include "u8g_fontutf8.h"
 
