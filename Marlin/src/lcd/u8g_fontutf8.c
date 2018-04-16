@@ -10,7 +10,6 @@
 #if defined(U8GLIB_SH1106) || defined(U8GLIB_SSD1306) || defined(U8GLIB_ST7920)
 
 #include <string.h>
-#include <clib/u8g.h>
 #include "fontutils.h"
 #include "u8g_fontutf8.h"
 
@@ -218,7 +217,7 @@ unsigned int uxg_DrawWchar(u8g_t *pu8g, unsigned int x, unsigned int y, wchar_t 
   const font_t *fnt_default = uxg_GetFont(pu8g);
 
   if (!uxg_Utf8FontIsInited()) {
-    u8g_DrawStrP(pu8g, x, y, PSTR("Err: utf8 font not initialized."));
+    u8g_DrawStrP(pu8g, x, y, (const u8g_pgm_uint8_t *)PSTR("Err: utf8 font not initialized."));
     return 0;
   }
   data.pu8g = pu8g;
@@ -252,7 +251,7 @@ unsigned int uxg_DrawUtf8Str(u8g_t *pu8g, unsigned int x, unsigned int y, const 
   const font_t *fnt_default = uxg_GetFont(pu8g);
 
   if (!uxg_Utf8FontIsInited()) {
-    u8g_DrawStrP(pu8g, x, y, PSTR("Err: utf8 font not initialized."));
+    u8g_DrawStrP(pu8g, x, y, (const u8g_pgm_uint8_t *)PSTR("Err: utf8 font not initialized."));
     return 0;
   }
   data.pu8g = pu8g;
@@ -287,7 +286,7 @@ unsigned int uxg_DrawUtf8StrP(u8g_t *pu8g, unsigned int x, unsigned int y, const
 
   if (!uxg_Utf8FontIsInited()) {
     TRACE("Error, utf8string not inited!");
-    u8g_DrawStrP(pu8g, x, y, PSTR("Err: utf8 font not initialized."));
+    u8g_DrawStrP(pu8g, x, y, (const u8g_pgm_uint8_t *)PSTR("Err: utf8 font not initialized."));
     return 0;
   }
   data.pu8g = pu8g;
