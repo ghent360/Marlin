@@ -8,7 +8,11 @@
   ******************************************************************************
   * @attention
   *
+<<<<<<< HEAD
   * <h2><center>&copy; Copyright � 2016 STMicroelectronics International N.V.
+=======
+  * <h2><center>&copy; Copyright © 2016 STMicroelectronics International N.V.
+>>>>>>> df2f24617bc110ee9fc19c1c60d1f83f8e1b8f6f
   * All rights reserved.</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without

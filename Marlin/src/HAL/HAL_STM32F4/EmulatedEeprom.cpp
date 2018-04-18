@@ -26,6 +26,8 @@
 
 #include "../../inc/MarlinConfig.h"
 
+#if ENABLED(EEPROM_SETTINGS) && DISABLED(I2C_EEPROM) && DISABLED(SPI_EEPROM)
+
 // --------------------------------------------------------------------------
 // Includes
 // --------------------------------------------------------------------------
@@ -72,7 +74,7 @@ static bool eeprom_initialised = false;
 
 // FLASH_FLAG_PGSERR (Programming Sequence Error) was renamed to
 // FLASH_FLAG_ERSERR (Erasing Sequence Error) in STM32F4
-//#define FLASH_FLAG_PGSERR FLASH_FLAG_ERSERR
+// #define FLASH_FLAG_PGSERR FLASH_FLAG_ERSERR
 
 // --------------------------------------------------------------------------
 // EEPROM
@@ -136,5 +138,6 @@ void eeprom_update_block(const void *__src, void *__dst, size_t __n) {
 
 }
 
+#endif // ENABLED(EEPROM_SETTINGS) && DISABLED(I2C_EEPROM) && DISABLED(SPI_EEPROM)
 #endif // STM32F4xx
 

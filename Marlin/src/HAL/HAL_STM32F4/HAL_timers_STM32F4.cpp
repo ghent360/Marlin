@@ -45,7 +45,6 @@
 // Types
 // --------------------------------------------------------------------------
 
-
 // --------------------------------------------------------------------------
 // Public Variables
 // --------------------------------------------------------------------------
@@ -55,7 +54,7 @@
 // --------------------------------------------------------------------------
 
 tTimerConfig timerConfig[NUM_HARDWARE_TIMERS];
-bool timerInterruptEnabled[NUM_HARDWARE_TIMERS] = {false};
+//bool timerInterruptEnabled[NUM_HARDWARE_TIMERS] = {false};
 
 // --------------------------------------------------------------------------
 // Function prototypes
@@ -85,8 +84,6 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       timerConfig[0].IRQ_Id = TIM5_IRQn;
       timerConfig[0].callback = (uint32_t)TC5_Handler;
       HAL_NVIC_SetPriority(timerConfig[0].IRQ_Id, 1, 0);
-      pinMode(STEPPER_ENABLE_PIN,OUTPUT);
-      digitalWrite(STEPPER_ENABLE_PIN,LOW);
       break;
     case TEMP_TIMER_NUM:
       //TEMP TIMER TIM7 // any available 16bit Timer (1 already used for PWM)
@@ -101,7 +98,7 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       break;
     }
     timers_initialised[timer_num] = true;
-    timerInterruptEnabled[timer_num] = false;
+    //timerInterruptEnabled[timer_num] = false;
   }
 
   timerConfig[timer_num].timerdef.Init.Period = (((HAL_TIMER_RATE) / timerConfig[timer_num].timerdef.Init.Prescaler) / frequency) - 1;
@@ -126,17 +123,17 @@ void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
 
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
   HAL_NVIC_EnableIRQ(timerConfig[timer_num].IRQ_Id);
-  timerInterruptEnabled[timer_num] = true;
+//  timerInterruptEnabled[timer_num] = true;
 }
 
 void HAL_timer_disable_interrupt(const uint8_t timer_num) {
   HAL_NVIC_DisableIRQ(timerConfig[timer_num].IRQ_Id);
-  timerInterruptEnabled[timer_num] = false;
+//  timerInterruptEnabled[timer_num] = false;
 }
 
-bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
-  return timerInterruptEnabled[timer_num];
-}
+//bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
+//  return timerInterruptEnabled[timer_num];
+//}
 
 hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
   return __HAL_TIM_GetAutoreload(&timerConfig[timer_num].timerdef);
@@ -154,6 +151,15 @@ void HAL_timer_restrain(const uint8_t timer_num, const uint16_t interval_ticks) 
 void HAL_timer_isr_prologue(const uint8_t timer_num) {
   if (__HAL_TIM_GET_FLAG(&timerConfig[timer_num].timerdef, TIM_FLAG_UPDATE) == SET) {
     __HAL_TIM_CLEAR_FLAG(&timerConfig[timer_num].timerdef, TIM_FLAG_UPDATE);
+  }
+}
+
+bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
+  if (NVIC->ISER[(uint32_t)((int32_t)timerConfig[timer_num].IRQ_Id) >> 5] & (uint32_t)(1 << ((uint32_t)((int32_t)timerConfig[timer_num].IRQ_Id) & (uint32_t)0x1F))) {
+    return true;
+  }
+  else {
+    return false;
   }
 }
 

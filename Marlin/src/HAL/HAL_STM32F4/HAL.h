@@ -43,7 +43,6 @@
 
 #include "../math_32bit.h"
 #include "../HAL_SPI.h"
-
 #include "fastio_STM32F4.h"
 #include "watchdog_STM32F4.h"
 
@@ -56,6 +55,10 @@
 
 //Serial override
 //extern HalSerial usb_serial;
+
+#if SERIAL_PORT == 0
+  #error "Serial port 0 does not exist"
+#endif
 
 #if !WITHIN(SERIAL_PORT, -1, 6)
   #error "SERIAL_PORT must be from -1 to 6"
@@ -138,6 +141,8 @@
 // --------------------------------------------------------------------------
 
 typedef int8_t pin_t;
+
+#define HAL_SERVO_LIB libServo
 
 // --------------------------------------------------------------------------
 // Public Variables

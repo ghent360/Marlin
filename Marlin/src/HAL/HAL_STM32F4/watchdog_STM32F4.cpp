@@ -27,7 +27,6 @@
 #if ENABLED(USE_WATCHDOG)
 
   #include "watchdog_STM32F4.h"
-  //#include "stm32f4xx_hal_iwdg.h"
 
   IWDG_HandleTypeDef hiwdg;
 
@@ -45,6 +44,11 @@
     if (HAL_IWDG_Refresh(&hiwdg) != HAL_OK) {
       /* Refresh Error */
       //Error_Handler();
+    }
+    else {
+    #if PIN_EXISTS(LED)
+      TOGGLE(LED_PIN);  // heart beat indicator
+    #endif
     }
   }
 
