@@ -41,18 +41,14 @@
 #define STEP_TIMER_NUM 0  // index of timer to use for stepper
 #define TEMP_TIMER_NUM 1  // index of timer to use for temperature
 
-#define HAL_TIMER_RATE         (HAL_RCC_GetSysClockFreq() / 2)  // frequency of timer peripherals
-#define STEPPER_TIMER_PRESCALE 54            // was 40,prescaler for setting stepper timer, 2Mhz
-#define HAL_STEPPER_TIMER_RATE (HAL_TIMER_RATE / STEPPER_TIMER_PRESCALE)   // frequency of stepper timer (HAL_TIMER_RATE / STEPPER_TIMER_PRESCALE)
+#define HAL_TIMER_RATE         7826086  // 7.82Mhz - frequency of timer peripherals
+#define HAL_STEPPER_TIMER_RATE 7826086  // 7.82Mhz - frequency of stepper timer
 #define HAL_TICKS_PER_US       ((HAL_STEPPER_TIMER_RATE) / 1000000) // stepper timer ticks per µs
 
-#define PULSE_TIMER_NUM STEP_TIMER_NUM
-#define PULSE_TIMER_PRESCALE STEPPER_TIMER_PRESCALE
+#define PULSE_TIMER_NUM      STEP_TIMER_NUM
 
-#define TEMP_TIMER_PRESCALE     1000 // prescaler for setting Temp timer, 72Khz
-#define TEMP_TIMER_FREQUENCY    1000 // temperature interrupt frequency
-
-#define STEP_TIMER_MIN_INTERVAL    8 // minimum time in µs between stepper interrupts
+#define TEMP_TIMER_FREQUENCY     1000   // 1kHz - temperature interrupt frequency
+#define STEP_TIMER_MIN_INTERVAL     8   // minimum time in µs between stepper interrupts
 
 #define ENABLE_STEPPER_DRIVER_INTERRUPT() HAL_timer_enable_interrupt(STEP_TIMER_NUM)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT() HAL_timer_disable_interrupt(STEP_TIMER_NUM)
@@ -61,24 +57,27 @@
 #define ENABLE_TEMPERATURE_INTERRUPT() HAL_timer_enable_interrupt(TEMP_TIMER_NUM)
 #define DISABLE_TEMPERATURE_INTERRUPT() HAL_timer_disable_interrupt(TEMP_TIMER_NUM)
 
-#define HAL_ENABLE_ISRs() do { if (thermalManager.in_temp_isr)DISABLE_TEMPERATURE_INTERRUPT(); else ENABLE_TEMPERATURE_INTERRUPT(); ENABLE_STEPPER_DRIVER_INTERRUPT(); } while(0)
+#define HAL_ENABLE_ISRs() \
+  do {\
+    if (thermalManager.in_temp_isr) {\
+      DISABLE_TEMPERATURE_INTERRUPT();\
+    } else {\
+      ENABLE_TEMPERATURE_INTERRUPT();\
+    }\
+    ENABLE_STEPPER_DRIVER_INTERRUPT();\
+  } while(0)
+
 // TODO change this
 
+void STEP_Timer_Handler(stimer_t*);
+void TEMP_Timer_Handler(stimer_t*);
 
-extern void TC5_Handler();
-extern void TC7_Handler();
-#define HAL_STEP_TIMER_ISR  void TC5_Handler()
-#define HAL_TEMP_TIMER_ISR  void TC7_Handler()
+#define HAL_STEP_TIMER_ISR  void STEP_Timer_Handler(stimer_t*)
+#define HAL_TEMP_TIMER_ISR  void TEMP_Timer_Handler(stimer_t*)
 
 // --------------------------------------------------------------------------
 // Types
 // --------------------------------------------------------------------------
-
-typedef struct {
-  TIM_HandleTypeDef timerdef;
-  IRQn_Type   IRQ_Id;
-  uint32_t callback;
-} tTimerConfig;
 
 // --------------------------------------------------------------------------
 // Public Variables
@@ -100,6 +99,7 @@ hal_timer_t HAL_timer_get_compare(const uint8_t timer_num);
 uint32_t HAL_timer_get_count(const uint8_t timer_num);
 void HAL_timer_restrain(const uint8_t timer_num, const uint16_t interval_ticks);
 
-void HAL_timer_isr_prologue(const uint8_t timer_num);
+//void HAL_timer_isr_prologue(const uint8_t timer_num);
+#define HAL_timer_isr_prologue(timer_num)
 
 #endif // _HAL_TIMERS_STM32F4_H

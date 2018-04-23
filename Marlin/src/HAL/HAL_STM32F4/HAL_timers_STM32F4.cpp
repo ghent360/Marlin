@@ -40,7 +40,6 @@
 
 #define NUM_HARDWARE_TIMERS 2
 
-//#define PRESCALER 1
 // --------------------------------------------------------------------------
 // Types
 // --------------------------------------------------------------------------
@@ -53,8 +52,7 @@
 // Private Variables
 // --------------------------------------------------------------------------
 
-tTimerConfig timerConfig[NUM_HARDWARE_TIMERS];
-//bool timerInterruptEnabled[NUM_HARDWARE_TIMERS] = {false};
+static stimer_t timerConfig[NUM_HARDWARE_TIMERS];
 
 // --------------------------------------------------------------------------
 // Function prototypes
@@ -68,99 +66,75 @@ tTimerConfig timerConfig[NUM_HARDWARE_TIMERS];
 // Public functions
 // --------------------------------------------------------------------------
 
-bool timers_initialised[NUM_HARDWARE_TIMERS] = {false};
+static bool timersInitialised[NUM_HARDWARE_TIMERS] = {false};
+
+#define MAX_RELOAD 0xffff
+
+static void HAL_TimerInit(stimer_t* dev, uint32_t microseconds) {
+  uint32_t cycles_per_us = getTimerClkFreq(dev->timer) / 1000000;
+  uint32_t period_cyc = (microseconds * cycles_per_us);
+  uint16_t prescaler = (uint16_t)(period_cyc / MAX_RELOAD + 1);
+  uint16_t overflow = (uint16_t)((period_cyc + (prescaler / 2)) / prescaler);
+  
+  TimerHandleInit(&timerConfig[0], overflow, prescaler);
+}
 
 void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
-
-  if (!timers_initialised[timer_num]) {
+  if (!timersInitialised[timer_num]) {
     switch (timer_num) {
-      case STEP_TIMER_NUM:
-      //STEPPER TIMER TIM5 //use a 32bit timer
-      __HAL_RCC_TIM5_CLK_ENABLE();
-      timerConfig[0].timerdef.Instance               = TIM5;
-      timerConfig[0].timerdef.Init.Prescaler         = (STEPPER_TIMER_PRESCALE);
-      timerConfig[0].timerdef.Init.CounterMode       = TIM_COUNTERMODE_UP;
-      timerConfig[0].timerdef.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
-      timerConfig[0].IRQ_Id = TIM5_IRQn;
-      timerConfig[0].callback = (uint32_t)TC5_Handler;
-      HAL_NVIC_SetPriority(timerConfig[0].IRQ_Id, 1, 0);
+    case STEP_TIMER_NUM:
+      timerConfig[0].timer = TIM5;
+      attachIntHandle(&timerConfig[0], STEP_Timer_Handler);
+      HAL_NVIC_SetPriority((IRQn_Type)getTimerIrq(TIM5), 1, 0);
+      HAL_TimerInit(&timerConfig[0], 1000000 / frequency);
       break;
     case TEMP_TIMER_NUM:
-      //TEMP TIMER TIM7 // any available 16bit Timer (1 already used for PWM)
-      __HAL_RCC_TIM7_CLK_ENABLE();
-      timerConfig[1].timerdef.Instance               = TIM7;
-      timerConfig[1].timerdef.Init.Prescaler         = (TEMP_TIMER_PRESCALE);
-      timerConfig[1].timerdef.Init.CounterMode       = TIM_COUNTERMODE_UP;
-      timerConfig[1].timerdef.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
-      timerConfig[1].IRQ_Id = TIM7_IRQn;
-      timerConfig[1].callback = (uint32_t)TC7_Handler;
-      HAL_NVIC_SetPriority(timerConfig[1].IRQ_Id, 2, 0);
+      timerConfig[1].timer = TIM7;
+      attachIntHandle(&timerConfig[1], TEMP_Timer_Handler);
+      HAL_NVIC_SetPriority((IRQn_Type)getTimerIrq(TIM7), 2, 0);
+      HAL_TimerInit(&timerConfig[1], 1000000 / frequency);
       break;
     }
-    timers_initialised[timer_num] = true;
-    //timerInterruptEnabled[timer_num] = false;
+    timersInitialised[timer_num] = true;
   }
-
-  timerConfig[timer_num].timerdef.Init.Period = (((HAL_TIMER_RATE) / timerConfig[timer_num].timerdef.Init.Prescaler) / frequency) - 1;
-
-  if (HAL_TIM_Base_Init(&timerConfig[timer_num].timerdef) == HAL_OK)
-    HAL_TIM_Base_Start_IT(&timerConfig[timer_num].timerdef);
-}
-
-//forward the interrupt
-/*
-extern "C" void TIM5_IRQHandler() {
-  ((void(*)(void))timerConfig[0].callback)();
-}
-extern "C" void TIM7_IRQHandler() {
-  ((void(*)(void))timerConfig[1].callback)();
-}
-*/
-
-void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
-  __HAL_TIM_SetAutoreload(&timerConfig[timer_num].timerdef, compare);
 }
 
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
-  HAL_NVIC_EnableIRQ(timerConfig[timer_num].IRQ_Id);
-//  timerInterruptEnabled[timer_num] = true;
+  switch (timer_num) {
+  case STEP_TIMER_NUM:
+    attachIntHandle(&timerConfig[0], STEP_Timer_Handler);
+    break;
+  case TEMP_TIMER_NUM:
+    attachIntHandle(&timerConfig[1], TEMP_Timer_Handler);
+    break;
+  }
 }
 
 void HAL_timer_disable_interrupt(const uint8_t timer_num) {
-  HAL_NVIC_DisableIRQ(timerConfig[timer_num].IRQ_Id);
-//  timerInterruptEnabled[timer_num] = false;
+  attachIntHandle(&timerConfig[timer_num], NULL);
 }
 
-//bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
-//  return timerInterruptEnabled[timer_num];
-//}
+void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
+  __HAL_TIM_SET_AUTORELOAD(&timerConfig[timer_num].handle, compare);
+}
 
 hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
-  return __HAL_TIM_GetAutoreload(&timerConfig[timer_num].timerdef);
+  __HAL_TIM_GET_AUTORELOAD(&timerConfig[timer_num].handle);
 }
 
 uint32_t HAL_timer_get_count(const uint8_t timer_num) {
-  return __HAL_TIM_GetCounter(&timerConfig[timer_num].timerdef);
+  return getTimerCounter(&timerConfig[timer_num]);
 }
 
 void HAL_timer_restrain(const uint8_t timer_num, const uint16_t interval_ticks) {
   const hal_timer_t mincmp = HAL_timer_get_count(timer_num) + interval_ticks;
-  if (HAL_timer_get_compare(timer_num) < mincmp) HAL_timer_set_compare(timer_num, mincmp);
-}
-
-void HAL_timer_isr_prologue(const uint8_t timer_num) {
-  if (__HAL_TIM_GET_FLAG(&timerConfig[timer_num].timerdef, TIM_FLAG_UPDATE) == SET) {
-    __HAL_TIM_CLEAR_FLAG(&timerConfig[timer_num].timerdef, TIM_FLAG_UPDATE);
+  if (HAL_timer_get_compare(timer_num) < mincmp) {
+    HAL_timer_set_compare(timer_num, mincmp);
   }
 }
 
 bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
-  if (NVIC->ISER[(uint32_t)((int32_t)timerConfig[timer_num].IRQ_Id) >> 5] & (uint32_t)(1 << ((uint32_t)((int32_t)timerConfig[timer_num].IRQ_Id) & (uint32_t)0x1F))) {
-    return true;
-  }
-  else {
-    return false;
-  }
+  return &timerConfig[timer_num].irqHandle != NULL;
 }
 
 #endif // STM32F4xx

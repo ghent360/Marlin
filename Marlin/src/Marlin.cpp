@@ -731,7 +731,7 @@ void setup() {
   SERIAL_ECHO_START();
   SERIAL_ECHOPAIR(MSG_FREE_MEMORY, freeMemory());
   SERIAL_ECHOLNPAIR(MSG_PLANNER_BUFFER_BYTES, (int)sizeof(block_t)*BLOCK_BUFFER_SIZE);
-
+ 
   queue_setup();
 
   // Load data from EEPROM if available (or use defaults)
@@ -926,7 +926,9 @@ void loop() {
       }
     #endif // SDSUPPORT && ULTIPANEL
 
-    if (commands_in_queue < BUFSIZE) get_available_commands();
+    if (commands_in_queue < BUFSIZE) {
+      get_available_commands();
+    }
     advance_command_queue();
     endstops.report_state();
     idle();
