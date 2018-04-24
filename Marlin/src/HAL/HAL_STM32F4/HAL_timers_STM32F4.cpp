@@ -76,7 +76,7 @@ static void HAL_TimerInit(stimer_t* dev, uint32_t microseconds) {
   uint16_t prescaler = (uint16_t)(period_cyc / MAX_RELOAD + 1);
   uint16_t overflow = (uint16_t)((period_cyc + (prescaler / 2)) / prescaler);
   
-  TimerHandleInit(&timerConfig[0], overflow, prescaler);
+  TimerHandleInit(dev, overflow, prescaler);
 }
 
 void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
