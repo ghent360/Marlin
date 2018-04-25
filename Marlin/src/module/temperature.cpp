@@ -49,6 +49,10 @@
   #include "../feature/filwidth.h"
 #endif
 
+#if ENABLED(EMERGENCY_PARSER)
+  #include "../feature/emergency_parser.h"
+#endif
+
 #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
   static void* heater_ttbl_map[2] = { (void*)HEATER_0_TEMPTABLE, (void*)HEATER_1_TEMPTABLE };
   static uint8_t heater_ttbllen_map[2] = { HEATER_0_TEMPTABLE_LEN, HEATER_1_TEMPTABLE_LEN };
@@ -566,8 +570,11 @@ int Temperature::getHeaterPower(const int heater) {
     HOTEND_LOOP()
       if (current_temperature[e] > EXTRUDER_AUTO_FAN_TEMPERATURE)
         SBI(fanState, pgm_read_byte(&fanBit[e]));
-    if (current_temperature_chamber > EXTRUDER_AUTO_FAN_TEMPERATURE)
-      SBI(fanState, pgm_read_byte(&fanBit[5]));
+
+    #if HAS_TEMP_CHAMBER
+      if (current_temperature_chamber > EXTRUDER_AUTO_FAN_TEMPERATURE)
+        SBI(fanState, pgm_read_byte(&fanBit[5]));
+    #endif
 
     uint8_t fanDone = 0;
     for (uint8_t f = 0; f < COUNT(fanPin); f++) {
@@ -789,7 +796,7 @@ void Temperature::manage_heater() {
   #endif
 
   #if ENABLED(EMERGENCY_PARSER)
-    if (killed_by_M112) kill(PSTR(MSG_KILLED));
+    if (emergency_parser.killed_by_M112) kill(PSTR(MSG_KILLED));
   #endif
 
   if (!temp_meas_ready) return;
@@ -1219,11 +1226,10 @@ void Temperature::init() {
     // Use timer0 for temperature measurement
     // Interleave temperature interrupt with millies interrupt
     OCR0B = 128;
-    SBI(TIMSK0, OCIE0B);
   #else
     HAL_timer_start(TEMP_TIMER_NUM, TEMP_TIMER_FREQUENCY);
-    HAL_timer_enable_interrupt(TEMP_TIMER_NUM);
   #endif
+  ENABLE_TEMPERATURE_INTERRUPT();
 
   #if HAS_AUTO_FAN_0
     #if E0_AUTO_FAN_PIN == FAN1_PIN
@@ -1716,22 +1722,13 @@ void Temperature::set_current_temp_raw() {
  */
 HAL_TEMP_TIMER_ISR {
   HAL_timer_isr_prologue(TEMP_TIMER_NUM);
+
   Temperature::isr();
+
+  HAL_timer_isr_epilogue(TEMP_TIMER_NUM);
 }
 
-volatile bool Temperature::in_temp_isr = false;
-
 void Temperature::isr() {
-  // The stepper ISR can interrupt this ISR. When it does it re-enables this ISR
-  // at the end of its run, potentially causing re-entry. This flag prevents it.
-  if (in_temp_isr) return;
-  in_temp_isr = true;
-
-  // Allow UART and stepper ISRs
-  DISABLE_TEMPERATURE_INTERRUPT(); //Disable Temperature ISR
-  #ifndef CPU_32_BIT
-    sei();
-  #endif
 
   static int8_t temp_count = -1;
   static ADCSensorState adc_sensor_state = StartupDelay;
@@ -2255,12 +2252,6 @@ void Temperature::isr() {
       e_hit--;
     }
   #endif
-
-  #ifndef CPU_32_BIT
-    cli();
-  #endif
-  in_temp_isr = false;
-  ENABLE_TEMPERATURE_INTERRUPT(); //re-enable Temperature ISR
 }
 
 #if HAS_TEMP_SENSOR
