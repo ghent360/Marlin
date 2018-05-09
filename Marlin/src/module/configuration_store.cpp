@@ -1908,6 +1908,26 @@ void MarlinSettings::reset(PORTARG_SOLO) {
     void say_M603(PORTARG_SOLO) { SERIAL_ECHOPGM_P(port, "  M603 "); }
   #endif
 
+  inline void say_units(
+    #if NUM_SERIAL > 1
+      const int8_t port,
+    #endif
+    const bool colon
+  ) {
+    serialprintPGM_P(port,
+      #if ENABLED(INCH_MODE_SUPPORT)
+        parser.linear_unit_factor != 1.0 ? PSTR(" (in)") :
+      #endif
+      PSTR(" (mm)")
+    );
+    if (colon) SERIAL_ECHOLNPGM_P(port, ":");
+  }
+  #if NUM_SERIAL > 1
+    #define SAY_UNITS_P(PORT, COLON) say_units(PORT, COLON)
+  #else
+    #define SAY_UNITS_P(PORT, COLON) say_units(COLON)
+  #endif
+
   /**
    * M503 - Report current settings in RAM
    *
@@ -1927,13 +1947,15 @@ void MarlinSettings::reset(PORTARG_SOLO) {
       #define VOLUMETRIC_UNIT(N) (float(N) / (parser.volumetric_enabled ? parser.volumetric_unit_factor : parser.linear_unit_factor))
       SERIAL_ECHOPGM_P(port, "  G2");
       SERIAL_CHAR_P(port, parser.linear_unit_factor == 1.0 ? '1' : '0');
-      SERIAL_ECHOPGM_P(port, " ; Units in ");
-      serialprintPGM_P(port, parser.linear_unit_factor == 1.0 ? PSTR("mm\n") : PSTR("inches\n"));
+      SERIAL_ECHOPGM_P(port, " ;");
+      SAY_UNITS_P(port, false);
     #else
       #define LINEAR_UNIT(N) (N)
       #define VOLUMETRIC_UNIT(N) (N)
-      SERIAL_ECHOLNPGM_P(port, "  G21    ; Units in mm");
+      SERIAL_ECHOPGM_P(port, "  G21    ; Units in mm");
+      SAY_UNITS_P(port, false);
     #endif
+    SERIAL_EOL_P(port);
 
     #if ENABLED(ULTIPANEL)
 
@@ -2345,7 +2367,8 @@ void MarlinSettings::reset(PORTARG_SOLO) {
     #if HAS_BED_PROBE
       if (!forReplay) {
         CONFIG_ECHO_START;
-        SERIAL_ECHOLNPGM_P(port, "Z-Probe Offset (mm):");
+        SERIAL_ECHOPGM_P(port, "Z-Probe Offset (mm):");
+        SAY_UNITS_P(port, true);
       }
       CONFIG_ECHO_START;
       SERIAL_ECHOLNPAIR_P(port, "  M851 Z", LINEAR_UNIT(zprobe_zoffset));
