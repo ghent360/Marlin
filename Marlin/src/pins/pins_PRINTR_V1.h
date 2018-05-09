@@ -82,6 +82,12 @@
 #define E2_DIR_PIN         -1
 #define E2_ENABLE_PIN      -1
 
+#define X_CS_PIN           PA10
+#define Y_CS_PIN           PA11
+#define Z_CS_PIN           PA12
+#define E0_CS_PIN          PB8
+#define E1_CS_PIN          PB9
+
 //
 // Misc. Functions
 //
