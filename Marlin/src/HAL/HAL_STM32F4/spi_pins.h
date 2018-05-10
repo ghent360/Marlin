@@ -29,8 +29,8 @@
 #ifndef MOSI_PIN
     #define MOSI_PIN  PA7
 #endif
-#ifndef SS_PIN
-    #define SS_PIN    PA8
-#endif
+//#ifndef SS_PIN
+//    #define SS_PIN    PA8
+//#endif
 
 #endif // SPI_PINS_H_

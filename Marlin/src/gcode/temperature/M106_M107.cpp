@@ -55,7 +55,7 @@ void GcodeSuite::M106() {
             fanSpeeds[p] = new_fanSpeeds[p];
             break;
           default:
-            new_fanSpeeds[p] = min(t, 255);
+            new_fanSpeeds[p] = min(t, (int16_t)255);
             break;
         }
         return;

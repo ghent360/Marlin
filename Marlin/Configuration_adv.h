@@ -51,6 +51,10 @@
   #define HEATER_BED_INVERTING true
 #endif
 
+#define HEATER_BED_INVERTING true
+#define HEATER_0_INVERTING true
+#define HEATER_1_INVERTING true
+
 #if DISABLED(PIDTEMPBED)
   #define BED_CHECK_INTERVAL 5000 // ms between checks in bang-bang control
   #if ENABLED(BED_LIMIT_SWITCHING)
@@ -928,7 +932,7 @@
  *   'M106 P<fan> T2'     : Use the set secondary speed
  *   'M106 P<fan> T1'     : Restore the previous fan speed
  */
-//#define EXTRA_FAN_SPEED
+#define EXTRA_FAN_SPEED
 
 /**
  * Advanced Pause
@@ -1064,13 +1068,13 @@
  */
 #define HAVE_TMC2130
 #if ENABLED(HAVE_TMC2130)  // Choose your axes here. This is mandatory!
-  #define X_IS_TMC2130
+  //#define X_IS_TMC2130
   //#define X2_IS_TMC2130
-  #define Y_IS_TMC2130
+  //#define Y_IS_TMC2130
   //#define Y2_IS_TMC2130
-  #define Z_IS_TMC2130
+  //#define Z_IS_TMC2130
   //#define Z2_IS_TMC2130
-  #define E0_IS_TMC2130
+  //#define E0_IS_TMC2130
   #define E1_IS_TMC2130
   //#define E2_IS_TMC2130
   //#define E3_IS_TMC2130
@@ -1104,7 +1108,7 @@
 
 #if ENABLED(HAVE_TMC2130) || ENABLED(HAVE_TMC2208)
 
-  #define R_SENSE           0.11  // R_sense resistor for SilentStepStick2130
+  #define R_SENSE           0.15  // R_sense resistor for SilentStepStick2130
   #define HOLD_MULTIPLIER    0.5  // Scales down the holding current from run current
   #define INTERPOLATE       true  // Interpolate X/Y/Z_MICROSTEPS to 256
 

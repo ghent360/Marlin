@@ -52,6 +52,7 @@
 #define GET_OUTPUT(IO)
 #define GET_TIMER(IO)
 
+#ifdef REDEFINE_PIN_NAMES
 #define PORTA 0
 #define PORTB 1
 #define PORTC 2
@@ -144,5 +145,6 @@
 #define PE13 _STM32_PIN(E, 13)
 #define PE14 _STM32_PIN(E, 14)
 #define PE15 _STM32_PIN(E, 15)
+#endif // REDEFINE_PIN_NAMES
 
 #endif // _FASTIO_STM32F4_H
