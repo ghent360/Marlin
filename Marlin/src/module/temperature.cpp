@@ -1126,7 +1126,9 @@ void Temperature::init() {
     inited = true;
   #endif
 
-  #if MB(RUMBA) && (TEMP_SENSOR_0 == -1 || TEMP_SENSOR_1 == -1 || TEMP_SENSOR_2 == -1 || TEMP_SENSOR_BED == -1 || TEMP_SENSOR_CHAMBER == -1)
+  #if MB(RUMBA) && ( \
+       HEATER_0_USES_AD595 || HEATER_1_USES_AD595 || HEATER_2_USES_AD595 || HEATER_3_USES_AD595 || HEATER_4_USES_AD595 || HEATER_BED_USES_AD595 || HEATER_CHAMBER_USES_AD595) || \
+    || HEATER_0_USES_AD8495 || HEATER_1_USES_AD8495 || HEATER_2_USES_AD8495|| HEATER_3_USES_AD8495|| HEATER_4_USES_AD8495 || HEATER_BED_USES_AD8495 || HEATER_CHAMBER_USES_AD8495)
     // Disable RUMBA JTAG in case the thermocouple extension is plugged on top of JTAG connector
     MCUCR = _BV(JTD);
     MCUCR = _BV(JTD);
