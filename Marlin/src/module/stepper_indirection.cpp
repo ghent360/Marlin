@@ -217,6 +217,7 @@
   #define _TMC2130_INIT(ST, SPMM) tmc2130_init(stepper##ST, ST##_CURRENT, ST##_MICROSTEPS, ST##_HYBRID_THRESHOLD, SPMM)
 
   void tmc2130_init_to_defaults() {
+    spiBegin();
     #if ENABLED(X_IS_TMC2130)
       _TMC2130_INIT( X, planner.axis_steps_per_mm[X_AXIS]);
     #endif

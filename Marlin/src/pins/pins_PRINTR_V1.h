@@ -306,3 +306,7 @@
 #define STEPPER_SPI_MOSI   PC1
 #define STEPPER_SPI_MISO   PC2
 #define STEPPER_SPI_SCK    PB10
+
+#define MOSI_PIN PC1
+#define MISO_PIN PC2
+#define SCK_PIN  PB10
