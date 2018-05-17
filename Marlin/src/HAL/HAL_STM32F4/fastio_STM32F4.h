@@ -39,12 +39,12 @@
 #define _SET_MODE(IO,M)         pinMode(IO, M)
 #define _SET_OUTPUT(IO)         pinMode(IO, OUTPUT)                               /*!< Output Push Pull Mode & GPIO_NOPULL   */
 
-#define OUT_WRITE(IO,V)         do{ _SET_OUTPUT(IO); WRITE(IO,V); }while(0)
+#define OUT_WRITE(IO,V)         WRITE(IO,V)
 
 #define SET_INPUT(IO)           _SET_MODE(IO, INPUT)                              /*!< Input Floating Mode                   */
 #define SET_INPUT_PULLUP(IO)    _SET_MODE(IO, INPUT_PULLUP)                       /*!< Input with Pull-up activation         */
 #define SET_INPUT_PULLDOWN(IO)  _SET_MODE(IO, INPUT_PULLDOWN)                     /*!< Input with Pull-down activation       */
-#define SET_OUTPUT(IO)          OUT_WRITE(IO, LOW)
+#define SET_OUTPUT(IO)          _SET_MODE(IO, OUTPUT)
 
 #define TOGGLE(IO)              OUT_WRITE(IO, !READ(IO))
 
