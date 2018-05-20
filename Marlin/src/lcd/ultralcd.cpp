@@ -3270,7 +3270,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
     else
       MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
 
-    #if ENABLED(SWITCHING_EXTRUDER)
+    #if ENABLED(SWITCHING_EXTRUDER) || ENABLED(SWITCHING_NOZZLE)
 
       #if EXTRUDERS == 4
         switch (active_extruder) {
@@ -3335,7 +3335,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
     lcd_completion_feedback();
   }
 
-  #if ENABLED(EEPROM_SETTINGS)
+  #if ENABLED(EEPROM_SETTINGS) && DISABLED(SLIM_LCD_MENUS)
 
     static void lcd_init_eeprom() {
       lcd_completion_feedback(settings.init_eeprom());
