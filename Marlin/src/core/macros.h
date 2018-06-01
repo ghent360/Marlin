@@ -29,6 +29,8 @@
 #define ABC  3
 #define XYZ  3
 
+#define _AXIS(A) (A##_AXIS)
+
 #define _XMIN_ 100
 #define _YMIN_ 200
 #define _ZMIN_ 300
@@ -65,10 +67,11 @@
 
 // Macros for bit masks
 #undef _BV
-#define _BV(b) (1 << (b))
+#define _BV(n) (1<<(n))
 #define TEST(n,b) !!((n)&_BV(b))
 #define SBI(n,b) (n |= _BV(b))
 #define CBI(n,b) (n &= ~_BV(b))
+#define SET_BIT_TO(N,B,TF) do{ if (TF) SBI(N,B); else CBI(N,B); }while(0)
 
 #define _BV32(b) (1UL << (b))
 #define TEST32(n,b) !!((n)&_BV32(b))
@@ -89,10 +92,50 @@
 #define SIGN(a) ((a>0)-(a<0))
 #define IS_POWER_OF_2(x) ((x) && !((x) & ((x) - 1)))
 
-// Macros to contrain values
-#define NOLESS(v,n) do{ if (v < n) v = n; }while(0)
-#define NOMORE(v,n) do{ if (v > n) v = n; }while(0)
-#define LIMIT(v,n1,n2) do{ if (v < n1) v = n1; else if (v > n2) v = n2; }while(0)
+// Macros to constrain values
+// Avoid double evaluation of arguments to NOMORE/NOLESS/LIMIT
+#undef NOMORE
+#undef NOLESS
+#undef LIMIT
+#ifdef __cplusplus
+
+  // C++11 solution that is standards compliant.
+  template <class V, class N> static inline constexpr void NOLESS(V& v, const N n) {
+    if (v < n) v = n;
+  }
+  template <class V, class N> static inline constexpr void NOMORE(V& v, const N n) {
+    if (v > n) v = n;
+  }
+  template <class V, class N1, class N2> static inline constexpr void LIMIT(V& v, const N1 n1, const N2 n2) {
+    if (v < n1) v = n1;
+    else if (v > n2) v = n2;
+  }
+
+#else
+
+  // Using GCC extensions, but Travis GCC version does not like it and gives
+  //  "error: statement-expressions are not allowed outside functions nor in template-argument lists"
+  #define NOLESS(v, n) \
+    do { \
+      __typeof__(n) _n = (n); \
+      if (v < _n) v = _n; \
+    } while(0)
+
+  #define NOMORE(v, n) \
+    do { \
+      __typeof__(n) _n = (n); \
+      if (v > _n) v = _n; \
+    } while(0)
+
+  #define LIMIT(v, n1, n2) \
+    do { \
+      __typeof__(n1) _n1 = (n1); \
+      __typeof__(n2) _n2 = (n2); \
+      if (v < _n1) v = _n1; \
+      else if (v > _n2) v = _n2; \
+    } while(0)
+
+#endif
 
 // Macros to support option testing
 #define _CAT(a, ...) a ## __VA_ARGS__
@@ -113,7 +156,7 @@
 #define DECIMAL_SIGNED(a) (DECIMAL(a) || (a) == '-' || (a) == '+')
 #define COUNT(a) (sizeof(a)/sizeof(*a))
 #define ZERO(a) memset(a,0,sizeof(a))
-#define COPY(a,b) memcpy(a,b,min(sizeof(a),sizeof(b)))
+#define COPY(a,b) memcpy(a,b,MIN(sizeof(a),sizeof(b)))
 
 // Macros for initializing arrays
 #define ARRAY_6(v1, v2, v3, v4, v5, v6, ...) { v1, v2, v3, v4, v5, v6 }
@@ -164,12 +207,48 @@
 
 #define CEILING(x,y) (((x) + (y) - 1) / (y))
 
-#define MIN3(a, b, c)       min(min(a, b), c)
-#define MIN4(a, b, c, d)    min(MIN3(a, b, c), d)
-#define MIN5(a, b, c, d, e) min(MIN4(a, b, c, d), e)
-#define MAX3(a, b, c)       max(max(a, b), c)
-#define MAX4(a, b, c, d)    max(MAX3(a, b, c), d)
-#define MAX5(a, b, c, d, e) max(MAX4(a, b, c, d), e)
+// Avoid double evaluation of arguments on MIN/MAX/ABS
+#undef MIN
+#undef MAX
+#undef ABS
+#ifdef __cplusplus
+
+  // C++11 solution that is standards compliant. Return type is deduced automatically
+  template <class L, class R> static inline constexpr auto MIN(const L lhs, const R rhs) -> decltype(lhs + rhs) {
+    return lhs < rhs ? lhs : rhs;
+  }
+  template <class L, class R> static inline constexpr auto MAX(const L lhs, const R rhs) -> decltype(lhs + rhs){
+    return lhs > rhs ? lhs : rhs;
+  }
+  template <class T> static inline constexpr const T ABS(const T v) {
+    return v >= 0 ? v : -v;
+  }
+#else
+
+  // Using GCC extensions, but Travis GCC version does not like it and gives
+  //  "error: statement-expressions are not allowed outside functions nor in template-argument lists"
+  #define MIN(a, b) \
+    ({__typeof__(a) _a = (a); \
+      __typeof__(b) _b = (b); \
+      _a < _b ? _a : _b;})
+
+  #define MAX(a, b) \
+    ({__typeof__(a) _a = (a); \
+      __typeof__(b) _b = (b); \
+      _a > _b ? _a : _b;})
+
+  #define ABS(a) \
+    ({__typeof__(a) _a = (a); \
+      _a >= 0 ? _a : -_a;})
+
+#endif
+
+#define MIN3(a, b, c)       MIN(MIN(a, b), c)
+#define MIN4(a, b, c, d)    MIN(MIN3(a, b, c), d)
+#define MIN5(a, b, c, d, e) MIN(MIN4(a, b, c, d), e)
+#define MAX3(a, b, c)       MAX(MAX(a, b), c)
+#define MAX4(a, b, c, d)    MAX(MAX3(a, b, c), d)
+#define MAX5(a, b, c, d, e) MAX(MAX4(a, b, c, d), e)
 
 #define UNEAR_ZERO(x) ((x) < 0.000001)
 #define NEAR_ZERO(x) WITHIN(x, -0.000001, 0.000001)
@@ -182,7 +261,6 @@
 // Maths macros that can be overridden by HAL
 //
 #define ATAN2(y, x) atan2(y, x)
-#define FABS(x)     fabs(x)
 #define POW(x, y)   pow(x, y)
 #define SQRT(x)     sqrt(x)
 #define CEIL(x)     ceil(x)

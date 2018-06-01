@@ -24,6 +24,8 @@
 
 #if ENABLED(ULTRA_LCD)
 
+#include <stdarg.h>
+
 #include "ultralcd.h"
 
 #include "../sd/cardreader.h"
@@ -78,7 +80,7 @@
   #else
     #define MAX_MESSAGE_LENGTH CHARSIZE * 2 * (LCD_WIDTH)
   #endif
-  uint8_t status_scroll_pos = 0;
+  uint8_t status_scroll_offset = 0;
 #else
   #define MAX_MESSAGE_LENGTH CHARSIZE * (LCD_WIDTH)
 #endif
@@ -101,9 +103,7 @@ uint8_t lcd_status_update_delay = 1, // First update one loop delayed
 
 #if ENABLED(DOGLCD)
   #include "ultralcd_impl_DOGM.h"
-  #include <U8glib.h>
-  bool drawing_screen, // = false
-       first_page;
+  bool drawing_screen, first_page; // = false
 #else
   #include "ultralcd_impl_HD44780.h"
   constexpr bool first_page = true;
@@ -504,6 +504,11 @@ uint16_t max_display_update_time = 0;
   void lcd_goto_screen(screenFunc_t screen, const uint32_t encoder/*=0*/) {
     if (currentScreen != screen) {
 
+      #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
+        // Shadow for editing the fade height
+        new_z_fade_height = planner.z_fade_height;
+      #endif
+
       #if ENABLED(DOUBLECLICK_FOR_Z_BABYSTEPPING) && ENABLED(BABYSTEPPING)
         static millis_t doubleclick_expire_ms = 0;
         // Going to lcd_main_menu from status screen? Remember first click time.
@@ -512,7 +517,7 @@ uint16_t max_display_update_time = 0;
           if (currentScreen == lcd_status_screen)
             doubleclick_expire_ms = millis() + DOUBLECLICK_MAX_INTERVAL;
         }
-        else if (screen == lcd_status_screen && currentScreen == lcd_main_menu && PENDING(millis(), doubleclick_expire_ms))
+        else if (screen == lcd_status_screen && currentScreen == lcd_main_menu && PENDING(millis(), doubleclick_expire_ms) && (planner.movesplanned() || IS_SD_PRINTING))
           screen =
             #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
               lcd_babystep_zoffset
@@ -629,7 +634,7 @@ uint16_t max_display_update_time = 0;
       screen_changed = false;
     }
     if (screen_items > 0 && encoderLine >= screen_items - limit) {
-      encoderLine = max(0, screen_items - limit);
+      encoderLine = MAX(0, screen_items - limit);
       encoderPosition = encoderLine * (ENCODER_STEPS_PER_MENU_ITEM);
     }
     if (is_menu) {
@@ -1076,13 +1081,6 @@ void lcd_quick_feedback(const bool clear_buttons) {
    *
    */
 
-  #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-    void _lcd_goto_tune_menu() {
-      lcd_goto_screen(lcd_tune_menu);
-      new_z_fade_height = planner.z_fade_height;
-    }
-  #endif
-
   void lcd_main_menu() {
     START_MENU();
     MENU_BACK(MSG_WATCH);
@@ -1109,18 +1107,11 @@ void lcd_quick_feedback(const bool clear_buttons) {
         MENU_ITEM_EDIT_CALLBACK(bool, MSG_CASE_LIGHT, (bool*)&case_light_on, update_case_light);
     #endif
 
-    if (planner.movesplanned() || IS_SD_PRINTING) {
-      MENU_ITEM(submenu, MSG_TUNE,
-        #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-          _lcd_goto_tune_menu
-        #else
-          lcd_tune_menu
-        #endif
-      );
-    }
-    else {
+    if (planner.movesplanned() || IS_SD_PRINTING)
+      MENU_ITEM(submenu, MSG_TUNE, lcd_tune_menu);
+    else
       MENU_ITEM(submenu, MSG_PREPARE, lcd_prepare_menu);
-    }
+
     MENU_ITEM(submenu, MSG_CONTROL, lcd_control_menu);
 
     #if ENABLED(SDSUPPORT)
@@ -1579,7 +1570,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
    *
    */
   void _lcd_preheat(const int16_t endnum, const int16_t temph, const int16_t tempb, const int16_t fan) {
-    if (temph > 0) thermalManager.setTargetHotend(min(heater_maxtemp[endnum], temph), endnum);
+    if (temph > 0) thermalManager.setTargetHotend(MIN(heater_maxtemp[endnum], temph), endnum);
     #if HAS_HEATED_BED
       if (tempb >= 0) thermalManager.setTargetBed(tempb);
     #else
@@ -2057,13 +2048,6 @@ void lcd_quick_feedback(const bool clear_buttons) {
 
     void _lcd_ubl_level_bed();
 
-    #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-      void _lcd_goto_ubl_level_bed() {
-        lcd_goto_screen(_lcd_ubl_level_bed);
-        new_z_fade_height = planner.z_fade_height;
-      }
-    #endif
-
     static int16_t ubl_storage_slot = 0,
                custom_hotend_temp = 190,
                side_points = 3,
@@ -2118,7 +2102,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
       char UBL_LCD_GCODE[16];
       const int ind = ubl_height_amount > 0 ? 9 : 10;
       strcpy_P(UBL_LCD_GCODE, PSTR("G29 P6 C -"));
-      sprintf_P(&UBL_LCD_GCODE[ind], PSTR(".%i"), abs(ubl_height_amount));
+      sprintf_P(&UBL_LCD_GCODE[ind], PSTR(".%i"), ABS(ubl_height_amount));
       lcd_enqueue_command(UBL_LCD_GCODE);
     }
 
@@ -2419,12 +2403,10 @@ void lcd_quick_feedback(const bool clear_buttons) {
 
     void _lcd_do_nothing() {}
     void _lcd_hard_stop() {
-      stepper.quick_stop();
       const screenFunc_t old_screen = currentScreen;
       currentScreen = _lcd_do_nothing;
-      while (planner.movesplanned()) idle();
+      planner.quick_stop();
       currentScreen = old_screen;
-      stepper.cleaning_buffer_counter = 0;
       set_current_from_steppers_for_axis(ALL_AXES);
       sync_plan_position();
     }
@@ -2441,7 +2423,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
       if (encoderPosition) {
         step_scaler += (int32_t)encoderPosition;
         x_plot += step_scaler / (ENCODER_STEPS_PER_MENU_ITEM);
-        if (abs(step_scaler) >= ENCODER_STEPS_PER_MENU_ITEM) step_scaler = 0;
+        if (ABS(step_scaler) >= ENCODER_STEPS_PER_MENU_ITEM) step_scaler = 0;
         encoderPosition = 0;
         lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
       }
@@ -2663,13 +2645,6 @@ void lcd_quick_feedback(const bool clear_buttons) {
       END_MENU();
     }
 
-    #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-      void _lcd_goto_bed_leveling() {
-        lcd_goto_screen(lcd_bed_leveling);
-        new_z_fade_height = planner.z_fade_height;
-      }
-    #endif
-
   #endif // LCD_BED_LEVELING
 
   /**
@@ -2709,29 +2684,14 @@ void lcd_quick_feedback(const bool clear_buttons) {
     //
     #if ENABLED(AUTO_BED_LEVELING_UBL)
 
-      MENU_ITEM(submenu, MSG_UBL_LEVEL_BED, (
-          #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-            _lcd_goto_ubl_level_bed
-          #else
-            _lcd_ubl_level_bed
-          #endif
-        )
-      );
+      MENU_ITEM(submenu, MSG_UBL_LEVEL_BED, _lcd_ubl_level_bed);
 
     #elif ENABLED(LCD_BED_LEVELING)
 
       #if ENABLED(PROBE_MANUALLY)
         if (!g29_in_progress)
       #endif
-
-          MENU_ITEM(submenu, MSG_BED_LEVELING, (
-              #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-                _lcd_goto_bed_leveling
-              #else
-                lcd_bed_leveling
-              #endif
-            )
-          );
+          MENU_ITEM(submenu, MSG_BED_LEVELING, lcd_bed_leveling);
 
     #elif PLANNER_LEVELING && DISABLED(SLIM_LCD_MENUS)
 
@@ -2853,7 +2813,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
       do_blocking_move_to_xy(rx, ry);
 
       lcd_synchronize();
-      move_menu_scale = max(PROBE_MANUALLY_STEP, MIN_STEPS_PER_SEGMENT / float(DEFAULT_XYZ_STEPS_PER_UNIT));
+      move_menu_scale = MAX(PROBE_MANUALLY_STEP, MIN_STEPS_PER_SEGMENT / float(DEFAULT_XYZ_STEPS_PER_UNIT));
       lcd_goto_screen(lcd_move_z);
     }
 
@@ -3268,7 +3228,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
     else
       MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
 
-    #if ENABLED(SWITCHING_EXTRUDER)
+    #if ENABLED(SWITCHING_EXTRUDER) || ENABLED(SWITCHING_NOZZLE)
 
       #if EXTRUDERS == 4
         switch (active_extruder) {
@@ -3300,20 +3260,36 @@ void lcd_quick_feedback(const bool clear_buttons) {
 
     #endif
 
-    MENU_ITEM(submenu, MSG_MOVE_E, lcd_move_get_e_amount);
-    #if E_MANUAL > 1
-      MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E1, lcd_move_get_e0_amount);
-      MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E2, lcd_move_get_e1_amount);
-      #if E_MANUAL > 2
+    #if ENABLED(SWITCHING_EXTRUDER) || ENABLED(SWITCHING_NOZZLE)
+
+      // Only the current...
+      MENU_ITEM(submenu, MSG_MOVE_E, lcd_move_get_e_amount);
+      // ...and the non-switching
+      #if E_MANUAL == 5
+        MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E5, lcd_move_get_e4_amount);
+      #elif E_MANUAL == 3
         MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E3, lcd_move_get_e2_amount);
-        #if E_MANUAL > 3
-          MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E4, lcd_move_get_e3_amount);
-          #if E_MANUAL > 4
-            MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E5, lcd_move_get_e4_amount);
-          #endif // E_MANUAL > 4
-        #endif // E_MANUAL > 3
-      #endif // E_MANUAL > 2
-    #endif // E_MANUAL > 1
+      #endif
+
+    #else
+
+      // Independent extruders with one E-stepper per hotend
+      MENU_ITEM(submenu, MSG_MOVE_E, lcd_move_get_e_amount);
+      #if E_MANUAL > 1
+        MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E1, lcd_move_get_e0_amount);
+        MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E2, lcd_move_get_e1_amount);
+        #if E_MANUAL > 2
+          MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E3, lcd_move_get_e2_amount);
+          #if E_MANUAL > 3
+            MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E4, lcd_move_get_e3_amount);
+            #if E_MANUAL > 4
+              MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E5, lcd_move_get_e4_amount);
+            #endif // E_MANUAL > 4
+          #endif // E_MANUAL > 3
+        #endif // E_MANUAL > 2
+      #endif // E_MANUAL > 1
+
+    #endif
 
     END_MENU();
   }
@@ -3333,7 +3309,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
     lcd_completion_feedback();
   }
 
-  #if ENABLED(EEPROM_SETTINGS)
+  #if ENABLED(EEPROM_SETTINGS) && DISABLED(SLIM_LCD_MENUS)
 
     static void lcd_init_eeprom() {
       lcd_completion_feedback(settings.init_eeprom());
@@ -3625,8 +3601,8 @@ void lcd_quick_feedback(const bool clear_buttons) {
         #define MINTEMP_ALL MIN3(HEATER_0_MINTEMP, HEATER_1_MINTEMP, HEATER_2_MINTEMP)
         #define MAXTEMP_ALL MAX3(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP, HEATER_2_MAXTEMP)
       #elif HOTENDS > 1
-        #define MINTEMP_ALL min(HEATER_0_MINTEMP, HEATER_1_MINTEMP)
-        #define MAXTEMP_ALL max(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP)
+        #define MINTEMP_ALL MIN(HEATER_0_MINTEMP, HEATER_1_MINTEMP)
+        #define MAXTEMP_ALL MAX(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP)
       #else
         #define MINTEMP_ALL HEATER_0_MINTEMP
         #define MAXTEMP_ALL HEATER_0_MAXTEMP
@@ -3854,7 +3830,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
 
     // M540 S - Abort on endstop hit when SD printing
     #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
-      MENU_ITEM_EDIT(bool, MSG_ENDSTOP_ABORT, &stepper.abort_on_endstop_hit);
+      MENU_ITEM_EDIT(bool, MSG_ENDSTOP_ABORT, &planner.abort_on_endstop_hit);
     #endif
 
     END_MENU();
@@ -4867,7 +4843,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
       callbackFunc = callback; \
       liveEdit = live; \
     } \
-    typedef void _name
+    typedef void _name##_void
 
   DEFINE_MENU_EDIT_TYPE(int16_t, int3, itostr3, 1);
   DEFINE_MENU_EDIT_TYPE(uint8_t, int8, i8tostr3, 1);
@@ -5229,7 +5205,7 @@ void lcd_update() {
 
       #endif
 
-      const bool encoderPastThreshold = (abs(encoderDiff) >= ENCODER_PULSES_PER_STEP);
+      const bool encoderPastThreshold = (ABS(encoderDiff) >= ENCODER_PULSES_PER_STEP);
       if (encoderPastThreshold || lcd_clicked) {
         if (encoderPastThreshold) {
           int32_t encoderMultiplier = 1;
@@ -5237,7 +5213,7 @@ void lcd_update() {
           #if ENABLED(ENCODER_RATE_MULTIPLIER)
 
             if (encoderRateMultiplierEnabled) {
-              int32_t encoderMovementSteps = abs(encoderDiff) / ENCODER_PULSES_PER_STEP;
+              int32_t encoderMovementSteps = ABS(encoderDiff) / ENCODER_PULSES_PER_STEP;
 
               if (lastEncoderMovementMillis) {
                 // Note that the rate is always calculated between two passes through the
@@ -5400,29 +5376,7 @@ void lcd_update() {
   } // ELAPSED(ms, next_lcd_update_ms)
 }
 
-inline void pad_message_string() {
-  uint8_t i = 0, j = 0;
-  char c;
-  lcd_status_message[MAX_MESSAGE_LENGTH] = '\0';
-  while ((c = lcd_status_message[i]) && j < LCD_WIDTH) {
-    if (PRINTABLE(c)) j++;
-    i++;
-  }
-  if (true
-    #if ENABLED(STATUS_MESSAGE_SCROLLING)
-      && j < LCD_WIDTH
-    #endif
-  ) {
-    // pad with spaces to fill up the line
-    while (j++ < LCD_WIDTH) lcd_status_message[i++] = ' ';
-    // chop off at the edge
-    lcd_status_message[i] = '\0';
-  }
-}
-
 void lcd_finishstatus(const bool persist=false) {
-
-  pad_message_string();
 
   #if !(ENABLED(LCD_PROGRESS_BAR) && (PROGRESS_MSG_EXPIRE > 0))
     UNUSED(persist);
@@ -5441,7 +5395,7 @@ void lcd_finishstatus(const bool persist=false) {
   #endif
 
   #if ENABLED(STATUS_MESSAGE_SCROLLING)
-    status_scroll_pos = 0;
+    status_scroll_offset = 0;
   #endif
 }
 
@@ -5453,7 +5407,26 @@ bool lcd_hasstatus() { return (lcd_status_message[0] != '\0'); }
 
 void lcd_setstatus(const char * const message, const bool persist) {
   if (lcd_status_message_level > 0) return;
-  strncpy(lcd_status_message, message, MAX_MESSAGE_LENGTH);
+
+  // Here we have a problem. The message is encoded in UTF8, so
+  // arbitrarily cutting it will be a problem. We MUST be sure
+  // that there is no cutting in the middle of a multibyte character!
+
+  // Get a pointer to the null terminator
+  const char* pend = message + strlen(message);
+
+  //  If length of supplied UTF8 string is greater than
+  // our buffer size, start cutting whole UTF8 chars
+  while ((pend - message) > MAX_MESSAGE_LENGTH) {
+    --pend;
+    while (!START_OF_UTF8_CHAR(*pend)) --pend;
+  };
+
+  // At this point, we have the proper cut point. Use it
+  uint8_t maxLen = pend - message;
+  strncpy(lcd_status_message, message, maxLen);
+  lcd_status_message[maxLen] = '\0';
+
   lcd_finishstatus(persist);
 }
 
@@ -5461,7 +5434,26 @@ void lcd_setstatusPGM(const char * const message, int8_t level) {
   if (level < 0) level = lcd_status_message_level = 0;
   if (level < lcd_status_message_level) return;
   lcd_status_message_level = level;
-  strncpy_P(lcd_status_message, message, MAX_MESSAGE_LENGTH);
+
+  // Here we have a problem. The message is encoded in UTF8, so
+  // arbitrarily cutting it will be a problem. We MUST be sure
+  // that there is no cutting in the middle of a multibyte character!
+
+  // Get a pointer to the null terminator
+  const char* pend = message + strlen_P(message);
+
+  //  If length of supplied UTF8 string is greater than
+  // our buffer size, start cutting whole UTF8 chars
+  while ((pend - message) > MAX_MESSAGE_LENGTH) {
+    --pend;
+    while (!START_OF_UTF8_CHAR(pgm_read_byte(pend))) --pend;
+  };
+
+  // At this point, we have the proper cut point. Use it
+  uint8_t maxLen = pend - message;
+  strncpy_P(lcd_status_message, message, maxLen);
+  lcd_status_message[maxLen] = '\0';
+
   lcd_finishstatus(level > 0);
 }
 
@@ -5535,11 +5527,9 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
         #if BUTTON_EXISTS(EN1)
           if (BUTTON_PRESSED(EN1)) newbutton |= EN_A;
         #endif
-
         #if BUTTON_EXISTS(EN2)
           if (BUTTON_PRESSED(EN2)) newbutton |= EN_B;
         #endif
-
         #if BUTTON_EXISTS(ENC)
           if (BUTTON_PRESSED(ENC)) newbutton |= EN_C;
         #endif

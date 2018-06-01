@@ -35,6 +35,16 @@
   || MB(SCOOVO_X9H)                     \
 )
 
+#ifdef TEENSYDUINO
+  #undef max
+  #define max(a,b) ((a)>(b)?(a):(b))
+  #undef min
+  #define min(a,b) ((a)<(b)?(a):(b))
+
+  #undef NOT_A_PIN    // Override Teensyduino legacy CapSense define work-around
+  #define NOT_A_PIN 0 // For PINS_DEBUGGING
+#endif
+
 #define IS_SCARA (ENABLED(MORGAN_SCARA) || ENABLED(MAKERARM_SCARA))
 #define IS_KINEMATIC (ENABLED(DELTA) || IS_SCARA)
 #define IS_CARTESIAN !IS_KINEMATIC
@@ -424,6 +434,7 @@
 /**
  * Default hotend offsets, if not defined
  */
+#define HAS_HOTEND_OFFSET_Z (HOTENDS > 1 && (ENABLED(DUAL_X_CARRIAGE) || ENABLED(SWITCHING_NOZZLE) || ENABLED(PARKING_EXTRUDER)))
 #if HOTENDS > 1
   #ifndef HOTEND_OFFSET_X
     #define HOTEND_OFFSET_X { 0 } // X offsets for each extruder
@@ -431,7 +442,7 @@
   #ifndef HOTEND_OFFSET_Y
     #define HOTEND_OFFSET_Y { 0 } // Y offsets for each extruder
   #endif
-  #if !defined(HOTEND_OFFSET_Z) && (ENABLED(DUAL_X_CARRIAGE) || ENABLED(SWITCHING_NOZZLE))
+  #if HAS_HOTEND_OFFSET_Z && !defined(HOTEND_OFFSET_Z)
     #define HOTEND_OFFSET_Z { 0 }
   #endif
 #endif
@@ -970,6 +981,23 @@
 #define HAS_FANMUX PIN_EXISTS(FANMUX0)
 
 /**
+ * MIN/MAX fan PWM scaling
+ */
+#ifndef FAN_MIN_PWM
+  #define FAN_MIN_PWM 0
+#endif
+#ifndef FAN_MAX_PWM
+  #define FAN_MAX_PWM 255
+#endif
+#if FAN_MIN_PWM < 0 || FAN_MIN_PWM > 255
+  #error "FAN_MIN_PWM must be a value from 0 to 255."
+#elif FAN_MAX_PWM < 0 || FAN_MAX_PWM > 255
+  #error "FAN_MAX_PWM must be a value from 0 to 255."
+#elif FAN_MIN_PWM > FAN_MAX_PWM
+  #error "FAN_MIN_PWM must be less than or equal to FAN_MAX_PWM."
+#endif
+
+/**
  * Bed Probe dependencies
  */
 #if HAS_BED_PROBE
@@ -1374,23 +1402,12 @@
   #undef LROUND
   #undef FMOD
   #define ATAN2(y, x) atan2f(y, x)
-  #define FABS(x) fabsf(x)
   #define POW(x, y) powf(x, y)
   #define SQRT(x) sqrtf(x)
   #define CEIL(x) ceilf(x)
   #define FLOOR(x) floorf(x)
   #define LROUND(x) lroundf(x)
   #define FMOD(x, y) fmodf(x, y)
-#endif
-
-#ifdef TEENSYDUINO
-  #undef max
-  #define max(a,b) ((a)>(b)?(a):(b))
-  #undef min
-  #define min(a,b) ((a)<(b)?(a):(b))
-
-  #undef NOT_A_PIN    // Override Teensyduino legacy CapSense define work-around
-  #define NOT_A_PIN 0 // For PINS_DEBUGGING
 #endif
 
 // Number of VFAT entries used. Each entry has 13 UTF-16 characters

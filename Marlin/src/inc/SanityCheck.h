@@ -273,6 +273,14 @@
   #error "FILAMENT_CHANGE_LOAD_LENGTH is now FILAMENT_CHANGE_FAST_LOAD_LENGTH. Please update your configuration."
 #elif ENABLED(LEVEL_BED_CORNERS) && !defined(LEVEL_CORNERS_INSET)
   #error "LEVEL_BED_CORNERS requires a LEVEL_CORNERS_INSET value. Please update your Configuration.h."
+#elif defined(BEZIER_JERK_CONTROL)
+  #error "BEZIER_JERK_CONTROL is now S_CURVE_ACCELERATION. Please update your configuration."
+#elif defined(JUNCTION_DEVIATION_FACTOR)
+  #error "JUNCTION_DEVIATION_FACTOR is now JUNCTION_DEVIATION_MM. Please update your configuration."
+#elif defined(JUNCTION_ACCELERATION_FACTOR)
+  #error "JUNCTION_ACCELERATION_FACTOR is obsolete. Delete it from Configuration_adv.h."
+#elif defined(JUNCTION_ACCELERATION)
+  #error "JUNCTION_ACCELERATION is obsolete. Delete it from Configuration_adv.h."
 #endif
 
 #define BOARD_MKS_13     -47
@@ -321,6 +329,10 @@
 
 #if SERIAL_PORT > 7
   #error "Set SERIAL_PORT to the port on your board. Usually this is 0."
+#endif
+
+#if SERIAL_PORT_2 && NUM_SERIAL < 2
+  #error "SERIAL_PORT_2 is not supported for your MOTHERBOARD. Disable it to continue."
 #endif
 
 /**
@@ -1724,6 +1736,10 @@ static_assert(COUNT(sanity_arr_3) <= XYZE_N, "DEFAULT_MAX_ACCELERATION has too m
 
 #if ENABLED(POWER_LOSS_RECOVERY) && !ENABLED(ULTIPANEL)
   #error "POWER_LOSS_RECOVERY currently requires an LCD Controller."
+#endif
+
+#if ENABLED(FAST_PWM_FAN) && !(defined(ARDUINO) && !defined(ARDUINO_ARCH_SAM))
+  #error "FAST_PWM_FAN only supported by 8 bit CPUs."
 #endif
 
 #endif // _SANITYCHECK_H_
