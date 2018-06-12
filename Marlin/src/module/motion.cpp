@@ -971,13 +971,13 @@ void prepare_move_to_destination() {
 
   bool axis_unhomed_error(const bool x/*=true*/, const bool y/*=true*/, const bool z/*=true*/) {
     #if ENABLED(HOME_AFTER_DEACTIVATE)
-      const bool xx = x && !axis_known_position[X_AXIS],
-                 yy = y && !axis_known_position[Y_AXIS],
-                 zz = z && !axis_known_position[Z_AXIS];
+      const bool xx = x && !TEST(axis_known_position, X_AXIS),
+                 yy = y && !TEST(axis_known_position, Y_AXIS),
+                 zz = z && !TEST(axis_known_position, Z_AXIS);
     #else
-      const bool xx = x && !axis_homed[X_AXIS],
-                 yy = y && !axis_homed[Y_AXIS],
-                 zz = z && !axis_homed[Z_AXIS];
+      const bool xx = x && !TEST(axis_homed, X_AXIS),
+                 yy = y && !TEST(axis_homed, Y_AXIS),
+                 zz = z && !TEST(axis_homed, Z_AXIS);
     #endif
     if (xx || yy || zz) {
       SERIAL_ECHO_START();
@@ -1187,7 +1187,8 @@ void set_axis_is_at_home(const AxisEnum axis) {
     }
   #endif
 
-  axis_known_position[axis] = axis_homed[axis] = true;
+  SBI(axis_known_position, axis);
+  SBI(axis_homed, axis);
 
   #if HAS_POSITION_SHIFT
     position_shift[axis] = 0;
@@ -1349,7 +1350,7 @@ void homeaxis(const AxisEnum axis) {
       if (axis == X_AXIS) {
         const float adj = ABS(endstops.x_endstop_adj);
         if (pos_dir ? (endstops.x_endstop_adj > 0) : (endstops.x_endstop_adj < 0)) stepper.set_x_lock(true); else stepper.set_x2_lock(true);
-        do_homing_move(axis, pos_dir ? adj : -adj);
+        do_homing_move(axis, pos_dir ? -adj : adj);
         stepper.set_x_lock(false);
         stepper.set_x2_lock(false);
       }
@@ -1358,7 +1359,7 @@ void homeaxis(const AxisEnum axis) {
       if (axis == Y_AXIS) {
         const float adj = ABS(endstops.y_endstop_adj);
         if (pos_dir ? (endstops.y_endstop_adj > 0) : (endstops.y_endstop_adj < 0)) stepper.set_y_lock(true); else stepper.set_y2_lock(true);
-        do_homing_move(axis, pos_dir ? adj : -adj);
+        do_homing_move(axis, pos_dir ? -adj : adj);
         stepper.set_y_lock(false);
         stepper.set_y2_lock(false);
       }
@@ -1367,7 +1368,7 @@ void homeaxis(const AxisEnum axis) {
       if (axis == Z_AXIS) {
         const float adj = ABS(endstops.z_endstop_adj);
         if (pos_dir ? (endstops.z_endstop_adj > 0) : (endstops.z_endstop_adj < 0)) stepper.set_z_lock(true); else stepper.set_z2_lock(true);
-        do_homing_move(axis, pos_dir ? adj : -adj);
+        do_homing_move(axis, pos_dir ? -adj : adj);
         stepper.set_z_lock(false);
         stepper.set_z2_lock(false);
       }

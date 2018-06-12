@@ -161,7 +161,7 @@ bool Running = true;
  *   Flags that the position is known in each linear axis. Set when homed.
  *   Cleared whenever a stepper powers off, potentially losing its position.
  */
-bool axis_homed[XYZ] = { false }, axis_known_position[XYZ] = { false };
+uint8_t axis_homed, axis_known_position; // = 0
 
 #if ENABLED(TEMPERATURE_UNITS_SUPPORT)
   TempUnit input_temp_units = TEMPUNIT_C;
@@ -262,6 +262,11 @@ bool pin_is_protected(const pin_t pin) {
     if (pin == sensitive_pin) return true;
   }
   return false;
+}
+
+void protected_pin_err() {
+  SERIAL_ERROR_START();
+  SERIAL_ERRORLNPGM(MSG_ERR_PROTECTED_PIN);
 }
 
 void quickstop_stepper() {
