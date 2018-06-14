@@ -21,8 +21,7 @@
  *
  */
 
-
-#ifdef STM32F4xx
+#if defined(STM32F4) || defined(STM32F4xx)
 
 #include "../persistent_store_api.h"
 
@@ -77,6 +76,4 @@ bool read_data(int &pos, uint8_t* value, uint16_t size, uint16_t *crc, const boo
 }
 
 #endif // EEPROM_SETTINGS
-#endif // STM32F4xx
-
-
+#endif // STM32F4 || STM32F4xx

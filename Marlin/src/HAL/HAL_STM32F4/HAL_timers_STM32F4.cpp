@@ -20,7 +20,7 @@
  *
  */
 
-#ifdef STM32F4xx
+#if defined(STM32F4) || defined(STM32F4xx)
 
 // --------------------------------------------------------------------------
 // Includes
@@ -39,6 +39,8 @@
 // --------------------------------------------------------------------------
 
 #define NUM_HARDWARE_TIMERS 2
+#define STEP_TIMER_IRQ_ID TIM5_IRQn
+#define TEMP_TIMER_IRQ_ID TIM7_IRQn
 
 // --------------------------------------------------------------------------
 // Types
@@ -52,7 +54,7 @@
 // Private Variables
 // --------------------------------------------------------------------------
 
-static stimer_t timerConfig[NUM_HARDWARE_TIMERS];
+stm32f4_timer_t TimerHandle[NUM_HARDWARE_TIMERS];
 
 // --------------------------------------------------------------------------
 // Function prototypes
@@ -66,75 +68,91 @@ static stimer_t timerConfig[NUM_HARDWARE_TIMERS];
 // Public functions
 // --------------------------------------------------------------------------
 
-static bool timersInitialised[NUM_HARDWARE_TIMERS] = {false};
-
-#define MAX_RELOAD 0xffff
-
-static void HAL_TimerInit(stimer_t* dev, uint32_t microseconds) {
-  uint32_t cycles_per_us = getTimerClkFreq(dev->timer) / 1000000;
-  uint32_t period_cyc = (microseconds * cycles_per_us);
-  uint16_t prescaler = (uint16_t)(period_cyc / MAX_RELOAD + 1);
-  uint16_t overflow = (uint16_t)((period_cyc + (prescaler / 2)) / prescaler);
-  
-  TimerHandleInit(dev, overflow, prescaler);
-}
+static bool timers_initialised[NUM_HARDWARE_TIMERS] = {false};
 
 void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
-  if (!timersInitialised[timer_num]) {
+
+  if (!timers_initialised[timer_num]) {
+    constexpr uint32_t step_prescaler = STEPPER_TIMER_PRESCALE - 1,
+                       temp_prescaler = TEMP_TIMER_PRESCALE - 1;
     switch (timer_num) {
-    case STEP_TIMER_NUM:
-      timerConfig[0].timer = TIM5;
-      attachIntHandle(&timerConfig[0], STEP_Timer_Handler);
-      HAL_NVIC_SetPriority((IRQn_Type)getTimerIrq(TIM5), 1, 0);
-      HAL_TimerInit(&timerConfig[0], 1000000 / frequency);
-      break;
-    case TEMP_TIMER_NUM:
-      timerConfig[1].timer = TIM7;
-      attachIntHandle(&timerConfig[1], TEMP_Timer_Handler);
-      HAL_NVIC_SetPriority((IRQn_Type)getTimerIrq(TIM7), 2, 0);
-      HAL_TimerInit(&timerConfig[1], 1000000 / frequency);
-      break;
+      case STEP_TIMER_NUM:
+        // STEPPER TIMER TIM5 - use a 32bit timer
+        #ifdef STM32GENERIC
+          __HAL_RCC_TIM5_CLK_ENABLE();
+          TimerHandle[timer_num].handle.Instance            = TIM5;
+          TimerHandle[timer_num].handle.Init.Prescaler      = step_prescaler;
+          TimerHandle[timer_num].handle.Init.CounterMode    = TIM_COUNTERMODE_UP;
+          TimerHandle[timer_num].handle.Init.ClockDivision  = TIM_CLOCKDIVISION_DIV1;
+          TimerHandle[timer_num].callback = (uint32_t)TC5_Handler;
+        #else
+          TimerHandle[timer_num].timer = TIM5;
+          TimerHandle[timer_num].irqHandle = TC5_Handler;
+          TimerHandleInit(&TimerHandle[timer_num], (((HAL_TIMER_RATE) / step_prescaler) / frequency) - 1, step_prescaler);
+        #endif
+        HAL_NVIC_SetPriority(STEP_TIMER_IRQ_ID, 6, 0);
+        break;
+
+      case TEMP_TIMER_NUM:
+        // TEMP TIMER TIM7 - any available 16bit Timer (1 already used for PWM)
+        #ifdef STM32GENERIC
+          __HAL_RCC_TIM7_CLK_ENABLE();
+          TimerHandle[timer_num].handle.Instance            = TIM7;
+          TimerHandle[timer_num].handle.Init.Prescaler      = temp_prescaler;
+          TimerHandle[timer_num].handle.Init.CounterMode    = TIM_COUNTERMODE_UP;
+          TimerHandle[timer_num].handle.Init.ClockDivision  = TIM_CLOCKDIVISION_DIV1;
+          TimerHandle[timer_num].callback = (uint32_t)TC7_Handler;
+        #else
+          TimerHandle[timer_num].timer = TIM7;
+          TimerHandle[timer_num].irqHandle = TC7_Handler;
+          TimerHandleInit(&TimerHandle[timer_num], (((HAL_TIMER_RATE) / temp_prescaler) / frequency) - 1, temp_prescaler);
+        #endif
+        HAL_NVIC_SetPriority(TEMP_TIMER_IRQ_ID, 2, 0);
+        break;
     }
-    timersInitialised[timer_num] = true;
+    timers_initialised[timer_num] = true;
   }
+
+  #ifdef STM32GENERIC
+    TimerHandle[timer_num].handle.Init.Period = (((HAL_TIMER_RATE) / TimerHandle[timer_num].handle.Init.Prescaler) / frequency) - 1;
+    if (HAL_TIM_Base_Init(&TimerHandle[timer_num].handle) == HAL_OK)
+      HAL_TIM_Base_Start_IT(&TimerHandle[timer_num].handle);
+  #endif
 }
+
+#ifdef STM32GENERIC
+  extern "C" void TIM5_IRQHandler() {
+    ((void(*)(void))TimerHandle[0].callback)();
+  }
+  extern "C" void TIM7_IRQHandler() {
+    ((void(*)(void))TimerHandle[1].callback)();
+  }
+#endif
 
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
   switch (timer_num) {
-  case STEP_TIMER_NUM:
-    attachIntHandle(&timerConfig[0], STEP_Timer_Handler);
-    break;
-  case TEMP_TIMER_NUM:
-    attachIntHandle(&timerConfig[1], TEMP_Timer_Handler);
-    break;
+    case STEP_TIMER_NUM: HAL_NVIC_EnableIRQ(STEP_TIMER_IRQ_ID); break;
+    case TEMP_TIMER_NUM: HAL_NVIC_EnableIRQ(TEMP_TIMER_IRQ_ID); break;
   }
 }
 
 void HAL_timer_disable_interrupt(const uint8_t timer_num) {
-  attachIntHandle(&timerConfig[timer_num], NULL);
-}
-
-void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
-  __HAL_TIM_SET_AUTORELOAD(&timerConfig[timer_num].handle, compare);
-}
-
-hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
-  __HAL_TIM_GET_AUTORELOAD(&timerConfig[timer_num].handle);
-}
-
-uint32_t HAL_timer_get_count(const uint8_t timer_num) {
-  return getTimerCounter(&timerConfig[timer_num]);
-}
-
-void HAL_timer_restrain(const uint8_t timer_num, const uint16_t interval_ticks) {
-  const hal_timer_t mincmp = HAL_timer_get_count(timer_num) + interval_ticks;
-  if (HAL_timer_get_compare(timer_num) < mincmp) {
-    HAL_timer_set_compare(timer_num, mincmp);
+  switch (timer_num) {
+    case STEP_TIMER_NUM: HAL_NVIC_DisableIRQ(STEP_TIMER_IRQ_ID); break;
+    case TEMP_TIMER_NUM: HAL_NVIC_DisableIRQ(TEMP_TIMER_IRQ_ID); break;
   }
+  // We NEED memory barriers to ensure Interrupts are actually disabled!
+  // ( https://dzone.com/articles/nvic-disabling-interrupts-on-arm-cortex-m-and-the )
+  __DSB();
+  __ISB();
 }
 
 bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
-  return &timerConfig[timer_num].irqHandle != NULL;
+  switch (timer_num) {
+    case STEP_TIMER_NUM: return NVIC->ISER[(uint32_t)((int32_t)STEP_TIMER_IRQ_ID) >> 5] & (uint32_t)(1 << ((uint32_t)((int32_t)STEP_TIMER_IRQ_ID) & (uint32_t)0x1F));
+    case TEMP_TIMER_NUM: return NVIC->ISER[(uint32_t)((int32_t)TEMP_TIMER_IRQ_ID) >> 5] & (uint32_t)(1 << ((uint32_t)((int32_t)TEMP_TIMER_IRQ_ID) & (uint32_t)0x1F));
+  }
+  return false;
 }
 
-#endif // STM32F4xx
+#endif // STM32F4 || STM32F4xx
