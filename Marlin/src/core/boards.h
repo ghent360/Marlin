@@ -225,7 +225,11 @@
 
 #define BOARD_THE_BORG         1860   // THE-BORG (Power outputs: Hotend0, Hotend1, Bed, Fan)
 
+//
+// Espressif ESP32 WiFi
+//
+#define BOARD_ESP32            1900
 
-#define MB(board) (MOTHERBOARD==BOARD_##board)
+#define MB(board) (defined(BOARD_##board) && MOTHERBOARD==BOARD_##board)
 
 #endif // __BOARDS_H
