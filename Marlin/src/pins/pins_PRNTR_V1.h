@@ -45,10 +45,8 @@
 #define STEPPER_ENABLE_PIN PA5
 
 // Swapped E0 and X motor pins for a moment.
-//#define X_STEP_PIN         PA4
-//#define X_DIR_PIN          PC4
-#define X_STEP_PIN         PC9
-#define X_DIR_PIN          PA9
+#define X_STEP_PIN         PA4
+#define X_DIR_PIN          PC4
 #define X_ENABLE_PIN       STEPPER_ENABLE_PIN
 #define X_MIN_PIN          PC10
 #define X_MAX_PIN          PD2
@@ -77,18 +75,15 @@
 #define E0_DIR_PIN         PC8
 #define E0_ENABLE_PIN      STEPPER_ENABLE_PIN
 
-//#define E1_STEP_PIN        PC9
-//#define E1_DIR_PIN         PA9
-#define E1_STEP_PIN        PA4
-#define E1_DIR_PIN         PC4
+#define E1_STEP_PIN        PC9
+#define E1_DIR_PIN         PA9
 #define E1_ENABLE_PIN      STEPPER_ENABLE_PIN
 
 #define E2_STEP_PIN        -1
 #define E2_DIR_PIN         -1
 #define E2_ENABLE_PIN      -1
 
-//#define X_CS_PIN           PA10
-#define X_CS_PIN           PB9
+#define X_CS_PIN           PA10
 //#define Y_CS_PIN           PA11
 //#define Z_CS_PIN           PA12
 //#define E0_CS_PIN          PB8
