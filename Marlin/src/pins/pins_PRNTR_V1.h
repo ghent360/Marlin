@@ -84,10 +84,10 @@
 #define E2_ENABLE_PIN      -1
 
 #define X_CS_PIN           PA10
-//#define Y_CS_PIN           PA11
-//#define Z_CS_PIN           PA12
-//#define E0_CS_PIN          PB8
-//#define E1_CS_PIN          PB9
+#define Y_CS_PIN           PA11
+#define Z_CS_PIN           PA12
+#define E0_CS_PIN          PB8
+#define E1_CS_PIN          PB9
 
 //
 // Misc. Functions
@@ -304,6 +304,9 @@
 #define V_MIN_PIN          PB7
 #define W_MIN_PIN          -1
 
+#define FIL_RUNOUT_PIN     U_MIN_PIN
+#define FIL_RUNOUT2_PIN    V_MIN_PIN
+
 #define STEPPER_SPI_MOSI   PC1
 #define STEPPER_SPI_MISO   PC2
 #define STEPPER_SPI_SCK    PB10
@@ -311,3 +314,7 @@
 #define MOSI_PIN PC1
 #define MISO_PIN PC2
 #define SCK_PIN  PB10
+
+#ifndef Z_MIN_PROBE_PIN
+  #define Z_MIN_PROBE_PIN  PC13
+#endif
