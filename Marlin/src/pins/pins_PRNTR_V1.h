@@ -30,6 +30,7 @@
 
 #define DEFAULT_MACHINE_NAME "STM32F4"
 #define BOARD_NAME "Marlin for PrntrBoard V1(STM32F4)"
+#define DEFAULT_WEBSITE_URL "http://blog.pcbxprt.com/index.php/category/prntrboard/"
 
 // Enable I2C_EEPROM for testing
 #define I2C_EEPROM
