@@ -619,6 +619,7 @@ void kill(const char* lcd_msg) {
     suicide();
   #endif
 
+  cli(); // Stop interrupts
   while (1) {
     #if ENABLED(USE_WATCHDOG)
       watchdog_reset();
