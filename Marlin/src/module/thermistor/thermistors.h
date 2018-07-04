@@ -55,6 +55,9 @@
 #if ANY_THERMISTOR_IS(5) // beta25 = 4267 K, R25 = 100 kOhm, Pull-up = 4.7 kOhm, "ParCan, ATC 104GT-2"
   #include "thermistor_5.h"
 #endif
+#if ANY_THERMISTOR_IS(501) // 100K Zonestar thermistor
+  #include "thermistor_501.h"
+#endif
 #if ANY_THERMISTOR_IS(6) // beta25 = 4092 K, R25 = 100 kOhm, Pull-up = 8.2 kOhm, "EPCOS ?"
   #include "thermistor_6.h"
 #endif
@@ -115,8 +118,8 @@
 #if ANY_THERMISTOR_IS(147) // Pt100 with 4k7 pullup
   #include "thermistor_147.h"
 #endif
-#if ANY_THERMISTOR_IS(501) // 
-  #include "thermistor_501.h"
+#if ANY_THERMISTOR_IS(510) // 
+  #include "thermistor_510.h"
 #endif
 #if ANY_THERMISTOR_IS(1010) // Pt1000 with 1k0 pullup
   #include "thermistor_1010.h"
