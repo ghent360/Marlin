@@ -316,6 +316,4 @@
 #define MISO_PIN PC2
 #define SCK_PIN  PB10
 
-#ifndef Z_MIN_PROBE_PIN
-  #define Z_MIN_PROBE_PIN  PC13
-#endif
+#define Z_MIN_PROBE_PIN  PC13

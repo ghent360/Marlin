@@ -22,7 +22,7 @@
 
 // R25 = 100 kOhm, beta25 = ??? K, 4.7 kOhm pull-up
 // Unknown 100k thermistor shipped with E3D clone.
-const short temptable_501[][2] PROGMEM = {
+const short temptable_510[][2] PROGMEM = {
   { OV(   1), 713 },
   { OV(  20), 300 }, // top rating 300C
   { OV(  25), 290 },
