@@ -948,7 +948,7 @@ void loop() {
       get_available_commands();
     }
     advance_command_queue();
-    endstops.report_state();
+    endstops.event_handler();
     idle();
   }
 }
