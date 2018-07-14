@@ -592,7 +592,7 @@ void _tmc_say_sgt(const TMC_AxisEnum axis, const int8_t sgt) {
 #endif // SENSORLESS_HOMING
 
 #if ENABLED(HAVE_TMC2130)
-  #define SET_CS_PIN(st) OUT_WRITE(st##_CS_PIN, HIGH)
+  #define SET_CS_PIN(st) digitalWrite(st##_CS_PIN, HIGH)
   void tmc_init_cs_pins() {
     #if ENABLED(X_IS_TMC2130)
       SET_CS_PIN(X);
