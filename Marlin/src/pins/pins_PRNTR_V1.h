@@ -43,26 +43,26 @@
 //
 // Steppers
 //
-#define STEPPER_ENABLE_PIN GPIOA_5
+#define STEPPER_ENABLE_PIN IO_PIN(A, 5)
 
 // Swapped E0 and X motor pins for a moment.
-#define X_STEP_PIN         GPIOA_4
-#define X_DIR_PIN          GPIOC_4
+#define X_STEP_PIN         IO_PIN(A, 4)
+#define X_DIR_PIN          IO_PIN(C, 4)
 #define X_ENABLE_PIN       STEPPER_ENABLE_PIN
-#define X_MIN_PIN          GPIOC_10
-#define X_MAX_PIN          GPIOD_2
+#define X_MIN_PIN          IO_PIN(C, 10)
+#define X_MAX_PIN          IO_PIN(D, 2)
 
-#define Y_STEP_PIN         GPIOC_5
-#define Y_DIR_PIN          GPIOB_12
+#define Y_STEP_PIN         IO_PIN(C, 5)
+#define Y_DIR_PIN          IO_PIN(B, 12)
 #define Y_ENABLE_PIN       STEPPER_ENABLE_PIN
-#define Y_MIN_PIN          GPIOC_11
-#define Y_MAX_PIN          GPIOB_4
+#define Y_MIN_PIN          IO_PIN(C, 11)
+#define Y_MAX_PIN          IO_PIN(B, 4)
 
-#define Z_STEP_PIN         GPIOB_13
-#define Z_DIR_PIN          GPIOB_15
+#define Z_STEP_PIN         IO_PIN(B, 13)
+#define Z_DIR_PIN          IO_PIN(B, 15)
 #define Z_ENABLE_PIN       STEPPER_ENABLE_PIN
-#define Z_MIN_PIN          GPIOC_12
-#define Z_MAX_PIN          GPIOB_5
+#define Z_MIN_PIN          IO_PIN(C, 12)
+#define Z_MAX_PIN          IO_PIN(B, 5)
 
 #define Y2_STEP_PIN        -1
 #define Y2_DIR_PIN         -1
@@ -72,23 +72,23 @@
 #define Z2_DIR_PIN         -1
 #define Z2_ENABLE_PIN      -1
 
-#define E0_STEP_PIN        GPIOC_7
-#define E0_DIR_PIN         GPIOC_8
+#define E0_STEP_PIN        IO_PIN(C, 7)
+#define E0_DIR_PIN         IO_PIN(C, 8)
 #define E0_ENABLE_PIN      STEPPER_ENABLE_PIN
 
-#define E1_STEP_PIN        GPIOC_9
-#define E1_DIR_PIN         GPIOA_9
+#define E1_STEP_PIN        IO_PIN(C, 9)
+#define E1_DIR_PIN         IO_PIN(A, 9)
 #define E1_ENABLE_PIN      STEPPER_ENABLE_PIN
 
 #define E2_STEP_PIN        -1
 #define E2_DIR_PIN         -1
 #define E2_ENABLE_PIN      -1
 
-#define X_CS_PIN           PA10
-#define Y_CS_PIN           PA11
-#define Z_CS_PIN           PA12
-#define E0_CS_PIN          PB8
-#define E1_CS_PIN          PB9
+#define X_CS_PIN           SLOW_PIN(A, 10)
+#define Y_CS_PIN           SLOW_PIN(A, 11)
+#define Z_CS_PIN           SLOW_PIN(A, 12)
+#define E0_CS_PIN          SLOW_PIN(B, 8)
+#define E1_CS_PIN          SLOW_PIN(B, 9)
 
 //
 // Misc. Functions
@@ -103,27 +103,27 @@
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN       GPIOA_6   // EXTRUDER 0
-#define HEATER_1_PIN       GPIOA_7   // EXTRUDER 1
+#define HEATER_0_PIN       IO_PIN(A, 6)   // EXTRUDER 0
+#define HEATER_1_PIN       IO_PIN(A, 7)   // EXTRUDER 1
 //#define HEATER_2_PIN       -1
 
-#define HEATER_BED_PIN     GPIOB_0 // BED
+#define HEATER_BED_PIN     IO_PIN(B, 0) // BED
 //#define HEATER_BED2_PIN    -1    // BED2
 //#define HEATER_BED3_PIN    -1    // BED3
 
-#define FAN_PIN            PB2
-#define FAN1_PIN           PC6
-#define FAN2_PIN           PB14
-#define FAN3_PIN           PA8
+#define FAN_PIN            SLOW_PIN(B, 2)
+#define FAN1_PIN           SLOW_PIN(C, 6)
+#define FAN2_PIN           SLOW_PIN(B, 14)
+#define FAN3_PIN           SLOW_PIN(A, 8)
 
 //#define FAN_SOFT_PWM
 
 //
 // Temperature Sensors
 //
-#define TEMP_BED_PIN       PC0
-#define TEMP_0_PIN         PA0
-#define TEMP_1_PIN         PA1
+#define TEMP_BED_PIN       SLOW_PIN(C, 0)
+#define TEMP_0_PIN         SLOW_PIN(A, 0)
+#define TEMP_1_PIN         SLOW_PIN(A, 1)
 #define TEMP_2_PIN         -1
 
 // Laser control
@@ -301,19 +301,19 @@
 #endif // ULTRA_LCD
 
 // Extruder filament end detectors
-#define U_MIN_PIN          GPIOB_6
-#define V_MIN_PIN          GPIOB_7
+#define U_MIN_PIN          IO_PIN(B, 6)
+#define V_MIN_PIN          IO_PIN(B, 7)
 #define W_MIN_PIN          -1
 
 #define FIL_RUNOUT_PIN     U_MIN_PIN
 #define FIL_RUNOUT2_PIN    V_MIN_PIN
 
-#define STEPPER_SPI_MOSI   PC1
-#define STEPPER_SPI_MISO   PC2
-#define STEPPER_SPI_SCK    PB10
+#define STEPPER_SPI_MOSI   SLOW_PIN(C, 1)
+#define STEPPER_SPI_MISO   SLOW_PIN(C, 2)
+#define STEPPER_SPI_SCK    SLOW_PIN(B, 10)
 
-#define MOSI_PIN PC1
-#define MISO_PIN PC2
-#define SCK_PIN  PB10
+#define MOSI_PIN STEPPER_SPI_MOSI
+#define MISO_PIN STEPPER_SPI_MISO
+#define SCK_PIN  STEPPER_SPI_SCK
 
-#define Z_MIN_PROBE_PIN  GPIOC_13
+#define Z_MIN_PROBE_PIN  IO_PIN(C, 13)
