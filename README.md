@@ -55,6 +55,7 @@ Marlin 2.0 adds a new abstraction layer so that Marlin can build and run on 32-b
   [Selena Compact](https://github.com/Ales2-k/Selena)|LPC1768 ARM-Cortex M3|100MHz|512k|32+16+16k|3.3-5V|no
   [Teensy 3.5](https://www.pjrc.com/store/teensy35.html)|ARM-Cortex M4|120MHz|512k|192k|3.3-5V|yes
   [Teensy 3.6](https://www.pjrc.com/store/teensy36.html)|ARM-Cortex M4|180MHz|1M|256k|3.3V|yes
+  [PrntrBoard/NUCLEO-F446](https://github.com/ghent360/PrntrBoard.git)|[STM32F446 ARM-Cortex M4](https://www.st.com/en/microcontrollers/stm32f446.html)|180MHz|512k|112+16k|3.3V|yes
 
 ### HALs in Development
 
