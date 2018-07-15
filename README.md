@@ -8,14 +8,13 @@
 ## This is a fork of the official Marlin code.
 Original code location: https://github.com/MarlinFirmware/Marlin.git 
 
-This repo is an attempt to port Marlin to STM32 F4 based board. I'm using Nucleo-F446RE as a test platform. My current plan is to develop a cape or a shield for the Nucleo board. Plans for the board: https://github.com/ghent360/PrntrBoard.git
+This repo is a port of Marlin to STM32 F4 MCU. I'm using Nucleo-F446RE as a test platform. I have an addon board for the NUCLEO that converts it to a 3D printer controller in similar fashion how RAMPS addon works with an arduino board. Plans for the addon board: https://github.com/ghent360/PrntrBoard.git. Bothe the board and this firmware are functional.
 
-Forst thing first - this code does not yet work. I was recently only able to compile it without errors, so don't get your hopes up.
+I was able to print a few object with this code, it is not guaranteed bug free, but it is comparable to the official Marlin bugfix-2.x branch in terms of what works and what does not.
 
 I'm using Arduino 1.8.5 with the official STM32 support library from this link https://github.com/stm32duino/Arduino_Core_STM32
 
-You can compile the code with the Arduino IDE, but I found that process to be quite unfriendly, so I use the
-stm32f4.sh script to invoke the arduino compiler from the command line. The script is coded to my linux machine folders, so you'll have to adapt it to your environment.
+You can compile the code with the Arduino IDE or Visual Studio Code with an Arduino extension installed.
 
 ## ~Happy hacking
 
