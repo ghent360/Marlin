@@ -32,28 +32,9 @@
 #define _BV(b) (1 << (b))
 
 #define USEABLE_HARDWARE_PWM(p) true
-//#define USE_FAST_IO
+#define USE_FAST_IO
 
 #ifdef USE_FAST_IO
-enum PinNumber {
-    Pin0  = 0x0001,
-    Pin1  = 0x0002,
-    Pin2  = 0x0004,
-    Pin3  = 0x0008,
-    Pin4  = 0x0010,
-    Pin5  = 0x0020,
-    Pin6  = 0x0040,
-    Pin7  = 0x0080,
-    Pin8  = 0x0100,
-    Pin9  = 0x0200,
-    Pin10 = 0x0400,
-    Pin11 = 0x0800,
-    Pin12 = 0x1000,
-    Pin13 = 0x2000,
-    Pin14 = 0x4000,
-    Pin15 = 0x8000,
-};
-
 enum PortNumber {
     PORTA = 0,
     PORTB = 1,
@@ -68,22 +49,18 @@ enum PortNumber {
     PORTK = 10,
 };
 
-#define FAST_IO_PIN(port, pin_no) (0x80000000 | ((port) << 16) | (pin_no & 0xffff))
-#define IS_FAST_IO_PIN(pin) (((pin) != -1) && ((pin) & 0x80000000)
-#define GET_PORT(fio_pin) ((fio_pin >> 16) & 0x7fff)
-#define GET_PIN_IDX(fio_pin) (fio_pin & 0xffff)
+#define FAST_IO_PIN(port, pin_no) (0x7000 | ((port) << 4) | (pin_no & 0xf))
+#define IS_FAST_IO_PIN(pin) (((pin) & 0xf000) == 0x7000)
+#define GET_PORT(fio_pin) ((fio_pin >> 4) & 0xf)
+#define GET_PIN_IDX(fio_pin) (fio_pin & 0xf)
 
 struct FastIOPin {
     const intptr_t port_addr_;
     const uint16_t pin_;
 
-    constexpr FastIOPin(uint32_t port, PinNumber pin)
-        : port_addr_(port),
-          pin_((uint16_t)pin) {}
-
     constexpr FastIOPin(uint32_t fast_io_pin)
         : port_addr_(AHB1PERIPH_BASE + GET_PORT(fast_io_pin) * 0x400),
-          pin_(GET_PIN_IDX(fast_io_pin)) {}
+          pin_(1 << GET_PIN_IDX(fast_io_pin)) {}
 
     void set_mode(uint32_t ulMode) const {
         GPIO_InitTypeDef GPIO_InitStructure;
@@ -145,7 +122,7 @@ struct FastIOPin {
 };
 #endif
 
-#define FAST_PIN(port_letter, pin_no) FAST_IO_PIN(PORT##port_letter, Pin##pin_no)
+#define FAST_PIN(port_letter, pin_no) FAST_IO_PIN(PORT##port_letter, pin_no)
 #define SLOW_PIN(port_letter, pin_no) P##port_letter##pin_no
 
 #ifdef USE_FAST_IO

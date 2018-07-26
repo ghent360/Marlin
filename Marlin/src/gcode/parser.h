@@ -61,12 +61,6 @@ private:
   #endif
 
 public:
-  GCodeParser() {
-    reset();
-  #if ENABLED(INCH_MODE_SUPPORT)
-    set_input_linear_units(LINEARUNIT_MM);
-  #endif
-  }
   // Global states for GCode-level units features
 
   static bool volumetric_enabled;
