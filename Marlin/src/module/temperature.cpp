@@ -333,8 +333,8 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS];
 
         // Get the current temperature and constrain it
         current = GHV(current_temperature_bed, current_temperature[hotend]);
-        NOLESS(max, current);
-        NOMORE(min, current);
+        NOLESS(maxT, current);
+        NOMORE(minT, current);
 
         #if HAS_AUTO_FAN
           if (ELAPSED(ms, next_auto_fan_check_ms)) {
