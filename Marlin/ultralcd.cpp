@@ -265,8 +265,8 @@ uint16_t max_display_update_time = 0;
 
   #if ENABLED(SDSUPPORT)
     void lcd_sdcard_menu();
-    void menu_action_sdfile(const char* filename, char* longFilename);
-    void menu_action_sddirectory(const char* filename, char* longFilename);
+    void menu_action_sdfile(CardReader& theCard);
+    void menu_action_sddirectory(CardReader& theCard);
   #endif
 
   ////////////////////////////////////////////
@@ -756,7 +756,7 @@ void lcd_reset_status() {
     msg = paused;
   #if ENABLED(SDSUPPORT)
     else if (card.sdprinting)
-      return lcd_setstatus(card.longFilename[0] ? card.longFilename : card.filename, true);
+      return lcd_setstatus(card.longest_filename(), true);
   #endif
   else if (print_job_timer.isRunning())
     msg = printing;
@@ -874,7 +874,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
       lcd_return_to_status();
 
       // Turn leveling off and home
-      enqueue_and_echo_commands_P(PSTR("M420 S0\nG28"
+      enqueue_and_echo_commands_P(PSTR("M420 S0\nG28 R0"
         #if ENABLED(MARLIN_DEV_MODE)
           " S"
         #elif !IS_KINEMATIC
@@ -1275,7 +1275,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
         ubl_encoderPosition = (ubl.encoder_diff > 0) ? 1 : -1;
         ubl.encoder_diff = 0;
 
-        mesh_edit_accumulator += float(ubl_encoderPosition) * 0.005f / 2.0f;
+        mesh_edit_accumulator += float(ubl_encoderPosition) * 0.005f * 0.5f;
         mesh_edit_value = mesh_edit_accumulator;
         encoderPosition = 0;
         lcdDrawUpdate = LCDVIEW_CALL_REDRAW_NEXT;
@@ -2676,6 +2676,13 @@ void lcd_quick_feedback(const bool clear_buttons) {
     #endif
 
     //
+    // TMC Z Calibration
+    //
+    #if ENABLED(TMC_Z_CALIBRATION)
+      MENU_ITEM(gcode, MSG_TMC_Z_CALIBRATION, PSTR("G28\nM915"));
+    #endif
+
+    //
     // Level Bed
     //
     #if ENABLED(AUTO_BED_LEVELING_UBL)
@@ -2919,7 +2926,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
 
         #if EXTRUDERS > 1
           const int8_t old_extruder = active_extruder;
-          active_extruder = manual_move_e_index;
+          if (manual_move_axis == E_AXIS) active_extruder = manual_move_e_index;
         #endif
 
         // Set movement on a single axis
@@ -2945,7 +2952,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
 
       #else
 
-        planner.buffer_line_kinematic(current_position, MMM_TO_MMS(manual_feedrate_mm_m[manual_move_axis]), manual_move_e_index);
+        planner.buffer_line_kinematic(current_position, MMM_TO_MMS(manual_feedrate_mm_m[manual_move_axis]), manual_move_axis == E_AXIS ? manual_move_e_index : active_extruder);
         manual_move_axis = (int8_t)NO_AXIS;
 
       #endif
@@ -3515,7 +3522,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
       MENU_ITEM_EDIT(bool, MSG_AUTOTEMP, &planner.autotemp_enabled);
       MENU_ITEM_EDIT(float3, MSG_MIN, &planner.autotemp_min, 0, float(HEATER_0_MAXTEMP) - 15);
       MENU_ITEM_EDIT(float3, MSG_MAX, &planner.autotemp_max, 0, float(HEATER_0_MAXTEMP) - 15);
-      MENU_ITEM_EDIT(float52, MSG_FACTOR, &planner.autotemp_factor, 0.0, 1.0);
+      MENU_ITEM_EDIT(float52, MSG_FACTOR, &planner.autotemp_factor, 0, 1);
     #endif
 
     //
@@ -4031,9 +4038,9 @@ void lcd_quick_feedback(const bool clear_buttons) {
           #endif
 
           if (card.filenameIsDir)
-            MENU_ITEM(sddirectory, MSG_CARD_MENU, card.filename, card.longFilename);
+            MENU_ITEM(sddirectory, MSG_CARD_MENU, card);
           else
-            MENU_ITEM(sdfile, MSG_CARD_MENU, card.filename, card.longFilename);
+            MENU_ITEM(sdfile, MSG_CARD_MENU, card);
         }
         else {
           MENU_ITEM_DUMMY();
@@ -4843,13 +4850,13 @@ void lcd_quick_feedback(const bool clear_buttons) {
 
   DEFINE_MENU_EDIT_TYPE(int16_t, int3, itostr3, 1);
   DEFINE_MENU_EDIT_TYPE(uint8_t, int8, i8tostr3, 1);
-  DEFINE_MENU_EDIT_TYPE(float, float3, ftostr3, 1.0f);
-  DEFINE_MENU_EDIT_TYPE(float, float52, ftostr52, 100.0f);
-  DEFINE_MENU_EDIT_TYPE(float, float43, ftostr43sign, 1000.0f);
+  DEFINE_MENU_EDIT_TYPE(float, float3, ftostr3, 1);
+  DEFINE_MENU_EDIT_TYPE(float, float52, ftostr52, 100);
+  DEFINE_MENU_EDIT_TYPE(float, float43, ftostr43sign, 1000);
   DEFINE_MENU_EDIT_TYPE(float, float5, ftostr5rj, 0.01f);
-  DEFINE_MENU_EDIT_TYPE(float, float51, ftostr51sign, 10.0f);
-  DEFINE_MENU_EDIT_TYPE(float, float52sign, ftostr52sign, 100.0f);
-  DEFINE_MENU_EDIT_TYPE(float, float62, ftostr62rj, 100.0f);
+  DEFINE_MENU_EDIT_TYPE(float, float51, ftostr51sign, 10);
+  DEFINE_MENU_EDIT_TYPE(float, float52sign, ftostr52sign, 100);
+  DEFINE_MENU_EDIT_TYPE(float, float62, ftostr62rj, 100);
   DEFINE_MENU_EDIT_TYPE(uint32_t, long5, ftostr5rj, 0.01f);
 
   /**
@@ -4954,19 +4961,17 @@ void lcd_quick_feedback(const bool clear_buttons) {
 
   #if ENABLED(SDSUPPORT)
 
-    void menu_action_sdfile(const char* filename, char* longFilename) {
+    void menu_action_sdfile(CardReader& theCard) {
       #if ENABLED(SD_REPRINT_LAST_SELECTED_FILE)
         last_sdfile_encoderPosition = encoderPosition;  // Save which file was selected for later use
       #endif
-      UNUSED(longFilename);
-      card.openAndPrintFile(filename);
+      card.openAndPrintFile(theCard.filename);
       lcd_return_to_status();
       lcd_reset_status();
     }
 
-    void menu_action_sddirectory(const char* filename, char* longFilename) {
-      UNUSED(longFilename);
-      card.chdir(filename);
+    void menu_action_sddirectory(CardReader& theCard) {
+      card.chdir(theCard.filename);
       encoderTopLine = 0;
       encoderPosition = 2 * ENCODER_STEPS_PER_MENU_ITEM;
       screen_changed = true;
@@ -5050,7 +5055,7 @@ void lcd_init() {
   #endif
 }
 
-int16_t lcd_strlen(const char* s) {
+int16_t utf8_strlen(const char* s) {
   int16_t i = 0, j = 0;
   while (s[i]) {
     if (START_OF_UTF8_CHAR(s[i])) j++;
@@ -5059,7 +5064,7 @@ int16_t lcd_strlen(const char* s) {
   return j;
 }
 
-int16_t lcd_strlen_P(const char* s) {
+int16_t utf8_strlen_P(const char* s) {
   int16_t j = 0;
   while (pgm_read_byte(s)) {
     if (START_OF_UTF8_CHAR(pgm_read_byte(s))) j++;

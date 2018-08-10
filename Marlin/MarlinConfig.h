@@ -28,6 +28,7 @@
 #include "Version.h"
 #include "Configuration.h"
 #include "Conditionals_LCD.h"
+#include "drivers.h"
 #include "Configuration_adv.h"
 
 #if USE_MARLINSERIAL
