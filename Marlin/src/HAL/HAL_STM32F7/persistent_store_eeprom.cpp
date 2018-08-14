@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifdef STM32F7
 
 #include "../../inc/MarlinConfig.h"
@@ -33,7 +32,7 @@
 bool PersistentStore::access_start() { return true; }
 bool PersistentStore::access_finish() { return true; }
 
-bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc) {
+bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t size, uint16_t *crc) {
   while (size--) {
     uint8_t * const p = (uint8_t * const)pos;
     uint8_t v = *value;
@@ -54,7 +53,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, ui
   return false;
 }
 
-bool PersistentStore::read_data(int &pos, uint8_t* value, size_t size, uint16_t *crc) {
+bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uint16_t *crc) {
   do {
     uint8_t c = eeprom_read_byte((unsigned char*)pos);
     *value = c;
@@ -65,13 +64,13 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, size_t size, uint16_t 
   return false;
 }
 
-bool PersistentStore::write_data(const int pos, uint8_t* value, size_t size) {
+bool PersistentStore::write_data(const int pos, uint8_t* value, const size_t size) {
   int data_pos = pos;
   uint16_t crc = 0;
   return write_data(data_pos, value, size, &crc);
 }
 
-bool PersistentStore::read_data(const int pos, uint8_t* value, size_t size) {
+bool PersistentStore::read_data(const int pos, uint8_t* value, const size_t size) {
   int data_pos = pos;
   uint16_t crc = 0;
   return read_data(data_pos, value, size, &crc);

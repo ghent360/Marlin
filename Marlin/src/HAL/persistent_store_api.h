@@ -1,9 +1,10 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
- * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2016 Bob Cousins bobcousins42@googlemail.com
+ * Copyright (c) 2015-2016 Nico Tonnhofer wurstnase.reprap@gmail.com
+ * Copyright (c) 2016 Victor Perez victor_pv@hotmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +29,10 @@ class PersistentStore {
 public:
   static bool access_start();
   static bool access_finish();
-  static bool write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc);
-  static bool read_data(int &pos, uint8_t* value, size_t size, uint16_t *crc, const bool writing=true);
-  static bool write_data(const int pos, uint8_t* value, size_t size);
-  static bool read_data(const int pos, uint8_t* value, size_t size);
+  static bool write_data(int &pos, const uint8_t *value, const size_t size, uint16_t *crc);
+  static bool read_data(int &pos, uint8_t* value, const size_t size, uint16_t *crc, const bool writing=true);
+  static bool write_data(const int pos, uint8_t* value, const size_t size);
+  static bool read_data(const int pos, uint8_t* value, const size_t size);
   static const size_t capacity();
 };
 

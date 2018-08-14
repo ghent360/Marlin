@@ -60,7 +60,7 @@ bool PersistentStore::access_finish() {
   return (bytes_written == HAL_STM32F1_EEPROM_SIZE);
 }
 
-bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc) {
+bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t size, uint16_t *crc) {
   for (int i = 0; i < size; i++)
     HAL_STM32F1_eeprom_content[pos + i] = value[i];
   crc16(crc, value, size);
@@ -68,7 +68,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, ui
   return false;
 }
 
-bool PersistentStore::read_data(int &pos, uint8_t* value, size_t size, uint16_t *crc, const bool writing/*=true*/) {
+bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uint16_t *crc, const bool writing/*=true*/) {
   for (int i = 0; i < size; i++) {
     uint8_t c = HAL_STM32F1_eeprom_content[pos + i];
     if (writing) value[i] = c;
@@ -78,13 +78,13 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, size_t size, uint16_t 
   return false;
 }
 
-bool PersistentStore::write_data(const int pos, uint8_t* value, size_t size) {
+bool PersistentStore::write_data(const int pos, uint8_t* value, const size_t size) {
   int data_pos = pos;
   uint16_t crc = 0;
   return write_data(data_pos, value, size, &crc);
 }
 
-bool PersistentStore::read_data(const int pos, uint8_t* value, size_t size) {
+bool PersistentStore::read_data(const int pos, uint8_t* value, const size_t size) {
   int data_pos = pos;
   uint16_t crc = 0;
   return read_data(data_pos, value, size, &crc);
