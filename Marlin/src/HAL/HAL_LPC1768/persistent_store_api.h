@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (C) 2016, 2017 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
@@ -19,26 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "../shared/persistent_store_api.h"
 
-/**
- * module/servo.h
- */
-
-#ifndef _SERVO_H_
-#define _SERVO_H_
-
-#include "../HAL/shared/servo.h"
-
-extern HAL_SERVO_LIB servo[NUM_SERVOS];
-extern void servo_init();
-
-#define MOVE_SERVO(I, P) servo[I].move(P)
-
-#include "../inc/MarlinConfig.h"
-
-#if HAS_Z_SERVO_PROBE
-  #define DEPLOY_Z_SERVO() MOVE_SERVO(Z_PROBE_SERVO_NR, z_servo_angle[0])
-  #define STOW_Z_SERVO() MOVE_SERVO(Z_PROBE_SERVO_NR, z_servo_angle[1])
-#endif
-
-#endif // _SERVO_H_
+//#define FLASH_EEPROM

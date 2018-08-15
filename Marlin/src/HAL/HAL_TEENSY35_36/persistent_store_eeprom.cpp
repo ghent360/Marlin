@@ -27,7 +27,7 @@
 
 #if ENABLED(EEPROM_SETTINGS)
 
-#include "../persistent_store_api.h"
+#include "../shared/persistent_store_api.h"
 #include <avr/eeprom.h>
 
 bool PersistentStore::access_start() { return true; }
@@ -65,21 +65,7 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uin
   return false;
 }
 
-bool PersistentStore::write_data(const int pos, uint8_t* value, const size_t size) {
-  int data_pos = pos;
-  uint16_t crc = 0;
-  return write_data(data_pos, value, size, &crc);
-}
-
-bool PersistentStore::read_data(const int pos, uint8_t* value, const size_t size) {
-  int data_pos = pos;
-  uint16_t crc = 0;
-  return read_data(data_pos, value, size, &crc);
-}
-
-const size_t PersistentStore::capacity() {
-  return E2END + 1;
-}
+size_t PersistentStore::capacity() { return E2END + 1; }
 
 #endif // EEPROM_SETTINGS
 #endif // __MK64FX512__ || __MK66FX1M0__

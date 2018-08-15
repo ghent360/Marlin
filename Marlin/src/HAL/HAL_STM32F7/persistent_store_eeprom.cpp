@@ -23,11 +23,11 @@
 
 #ifdef STM32F7
 
-#include "../../inc/MarlinConfig.h"
+#include "../../inc/MarlinConfigPre.h"
 
 #if ENABLED(EEPROM_SETTINGS)
 
-#include "../persistent_store_api.h"
+#include "../shared/persistent_store_api.h"
 
 bool PersistentStore::access_start() { return true; }
 bool PersistentStore::access_finish() { return true; }
@@ -64,6 +64,7 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uin
   return false;
 }
 
+<<<<<<< HEAD
 bool PersistentStore::write_data(const int pos, uint8_t* value, const size_t size) {
   int data_pos = pos;
   uint16_t crc = 0;
@@ -79,6 +80,9 @@ bool PersistentStore::read_data(const int pos, uint8_t* value, const size_t size
 const size_t PersistentStore::capacity() {
   return E2END + 1;
 }
+=======
+size_t PersistentStore::capacity() { return E2END + 1; }
+>>>>>>> 952a1bc9d511510d94079f398a747c582ef8f6b7
 
 #endif // EEPROM_SETTINGS
 #endif // STM32F7

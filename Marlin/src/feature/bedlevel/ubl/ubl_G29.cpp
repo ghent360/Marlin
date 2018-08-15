@@ -29,7 +29,7 @@
   #include "ubl.h"
 
   #include "../../../Marlin.h"
-  #include "../../../HAL/persistent_store_api.h"
+  #include "../../../HAL/shared/persistent_store_api.h"
   #include "../../../libs/hex_print_routines.h"
   #include "../../../module/configuration_store.h"
   #include "../../../lcd/ultralcd.h"
@@ -1169,8 +1169,6 @@
    */
   void unified_bed_leveling::g29_eeprom_dump() {
     uint8_t cccc;
-    int kkkk;
-    uint16_t crc = 0;
 
     SERIAL_ECHO_START();
     SERIAL_ECHOLNPGM("EEPROM Dump:");
@@ -1180,8 +1178,7 @@
       print_hex_word(i);
       SERIAL_ECHOPGM(": ");
       for (uint16_t j = 0; j < 16; j++) {
-        kkkk = i + j;
-        persistentStore.read_data(kkkk, &cccc, sizeof(uint8_t), &crc);
+        persistentStore.read_data(i + j, &cccc, sizeof(uint8_t));
         print_hex_byte(cccc);
         SERIAL_ECHO(' ');
       }
