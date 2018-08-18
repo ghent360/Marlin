@@ -24,8 +24,6 @@
   #error "Oops!  Make sure you have an STM32F4 board selected from the 'Tools -> Boards' menu."
 #endif
 
-#define F_CPU 180000000
-
 /**
  * 21017 Venelin Efremov Marlin for stm32f4 test
  */
