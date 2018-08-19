@@ -7309,6 +7309,7 @@ inline void protected_pin_err() {
  *
  *  P<pin>  Pin number (LED if omitted)
  *  S<byte> Pin status from 0 - 255
+ *  I       Flag to ignore Marlin's pin protection
  */
 inline void gcode_M42() {
   if (!parser.seenval('S')) return;
@@ -7317,7 +7318,7 @@ inline void gcode_M42() {
   const pin_t pin_number = parser.byteval('P', LED_PIN);
   if (pin_number < 0) return;
 
-  if (pin_is_protected(pin_number)) return protected_pin_err();
+  if (!parser.boolval('I') && pin_is_protected(pin_number)) return protected_pin_err();
 
   pinMode(pin_number, OUTPUT);
   digitalWrite(pin_number, pin_status);
@@ -10912,41 +10913,50 @@ inline void gcode_M502() {
    *               rows or columns depending upon rotation)
    */
   inline void gcode_M7219() {
-    if (parser.seen('I'))
-      Max7219_Clear();
+    if (parser.seen('I')) {
+      max7219.clear();
+      max7219.register_setup();
+    }
 
     if (parser.seen('F'))
       for (uint8_t x = 0; x < MAX7219_X_LEDS; x++)
-        Max7219_Set_Column(x, 0xffffffff);
+        max7219.set_column(x, 0xFFFFFFFF);
+
+    const uint32_t v = parser.ulongval('V');
 
     if (parser.seenval('R')) {
-      const uint32_t r = parser.value_int();
-      Max7219_Set_Row(r, parser.byteval('V'));
-      return;
+      const uint8_t r = parser.value_byte();
+      max7219.set_row(r, v);
     }
     else if (parser.seenval('C')) {
-      const uint32_t c = parser.value_int();
-      Max7219_Set_Column(c, parser.ulongval('V'));
-      return;
+      const uint8_t c = parser.value_byte();
+      max7219.set_column(c, v);
     }
-
-    if (parser.seenval('X') || parser.seenval('Y')) {
+    else if (parser.seenval('X') || parser.seenval('Y')) {
       const uint8_t x = parser.byteval('X'), y = parser.byteval('Y');
       if (parser.seenval('V'))
-        Max7219_LED_Set(x, y, parser.boolval('V'));
+        max7219.led_set(x, y, parser.boolval('V'));
       else
-        Max7219_LED_Toggle(x, y);
+        max7219.led_toggle(x, y);
+    }
+    else if (parser.seen('D')) {
+      const uint8_t r = parser.value_byte();
+      if (r < MAX7219_ROWS) {
+        max7219.led_line[r] = v;
+        return max7219.all(r);
+      }
     }
 
     if (parser.seen('P')) {
-      for (uint8_t x = 0; x < (8 * MAX7219_NUMBER_UNITS); x++) {
-        SERIAL_ECHOPAIR("LEDs[", x);
-        SERIAL_ECHOPAIR("]=", LEDs[x]);
-        SERIAL_ECHO("\n");
+      for (uint8_t r = 0; r < MAX7219_ROWS; r++) {
+        SERIAL_ECHOPGM("led_line[");
+        if (r < 10) SERIAL_CHAR('_');
+        SERIAL_ECHO(r);
+        SERIAL_ECHO("]=");
+        for (uint8_t b = 8; b--;) SERIAL_CHAR('0' + TEST(max7219.led_line[r], b));
+        SERIAL_EOL();
       }
-      return;
     }
-
   }
 #endif // MAX7219_GCODE
 
@@ -14314,7 +14324,7 @@ void idle(
   #endif
 ) {
   #if ENABLED(MAX7219_DEBUG)
-    Max7219_idle_tasks();
+    max7219.idle_tasks();
   #endif
 
   lcd_update();
@@ -14438,7 +14448,7 @@ void stop() {
 void setup() {
 
   #if ENABLED(MAX7219_DEBUG)
-    Max7219_init();
+    max7219.init();
   #endif
 
   #if ENABLED(DISABLE_JTAG)
