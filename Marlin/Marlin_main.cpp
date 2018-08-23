@@ -2481,6 +2481,8 @@ void clean_up_after_endstop_or_probe_move() {
 
     if (can_change && enable != planner.leveling_active) {
 
+      planner.synchronize();
+
       #if ENABLED(MESH_BED_LEVELING)
 
         if (!enable)
@@ -10914,13 +10916,11 @@ inline void gcode_M502() {
    */
   inline void gcode_M7219() {
     if (parser.seen('I')) {
-      max7219.clear();
       max7219.register_setup();
+      max7219.clear();
     }
 
-    if (parser.seen('F'))
-      for (uint8_t x = 0; x < MAX7219_X_LEDS; x++)
-        max7219.set_column(x, 0xFFFFFFFF);
+    if (parser.seen('F')) max7219.fill();
 
     const uint32_t v = parser.ulongval('V');
 
@@ -10940,18 +10940,18 @@ inline void gcode_M502() {
         max7219.led_toggle(x, y);
     }
     else if (parser.seen('D')) {
-      const uint8_t r = parser.value_byte();
-      if (r < MAX7219_ROWS) {
-        max7219.led_line[r] = v;
-        return max7219.all(r);
+      const uint8_t line = parser.byteval('D') + (parser.byteval('U') << 3);
+      if (line < MAX7219_LINES) {
+        max7219.led_line[line] = v;
+        return max7219.refresh_line(line);
       }
     }
 
     if (parser.seen('P')) {
-      for (uint8_t r = 0; r < MAX7219_ROWS; r++) {
+      for (uint8_t r = 0; r < MAX7219_LINES; r++) {
         SERIAL_ECHOPGM("led_line[");
-        if (r < 10) SERIAL_CHAR('_');
-        SERIAL_ECHO(r);
+        if (r < 10) SERIAL_CHAR(' ');
+        SERIAL_ECHO(int(r));
         SERIAL_ECHO("]=");
         for (uint8_t b = 8; b--;) SERIAL_CHAR('0' + TEST(max7219.led_line[r], b));
         SERIAL_EOL();
@@ -12004,6 +12004,12 @@ inline void invalid_extruder_error(const uint8_t e) {
 void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool no_move/*=false*/) {
   planner.synchronize();
 
+  #if HAS_LEVELING
+    // Set current position to the physical position
+    const bool leveling_was_active = planner.leveling_active;
+    set_bed_leveling_enabled(false);
+  #endif
+
   #if ENABLED(MIXING_EXTRUDER) && MIXING_VIRTUAL_TOOLS > 1
 
     mixing_tool_change(tmp_extruder);
@@ -12026,12 +12032,6 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool n
             if (DEBUGGING(LEVELING)) SERIAL_ECHOLNPGM("No move on toolchange");
           #endif
         }
-
-        #if HAS_LEVELING
-          // Set current position to the physical position
-          const bool leveling_was_active = planner.leveling_active;
-          set_bed_leveling_enabled(false);
-        #endif
 
         #if ENABLED(DUAL_X_CARRIAGE)
 
@@ -12087,11 +12087,6 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool n
         #if ENABLED(SWITCHING_NOZZLE)
           // The newly-selected extruder Z is actually at...
           current_position[Z_AXIS] -= zdiff;
-        #endif
-
-        #if HAS_LEVELING
-          // Restore leveling to re-establish the logical position
-          set_bed_leveling_enabled(leveling_was_active);
         #endif
 
         // Tell the planner the new "current position"
@@ -12165,6 +12160,11 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool n
 
     #if HAS_FANMUX
       fanmux_switch(active_extruder);
+    #endif
+
+    #if HAS_LEVELING
+      // Restore leveling to re-establish the logical position
+      set_bed_leveling_enabled(leveling_was_active);
     #endif
 
     SERIAL_ECHO_START();
