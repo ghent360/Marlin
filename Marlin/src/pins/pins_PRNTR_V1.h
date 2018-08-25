@@ -111,10 +111,11 @@
 //#define HEATER_BED2_PIN    -1    // BED2
 //#define HEATER_BED3_PIN    -1    // BED3
 
-#define FAN_PIN            SLOW_PIN(B, 2)
-#define FAN1_PIN           SLOW_PIN(C, 6)
-#define FAN2_PIN           SLOW_PIN(B, 14)
-#define FAN3_PIN           SLOW_PIN(A, 8)
+#define FAN_COUNT 2
+#define FAN_PIN            SLOW_PIN(B, 2)   // E0 Part
+#define FAN1_PIN           SLOW_PIN(B, 14)  // E1 Part
+#define FAN2_PIN           SLOW_PIN(C, 6)   // E0 Cool / TC1
+#define FAN3_PIN           SLOW_PIN(A, 8)   // E1 Cool / TC2
 
 //#define FAN_SOFT_PWM
 
