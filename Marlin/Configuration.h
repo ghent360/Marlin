@@ -386,9 +386,9 @@
   //#define DEFAULT_Ki 2.65
   //#define DEFAULT_Kd 145.18  
   // Clone Chimera with E3D V5 hotend
-  #define DEFAULT_Kp 23.44
-  #define DEFAULT_Ki 2.05
-  #define DEFAULT_Kd 67.05
+  #define DEFAULT_Kp 23.64
+  #define DEFAULT_Ki 1.89
+  #define DEFAULT_Kd 73.77
   // I3 mini
   //#define DEFAULT_Kp 38.03
   //#define DEFAULT_Ki 3.74
@@ -441,9 +441,9 @@
 
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-  #define DEFAULT_bedKp 10.00
-  #define DEFAULT_bedKi .023
-  #define DEFAULT_bedKd 305.4
+  #define DEFAULT_bedKp 107.43
+  #define DEFAULT_bedKi 3.94
+  #define DEFAULT_bedKd 732.66
 
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   //from pidautotune
