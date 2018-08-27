@@ -32,7 +32,7 @@
 #define _BV(b) (1 << (b))
 
 #define USEABLE_HARDWARE_PWM(p) true
-#define USE_FAST_IO
+//#define USE_FAST_IO
 
 #ifdef USE_FAST_IO
 enum PortNumber {
@@ -144,11 +144,10 @@ struct FastIOPin {
 
 #ifdef USE_FAST_IO
 #define _SET_MODE(IO, M)        FastIOPin(IO).set_mode(M)
-#define _SET_OUTPUT(IO)         FastIOPin(IO).set_mode(OUTPUT)
 #else
 #define _SET_MODE(IO,M)         pinMode(IO, M)
-#define _SET_OUTPUT(IO)         pinMode(IO, OUTPUT)
 #endif
+#define _SET_OUTPUT(IO)         _SET_MODE(IO, OUTPUT)
 
 #define OUT_WRITE(IO,V)         WRITE(IO,V)
 

@@ -27,7 +27,7 @@
 
 #include "../../inc/MarlinConfig.h"
 
-#if ENABLED(I2C_EEPROM) && !defined(STM32F4xx)
+#if ENABLED(I2C_EEPROM)
 
 // --------------------------------------------------------------------------
 // Includes

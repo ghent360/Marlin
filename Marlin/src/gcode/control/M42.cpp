@@ -36,7 +36,6 @@
  */
 void GcodeSuite::M42() {
   if (!parser.seenval('S')) return;
-#if !defined(STM32F4xx) && !defined(USE_FAST_IO)
   const byte pin_status = parser.value_byte();
 
   const int pin_index = PARSED_PIN_INDEX('P', GET_PIN_MAP_INDEX(LED_PIN));
@@ -63,5 +62,4 @@ void GcodeSuite::M42() {
       #endif
     }
   #endif
-#endif
 }
