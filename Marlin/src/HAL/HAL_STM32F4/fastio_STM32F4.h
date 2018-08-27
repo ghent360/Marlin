@@ -32,7 +32,7 @@
 #define _BV(b) (1 << (b))
 
 #define USEABLE_HARDWARE_PWM(p) true
-//#define USE_FAST_IO
+#define USE_FAST_IO
 
 #ifdef USE_FAST_IO
 enum PortNumber {
