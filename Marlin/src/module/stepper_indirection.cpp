@@ -284,8 +284,6 @@
 // TMC2208 Driver objects and inits
 //
 #if HAS_DRIVER(TMC2208)
-
-  #include <SoftwareSerial.h>
   #include <HardwareSerial.h>
   #include <TMC2208Stepper.h>
   #include "planner.h"
