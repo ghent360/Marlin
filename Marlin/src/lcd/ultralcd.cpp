@@ -3847,7 +3847,21 @@ void lcd_quick_feedback(const bool clear_buttons) {
     #if DISABLED(NO_VOLUMETRICS) || ENABLED(ADVANCED_PAUSE_FEATURE)
       MENU_ITEM(submenu, MSG_FILAMENT, lcd_advanced_filament_menu);
     #elif ENABLED(LIN_ADVANCE)
-      MENU_ITEM_EDIT(float32, MSG_ADVANCE_K, &planner.extruder_advance_K, 0, 999);
+      #if EXTRUDERS == 1
+        MENU_ITEM_EDIT(float52, MSG_ADVANCE_K, &planner.extruder_advance_K[0], 0, 999);
+      #elif EXTRUDERS > 1
+        MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E1, &planner.extruder_advance_K[0], 0, 999);
+        MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E2, &planner.extruder_advance_K[1], 0, 999);
+        #if EXTRUDERS > 2
+          MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E3, &planner.extruder_advance_K[2], 0, 999);
+          #if EXTRUDERS > 3
+            MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E4, &planner.extruder_advance_K[3], 0, 999);
+            #if EXTRUDERS > 4
+              MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E5, &planner.extruder_advance_K[4], 0, 999);
+            #endif // EXTRUDERS > 4
+          #endif // EXTRUDERS > 3
+        #endif // EXTRUDERS > 2
+      #endif // EXTRUDERS > 1
     #endif
 
     // M540 S - Abort on endstop hit when SD printing
@@ -3882,7 +3896,21 @@ void lcd_quick_feedback(const bool clear_buttons) {
       MENU_BACK(MSG_ADVANCED_SETTINGS);
 
       #if ENABLED(LIN_ADVANCE)
-        MENU_ITEM_EDIT(float52, MSG_ADVANCE_K, &planner.extruder_advance_K, 0, 999);
+        #if EXTRUDERS == 1
+          MENU_ITEM_EDIT(float52, MSG_ADVANCE_K, &planner.extruder_advance_K[0], 0, 999);
+        #elif EXTRUDERS > 1
+          MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E1, &planner.extruder_advance_K[0], 0, 999);
+          MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E2, &planner.extruder_advance_K[1], 0, 999);
+          #if EXTRUDERS > 2
+            MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E3, &planner.extruder_advance_K[2], 0, 999);
+            #if EXTRUDERS > 3
+              MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E4, &planner.extruder_advance_K[3], 0, 999);
+              #if EXTRUDERS > 4
+                MENU_ITEM_EDIT(float52, MSG_ADVANCE_K MSG_E5, &planner.extruder_advance_K[4], 0, 999);
+              #endif // EXTRUDERS > 4
+            #endif // EXTRUDERS > 3
+          #endif // EXTRUDERS > 2
+        #endif // EXTRUDERS > 1
       #endif
 
       #if DISABLED(NO_VOLUMETRICS)
@@ -4330,14 +4358,15 @@ void lcd_quick_feedback(const bool clear_buttons) {
       return PSTR(MSG_FILAMENTCHANGE);
     }
 
-    void _change_filament_temp(const uint8_t index) {
+    void _change_filament_temp(const uint16_t temperature) {
       char cmd[11];
       sprintf_P(cmd, _change_filament_temp_command(), _change_filament_temp_extruder);
-      thermalManager.setTargetHotend(index == 1 ? PREHEAT_1_TEMP_HOTEND : PREHEAT_2_TEMP_HOTEND, _change_filament_temp_extruder);
+      thermalManager.setTargetHotend(temperature, _change_filament_temp_extruder);
       lcd_enqueue_command(cmd);
     }
-    void _lcd_change_filament_temp_1_menu() { _change_filament_temp(1); }
-    void _lcd_change_filament_temp_2_menu() { _change_filament_temp(2); }
+    void _lcd_change_filament_temp_1_menu() { _change_filament_temp(PREHEAT_1_TEMP_HOTEND); }
+    void _lcd_change_filament_temp_2_menu() { _change_filament_temp(PREHEAT_2_TEMP_HOTEND); }
+    void _lcd_change_filament_temp_custom_menu() { _change_filament_temp(thermalManager.target_temperature[_change_filament_temp_extruder]); }
 
     static const char* change_filament_header(const AdvancedPauseMode mode) {
       switch (mode) {
@@ -4358,6 +4387,23 @@ void lcd_quick_feedback(const bool clear_buttons) {
       MENU_BACK(MSG_FILAMENTCHANGE);
       MENU_ITEM(submenu, MSG_PREHEAT_1, _lcd_change_filament_temp_1_menu);
       MENU_ITEM(submenu, MSG_PREHEAT_2, _lcd_change_filament_temp_2_menu);
+      uint16_t max_temp;
+      switch (extruder) {
+        default: max_temp = HEATER_0_MAXTEMP;
+        #if HOTENDS > 1
+          case 1: max_temp = HEATER_1_MAXTEMP; break;
+          #if HOTENDS > 2
+            case 2: max_temp = HEATER_2_MAXTEMP; break;
+            #if HOTENDS > 3
+              case 3: max_temp = HEATER_3_MAXTEMP; break;
+              #if HOTENDS > 4
+                case 4: max_temp = HEATER_4_MAXTEMP; break;
+              #endif
+            #endif
+          #endif
+        #endif
+      }
+      MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(int3, MSG_PREHEAT_CUSTOM, &thermalManager.target_temperature[_change_filament_temp_extruder], EXTRUDE_MINTEMP, max_temp - 15, _lcd_change_filament_temp_custom_menu);
       END_MENU();
     }
     void lcd_temp_menu_e0_filament_change()  { _lcd_temp_menu_filament_op(ADVANCED_PAUSE_MODE_PAUSE_PRINT, 0); }
