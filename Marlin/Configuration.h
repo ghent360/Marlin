@@ -241,7 +241,7 @@
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
 // For the other hotends it is their distance from the extruder 0 hotend.
-#define HOTEND_OFFSET_X {0.0, 36.00} // (mm) relative X-offset for each nozzle
+#define HOTEND_OFFSET_X {0.0, 0.00}  // (mm) relative X-offset for each nozzle
 #define HOTEND_OFFSET_Y {0.0, 0.00}  // (mm) relative Y-offset for each nozzle
 #define HOTEND_OFFSET_Z {0.0, 0.00}  // (mm) relative Z-offset for each nozzle
 
@@ -819,16 +819,16 @@
  *      O-- FRONT --+
  *    (0,0)
  */
-#define X_PROBE_OFFSET_FROM_EXTRUDER 40.5     // X offset: -left  +right  [of the nozzle]
-#define Y_PROBE_OFFSET_FROM_EXTRUDER 0        // Y offset: -front +behind [the nozzle]
+#define X_PROBE_OFFSET_FROM_EXTRUDER 50.35    // X offset: -left  +right  [of the nozzle]
+#define Y_PROBE_OFFSET_FROM_EXTRUDER 53.725   // Y offset: -front +behind [the nozzle]
 #define Z_PROBE_OFFSET_FROM_EXTRUDER -0.9     // Z offset: -below +above  [the nozzle]
 
 // Certain types of probes need to stay away from edges
-//#define MIN_PROBE_EDGE 10
-#define MIN_PROBE_X -25
-#define MIN_PROBE_Y -29
-#define MAZ_PROBE_X (245-25)
-#define MAZ_PROBE_Y (245-29)
+#define MIN_PROBE_EDGE 10
+//#define MIN_PROBE_X -25
+//#define MIN_PROBE_Y -29
+//#define MAZ_PROBE_X (245-25)
+//#define MAZ_PROBE_Y (245-29)
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED 5000
@@ -842,7 +842,7 @@
 // The number of probes to perform at each point.
 //   Set to 2 for a fast/slow probe, using the second probe result.
 //   Set to 3 or more for slow probes, averaging the results.
-#define MULTIPLE_PROBING 3
+//#define MULTIPLE_PROBING 3
 
 /**
  * Z probes require clearance when deploying, stowing, and moving between
