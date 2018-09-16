@@ -468,11 +468,14 @@ class Stepper {
 
   private:
 
-    // Set the current position in steps
-    static void _set_position(const int32_t &a, const int32_t &b, const int32_t &c, const int32_t &e);
-
     // Set direction bits for all steppers
     static void set_directions();
+
+    // Allow reset_stepper_drivers to access private set_directions
+    friend void reset_stepper_drivers();
+
+    // Set the current position in steps
+    static void _set_position(const int32_t &a, const int32_t &b, const int32_t &c, const int32_t &e);
 
     FORCE_INLINE static uint32_t calc_timer_interval(uint32_t step_rate, uint8_t scale, uint8_t* loops) {
       uint32_t timer;
