@@ -416,7 +416,7 @@ void _O2 Endstops::M119() {
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     #define FRS_COUNT (1 + PIN_EXISTS(FIL_RUNOUT2) + PIN_EXISTS(FIL_RUNOUT3) + PIN_EXISTS(FIL_RUNOUT4) + PIN_EXISTS(FIL_RUNOUT5) + PIN_EXISTS(FIL_RUNOUT6))
     #if FRS_COUNT == 1
-      print_es_state(READ(FIL_RUNOUT_PIN) == FIL_RUNOUT_INVERTING, MSG_FILAMENT_RUNOUT_SENSOR);
+      print_es_state(READ(FIL_RUNOUT_PIN) != FIL_RUNOUT_INVERTING, MSG_FILAMENT_RUNOUT_SENSOR);
     #else
       for (uint8_t i = 1; i <=
         #if   FRS_COUNT == 6
@@ -454,7 +454,7 @@ void _O2 Endstops::M119() {
         }
         SERIAL_PROTOCOLPGM(MSG_FILAMENT_RUNOUT_SENSOR);
         if (i > 1) { SERIAL_CHAR(' '); SERIAL_CHAR('0' + i); }
-        print_es_state(digitalRead(pin) == FIL_RUNOUT_INVERTING);
+        print_es_state(digitalRead(pin) != FIL_RUNOUT_INVERTING);
       }
     #endif
   #endif
