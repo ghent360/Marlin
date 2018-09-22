@@ -367,7 +367,7 @@ static void print_es_state(const bool is_hit, const char * const label=NULL) {
 
 void _O2 Endstops::M119() {
   SERIAL_PROTOCOLLNPGM(MSG_M119_REPORT);
-  #define ES_REPORT(S) print_es_state(READ(S##_PIN) == S##_ENDSTOP_INVERTING, PSTR(MSG_##S))
+  #define ES_REPORT(S) print_es_state(READ(S##_PIN) != S##_ENDSTOP_INVERTING, PSTR(MSG_##S))
   #if HAS_X_MIN
     ES_REPORT(X_MIN);
   #endif
@@ -411,7 +411,7 @@ void _O2 Endstops::M119() {
     ES_REPORT(Z3_MAX);
   #endif
   #if ENABLED(Z_MIN_PROBE_ENDSTOP)
-    print_es_state(READ(Z_MIN_PROBE_PIN) == Z_MIN_PROBE_ENDSTOP_INVERTING, PSTR(MSG_Z_PROBE));
+    print_es_state(READ(Z_MIN_PROBE_PIN) != Z_MIN_PROBE_ENDSTOP_INVERTING, PSTR(MSG_Z_PROBE));
   #endif
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     #define FRS_COUNT (1 + PIN_EXISTS(FIL_RUNOUT2) + PIN_EXISTS(FIL_RUNOUT3) + PIN_EXISTS(FIL_RUNOUT4) + PIN_EXISTS(FIL_RUNOUT5) + PIN_EXISTS(FIL_RUNOUT6))
