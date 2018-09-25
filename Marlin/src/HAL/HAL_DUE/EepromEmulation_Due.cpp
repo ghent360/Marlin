@@ -578,7 +578,7 @@ static uint32_t ee_GetAddrRange(uint32_t address, bool excludeRAMBuffer = false)
 static bool ee_IsPageClean(int page) {
   uint32_t* pflash = (uint32_t*) getFlashStorage(page);
   for (uint16_t i = 0; i < (PageSize >> 2); ++i)
-    if (*pflash++ != 0xFFFFFFFF) eturn false;
+    if (*pflash++ != 0xFFFFFFFF) return false;
   return true;
 }
 
@@ -815,7 +815,7 @@ static bool ee_Write(uint32_t address, uint8_t data) {
           //  Maybe we could coalesce the next block with this block. Let's try to do it!
           uint16_t inext = i + 3 + blen;
           if (inext <= (PageSize - 4) &&
-            (buffer[inext] | (uint16_t(buffer[inext + 1]) << 8)) == (baddr + blen + 1)) {
+            (buffer[inext] | uint16_t(buffer[inext + 1] << 8)) == (baddr + blen + 1)) {
             // YES! ... we can coalesce blocks! . Do it!
 
             // Adjust this block header to include the next one

@@ -157,7 +157,7 @@
 // @section extruder
 
 // This defines the number of extruders
-// :[1, 2, 3, 4, 5]
+// :[1, 2, 3, 4, 5, 6]
 #define EXTRUDERS 2
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
@@ -332,11 +332,11 @@
 #define TEMP_SENSOR_4 0
 #define TEMP_SENSOR_5 0
 
-#if(ENABLED(ROXYs_TRex))
+#ifdef ROXYs_TRex
   #define TEMP_SENSOR_BED 11
 #endif
 
-#if(ENABLED(TREX3))
+#if ENABLED(TREX3)
   #define TEMP_SENSOR_BED 11
 #endif
 
@@ -409,7 +409,7 @@
 
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 
-  #if(ENABLED(ROXYs_TRex))
+  #ifdef ROXYs_TRex
     // Roxy's T-Rex 2+
     #define DEFAULT_Kp 15.17
     #define DEFAULT_Ki 0.88
@@ -466,7 +466,7 @@
 
   //#define PID_BED_DEBUG // Sends debug data to the serial port.
 
-  #if(ENABLED(ROXYs_TRex))
+  #ifdef ROXYs_TRex
     // T-Rex 2+
     #define DEFAULT_bedKp 289.73
     #define DEFAULT_bedKi 51.26
@@ -626,21 +626,18 @@
 //#define ENDSTOP_INTERRUPTS_FEATURE
 
 /**
- * Endstop Noise Filter
+ * Endstop Noise Threshold
  *
- * Enable this option if endstops falsely trigger due to noise.
- * NOTE: Enabling this feature means adds an error of +/-0.2mm, so homing
- * will end up at a slightly different position on each G28. This will also
- * reduce accuracy of some bed probes.
- * For mechanical switches, the better approach to reduce noise is to install
- * a 100 nanofarads ceramic capacitor in parallel with the switch, making it
- * essentially noise-proof without sacrificing accuracy.
- * This option also increases MCU load when endstops or the probe are enabled.
- * So this is not recommended. USE AT YOUR OWN RISK.
- * (This feature is not required for common micro-switches mounted on PCBs
- * based on the Makerbot design, since they already include the 100nF capacitor.)
+ * Enable if your probe or endstops falsely trigger due to noise.
+ *
+ * - Higher values may affect repeatability or accuracy of some bed probes.
+ * - To fix noise install a 100nF ceramic capacitor inline with the switch.
+ * - This feature is not required for common micro-switches mounted on PCBs
+ *   based on the Makerbot design, which already have the 100nF capacitor.
+ *
+ * :[2,3,4,5,6,7]
  */
-//#define ENDSTOP_NOISE_FILTER
+//#define ENDSTOP_NOISE_THRESHOLD 2
 
 //=============================================================================
 //============================== Movement Settings ============================
@@ -803,20 +800,6 @@
   //#define BLTOUCH_DELAY 375   // (ms) Enable and increase if needed
 #endif
 
-/**
- * Enable one or more of the following if probing seems unreliable.
- * Heaters and/or fans can be disabled during probing to minimize electrical
- * noise. A delay can also be added to allow noise and vibration to settle.
- * These options are most useful for the BLTouch probe, but may also improve
- * readings with inductive probes and piezo sensors.
- */
-//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
-#if ENABLED(PROBING_HEATERS_OFF)
-  //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
-#endif
-//#define PROBING_FANS_OFF          // Turn fans off when probing
-//#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
-
 // A probe that is deployed and stowed with a solenoid pin (SOL1_PIN)
 //#define SOLENOID_PROBE
 
@@ -896,6 +879,23 @@
 // Enable the M48 repeatability test to test probe accuracy
 #define Z_MIN_PROBE_REPEATABILITY_TEST
 
+// Before deploy/stow pause for user confirmation
+//#define PAUSE_BEFORE_DEPLOY_STOW
+
+/**
+ * Enable one or more of the following if probing seems unreliable.
+ * Heaters and/or fans can be disabled during probing to minimize electrical
+ * noise. A delay can also be added to allow noise and vibration to settle.
+ * These options are most useful for the BLTouch probe, but may also improve
+ * readings with inductive probes and piezo sensors.
+ */
+//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
+#if ENABLED(PROBING_HEATERS_OFF)
+  //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
+#endif
+//#define PROBING_FANS_OFF          // Turn fans off when probing
+//#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
+
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
 // :{ 0:'Low', 1:'High' }
 #define X_ENABLE_ON 0
@@ -961,7 +961,7 @@
 #define Z_MIN_POS 0
 #define X_MAX_POS 450
 #define Y_MAX_POS Y_BED_SIZE
-#if(ENABLED(tallVersion))
+#if ENABLED(tallVersion)
   #define Z_MAX_POS 700
 #else
   #define Z_MAX_POS 500
@@ -1243,6 +1243,9 @@
 // Homing speeds (mm/m)
 #define HOMING_FEEDRATE_XY (50*60)
 #define HOMING_FEEDRATE_Z  (4*60)
+
+// Validate that endstops are triggered on homing moves
+#define VALIDATE_HOMING_ENDSTOPS
 
 // @section calibrate
 

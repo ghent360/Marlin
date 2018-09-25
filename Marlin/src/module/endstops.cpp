@@ -45,7 +45,7 @@ volatile uint8_t Endstops::hit_state;
 
 Endstops::esbits_t Endstops::live_state = 0;
 
-#if ENABLED(ENDSTOP_NOISE_FILTER)
+#if ENDSTOP_NOISE_THRESHOLD
   Endstops::esbits_t Endstops::validated_live_state;
   uint8_t Endstops::endstop_poll_count;
 #endif
@@ -246,10 +246,10 @@ void Endstops::poll() {
     run_monitor();  // report changes in endstop status
   #endif
 
-  #if ENABLED(ENDSTOP_INTERRUPTS_FEATURE) && ENABLED(ENDSTOP_NOISE_FILTER)
-    if (endstop_poll_count) update();
-  #elif DISABLED(ENDSTOP_INTERRUPTS_FEATURE) || ENABLED(ENDSTOP_NOISE_FILTER)
+  #if DISABLED(ENDSTOP_INTERRUPTS_FEATURE)
     update();
+  #elif ENABLED(ENDSTOP_NOISE_FILTER)
+    if (endstop_poll_count) update();
   #endif
 }
 
@@ -275,7 +275,16 @@ void Endstops::not_homing() {
   enabled = enabled_globally;
 
   #if ENABLED(ENDSTOP_INTERRUPTS_FEATURE)
-    update();
+    // Still 'enabled'? Then endstops are always on and kept in sync.
+    // Otherwise reset 'live's variables to let axes move in both directions.
+    if (!enabled) {
+      #if ENABLED(ENDSTOP_NOISE_FILTER)
+        endstop_poll_count = validated_live_state = 0; // Stop filtering
+      #endif
+      live_state = 0;
+    }
+  //#else
+    // When in polling endstops are always kept in sync
   #endif
 }
 
@@ -470,7 +479,7 @@ void _O2 Endstops::M119() {
 // Check endstops - Could be called from Temperature ISR!
 void Endstops::update() {
 
-  #if DISABLED(ENDSTOP_NOISE_FILTER)
+  #if !ENDSTOP_NOISE_THRESHOLD
     if (!abort_enabled()) return;
   #endif
 
@@ -613,7 +622,8 @@ void Endstops::update() {
     #endif
   #endif
 
-  #if ENABLED(ENDSTOP_NOISE_FILTER)
+  #if ENDSTOP_NOISE_THRESHOLD
+
     /**
      * Filtering out noise on endstops requires a delayed decision. Let's assume, due to noise,
      * that 50% of endstop signal samples are good and 50% are bad (assuming normal distribution
@@ -626,7 +636,7 @@ void Endstops::update() {
      */
     static esbits_t old_live_state;
     if (old_live_state != live_state) {
-      endstop_poll_count = 7;
+      endstop_poll_count = ENDSTOP_NOISE_THRESHOLD;
       old_live_state = live_state;
     }
     else if (endstop_poll_count && !--endstop_poll_count)
@@ -666,7 +676,7 @@ void Endstops::update() {
     if (triple_hit) { \
       _ENDSTOP_HIT(AXIS1, MINMAX); \
       /* if not performing home or if both endstops were trigged during homing... */ \
-      if (!stepper.separate_multi_axis || triple_hit == 0x7) \
+      if (!stepper.separate_multi_axis || triple_hit == 0b111) \
         planner.endstop_triggered(_AXIS(AXIS1)); \
     } \
   }while(0)

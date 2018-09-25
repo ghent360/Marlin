@@ -153,7 +153,8 @@ typedef struct SettingsDataStruct {
   //
   // HAS_BED_PROBE
   //
-  float zprobe_zoffset;                                 // M851 Z
+
+  float zprobe_zoffset;
 
   //
   // ABL_PLANAR

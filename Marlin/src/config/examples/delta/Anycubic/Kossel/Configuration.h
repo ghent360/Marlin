@@ -160,7 +160,7 @@
 // @section extruder
 
 // This defines the number of extruders
-// :[1, 2, 3, 4, 5]
+// :[1, 2, 3, 4, 5, 6]
 #define EXTRUDERS 1
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
@@ -672,7 +672,11 @@
 #define X_MAX_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
 #define Y_MAX_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
 #define Z_MAX_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
-#define Z_MIN_PROBE_ENDSTOP_INVERTING true  // set to true to invert the logic of the probe.
+#if ANYCUBIC_PROBE_VERSION == 1
+  #define Z_MIN_PROBE_ENDSTOP_INVERTING false  // V1 Probe is NC
+#elif ANYCUBIC_PROBE_VERSION == 2
+  #define Z_MIN_PROBE_ENDSTOP_INVERTING true  // V2 Probe is NO
+#endif
 
 /**
  * Stepper Drivers
@@ -707,21 +711,18 @@
 //#define ENDSTOP_INTERRUPTS_FEATURE
 
 /**
- * Endstop Noise Filter
+ * Endstop Noise Threshold
  *
- * Enable this option if endstops falsely trigger due to noise.
- * NOTE: Enabling this feature means adds an error of +/-0.2mm, so homing
- * will end up at a slightly different position on each G28. This will also
- * reduce accuracy of some bed probes.
- * For mechanical switches, the better approach to reduce noise is to install
- * a 100 nanofarads ceramic capacitor in parallel with the switch, making it
- * essentially noise-proof without sacrificing accuracy.
- * This option also increases MCU load when endstops or the probe are enabled.
- * So this is not recommended. USE AT YOUR OWN RISK.
- * (This feature is not required for common micro-switches mounted on PCBs
- * based on the Makerbot design, since they already include the 100nF capacitor.)
+ * Enable if your probe or endstops falsely trigger due to noise.
+ *
+ * - Higher values may affect repeatability or accuracy of some bed probes.
+ * - To fix noise install a 100nF ceramic capacitor inline with the switch.
+ * - This feature is not required for common micro-switches mounted on PCBs
+ *   based on the Makerbot design, which already have the 100nF capacitor.
+ *
+ * :[2,3,4,5,6,7]
  */
-//#define ENDSTOP_NOISE_FILTER
+//#define ENDSTOP_NOISE_THRESHOLD 2
 
 //=============================================================================
 //============================== Movement Settings ============================
@@ -887,77 +888,12 @@
   //#define BLTOUCH_DELAY 375   // (ms) Enable and increase if needed
 #endif
 
-/**
- * Enable one or more of the following if probing seems unreliable.
- * Heaters and/or fans can be disabled during probing to minimize electrical
- * noise. A delay can also be added to allow noise and vibration to settle.
- * These options are most useful for the BLTouch probe, but may also improve
- * readings with inductive probes and piezo sensors.
- */
-//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
-#if ENABLED(PROBING_HEATERS_OFF)
-  //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
-#endif
-//#define PROBING_FANS_OFF          // Turn fans off when probing
-//#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
-
 // A probe that is deployed and stowed with a solenoid pin (SOL1_PIN)
 //#define SOLENOID_PROBE
 
 // A sled-mounted probe like those designed by Charles Bell.
 //#define Z_PROBE_SLED
 //#define SLED_DOCKING_OFFSET 5  // The extra distance the X axis must travel to pickup the sled. 0 should be fine but you can push it further if you'd like.
-
-//
-// For Z_PROBE_ALLEN_KEY see the Delta example configurations.
-//
-
-/**
- *   Z Probe to nozzle (X,Y) offset, relative to (0, 0).
- *   X and Y offsets must be integers.
- *
- *   In the following example the X and Y offsets are both positive:
- *   #define X_PROBE_OFFSET_FROM_EXTRUDER 10
- *   #define Y_PROBE_OFFSET_FROM_EXTRUDER 10
- *
- *      +-- BACK ---+
- *      |           |
- *    L |    (+) P  | R <-- probe (20,20)
- *    E |           | I
- *    F | (-) N (+) | G <-- nozzle (10,10)
- *    T |           | H
- *      |    (-)    | T
- *      |           |
- *      O-- FRONT --+
- *    (0,0)
- */
-#define X_PROBE_OFFSET_FROM_EXTRUDER 0     // X offset: -left  +right  [of the nozzle]
-#define Y_PROBE_OFFSET_FROM_EXTRUDER 0     // Y offset: -front +behind [the nozzle]
-
-#if ANYCUBIC_PROBE_VERSION == 0
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER 0     // Z offset: -below +above  [the nozzle]
-#elif ANYCUBIC_PROBE_VERSION == 1
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER -19.0 // Z offset: -below +above  [the nozzle]
-#else
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER -16.8 // Z offset: -below +above  [the nozzle]
-#endif
-
-// Certain types of probes need to stay away from edges
-#define MIN_PROBE_EDGE 20
-
-// X and Y axis travel speed (mm/m) between probes
-#define XY_PROBE_SPEED 6000
-
-// Feedrate (mm/m) for the first approach when double-probing (MULTIPLE_PROBING == 2)
-#define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z
-
-// Feedrate (mm/m) for the "accurate" probe of each point
-#define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 3)
-
-// The number of probes to perform at each point.
-//   Set to 2 for a fast/slow probe, using the second probe result.
-//   Set to 3 or more for slow probes, averaging the results.
-#define MULTIPLE_PROBING 3
 
 /**
  * Allen key retractable z-probe as seen on many Kossel delta printers - http://reprap.org/wiki/Kossel#Automatic_bed_leveling_probe
@@ -1007,6 +943,53 @@
 #endif // Z_PROBE_ALLEN_KEY
 
 /**
+ *   Z Probe to nozzle (X,Y) offset, relative to (0, 0).
+ *   X and Y offsets must be integers.
+ *
+ *   In the following example the X and Y offsets are both positive:
+ *   #define X_PROBE_OFFSET_FROM_EXTRUDER 10
+ *   #define Y_PROBE_OFFSET_FROM_EXTRUDER 10
+ *
+ *      +-- BACK ---+
+ *      |           |
+ *    L |    (+) P  | R <-- probe (20,20)
+ *    E |           | I
+ *    F | (-) N (+) | G <-- nozzle (10,10)
+ *    T |           | H
+ *      |    (-)    | T
+ *      |           |
+ *      O-- FRONT --+
+ *    (0,0)
+ */
+#define X_PROBE_OFFSET_FROM_EXTRUDER 0     // X offset: -left  +right  [of the nozzle]
+#define Y_PROBE_OFFSET_FROM_EXTRUDER 0     // Y offset: -front +behind [the nozzle]
+
+#if ANYCUBIC_PROBE_VERSION == 2
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER -16.8     // Z offset: -below +above  [the nozzle]
+#elif ANYCUBIC_PROBE_VERSION == 1
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER -19.0 // Z offset: -below +above  [the nozzle]
+#else
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER 0 // Z offset: -below +above  [the nozzle]
+#endif
+
+// Certain types of probes need to stay away from edges
+#define MIN_PROBE_EDGE 20
+
+// X and Y axis travel speed (mm/m) between probes
+#define XY_PROBE_SPEED 6000
+
+// Feedrate (mm/m) for the first approach when double-probing (MULTIPLE_PROBING == 2)
+#define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z
+
+// Feedrate (mm/m) for the "accurate" probe of each point
+#define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 3)
+
+// The number of probes to perform at each point.
+//   Set to 2 for a fast/slow probe, using the second probe result.
+//   Set to 3 or more for slow probes, averaging the results.
+#define MULTIPLE_PROBING 3
+
+/**
  * Z probes require clearance when deploying, stowing, and moving between
  * probe points to avoid hitting the bed and other hardware.
  * Servo-mounted probes require extra space for the arm to rotate.
@@ -1020,10 +1003,10 @@
  * Example: `M851 Z-5` with a CLEARANCE of 4  =>  9mm from bed to nozzle.
  *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to nozzle.
  */
-#define Z_CLEARANCE_DEPLOY_PROBE   10 // Z Clearance for Deploy/Stow
-#define Z_CLEARANCE_BETWEEN_PROBES 25 // Z Clearance between probe points
-#define Z_CLEARANCE_MULTI_PROBE    25 // Z Clearance between multiple probes
-#define Z_AFTER_PROBING            30 // Z position after probing is done
+#define Z_CLEARANCE_DEPLOY_PROBE   30 // Z Clearance for Deploy/Stow
+#define Z_CLEARANCE_BETWEEN_PROBES 5 // Z Clearance between probe points
+#define Z_CLEARANCE_MULTI_PROBE    5 // Z Clearance between multiple probes
+#define Z_AFTER_PROBING            5 // Z position after probing is done
 
 #define Z_PROBE_LOW_POINT          -2 // Farthest distance below the trigger-point to go before stopping
 
@@ -1035,6 +1018,23 @@
 #if ANYCUBIC_PROBE_VERSION > 0
   #define Z_MIN_PROBE_REPEATABILITY_TEST
 #endif
+
+// Before deploy/stow pause for user confirmation
+#define PAUSE_BEFORE_DEPLOY_STOW
+
+/**
+ * Enable one or more of the following if probing seems unreliable.
+ * Heaters and/or fans can be disabled during probing to minimize electrical
+ * noise. A delay can also be added to allow noise and vibration to settle.
+ * These options are most useful for the BLTouch probe, but may also improve
+ * readings with inductive probes and piezo sensors.
+ */
+//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
+#if ENABLED(PROBING_HEATERS_OFF)
+  //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
+#endif
+//#define PROBING_FANS_OFF          // Turn fans off when probing
+//#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
 
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
 // :{ 0:'Low', 1:'High' }
@@ -1048,6 +1048,7 @@
 #define DISABLE_X false
 #define DISABLE_Y false
 #define DISABLE_Z false
+
 // Warn on display about possibly reduced accuracy
 //#define DISABLE_REDUCED_ACCURACY_WARNING
 
@@ -1366,6 +1367,9 @@
 
 // Delta only homes to Z
 #define HOMING_FEEDRATE_Z  (100*60)
+
+// Validate that endstops are triggered on homing moves
+#define VALIDATE_HOMING_ENDSTOPS
 
 // @section calibrate
 
