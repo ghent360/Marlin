@@ -248,7 +248,7 @@ void Endstops::poll() {
 
   #if DISABLED(ENDSTOP_INTERRUPTS_FEATURE)
     update();
-  #elif ENABLED(ENDSTOP_NOISE_FILTER)
+  #elif ENDSTOP_NOISE_THRESHOLD
     if (endstop_poll_count) update();
   #endif
 }
@@ -278,13 +278,12 @@ void Endstops::not_homing() {
     // Still 'enabled'? Then endstops are always on and kept in sync.
     // Otherwise reset 'live's variables to let axes move in both directions.
     if (!enabled) {
-      #if ENABLED(ENDSTOP_NOISE_FILTER)
-        endstop_poll_count = validated_live_state = 0; // Stop filtering
+      #if ENDSTOP_NOISE_THRESHOLD
+        endstop_poll_count = 0;   // Stop filtering (MUST be done first to prevent race condition)
+        validated_live_state = 0;
       #endif
       live_state = 0;
     }
-  //#else
-    // When in polling endstops are always kept in sync
   #endif
 }
 
