@@ -292,6 +292,12 @@ float zprobe_zoffset; // Initialized by settings.load()
     #if ENABLED(PROBING_FANS_OFF)
       fans_pause(p);
     #endif
+    #if ENABLED(PROBING_STEPPERS_OFF)
+      disable_e_steppers();
+      #if DISABLED(DELTA)
+        disable_X(); disable_Y();
+      #endif
+    #endif
     if (p) safe_delay(
       #if DELAY_BEFORE_PROBING > 25
         DELAY_BEFORE_PROBING
@@ -435,7 +441,7 @@ bool set_probe_deployed(const bool deploy) {
         BUZZ(100, 659);
         BUZZ(100, 698);
 
-        const char * const ds_str = deploy ? PSTR(MSG_MANUAL_DEPLOY) : PSTR(MSG_MANUAL_STOW);
+        PGM_P const ds_str = deploy ? PSTR(MSG_MANUAL_DEPLOY) : PSTR(MSG_MANUAL_STOW);
         lcd_setstatusPGM(ds_str);
         serialprintPGM(ds_str);
         SERIAL_EOL();
@@ -551,7 +557,7 @@ static bool do_probe_move(const float z, const float fr_mm_s) {
   do_blocking_move_to_z(z, fr_mm_s);
 
   // Check to see if the probe was triggered
-  const bool probe_triggered = 
+  const bool probe_triggered =
     #if ENABLED(DELTA) && ENABLED(SENSORLESS_PROBING)
       endstops.trigger_state() & (_BV(X_MIN) | _BV(Y_MIN) | _BV(Z_MIN))
     #else
