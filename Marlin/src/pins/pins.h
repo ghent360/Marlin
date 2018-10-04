@@ -35,7 +35,7 @@
 #ifndef __PINS_H__
 #define __PINS_H__
 
-#include "../inc/MarlinConfig.h"
+#define MAX_EXTRUDERS 6
 
 #if MB(RAMPS_13_EFB) || MB(RAMPS_14_EFB) || MB(RAMPS_PLUS_EFB) || MB(RAMPS_14_RE_ARM_EFB) || MB(RAMPS_SMART_EFB) || MB(RAMPS_DUO_EFB) || MB(RAMPS4DUE_EFB)
   #define IS_RAMPS_EFB
@@ -406,6 +406,8 @@
 
 #elif MB(THE_BORG)
   #include "pins_THE_BORG.h"          // STM32F7                                    env:STM32F7
+#elif MB(REMRAM_V1)
+  #include "pins_REMRAM_V1.h"         // STM32F7                                    env:STM32F7xx
 
 //
 // Espressif ESP32
@@ -656,10 +658,6 @@
 #endif
 #ifndef SUICIDE_PIN
   #define SUICIDE_PIN -1
-#endif
-
-#ifndef MAX_EXTRUDERS
-  #define MAX_EXTRUDERS 5
 #endif
 
 #ifndef NUM_SERVO_PLUGS

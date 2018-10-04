@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
 /**
  * MarlinSerial_Due.h - Hardware serial library for Arduino DUE
@@ -26,12 +27,7 @@
  * Based on MarlinSerial for AVR, copyright (c) 2006 Nicholas Zambetti.  All right reserved.
  */
 
-#ifndef MARLINSERIAL_DUE_H
-#define MARLINSERIAL_DUE_H
-
 #include "../shared/MarlinSerial.h"
-
-#if SERIAL_PORT >= 0
 
 #include <WString.h>
 
@@ -162,8 +158,9 @@ private:
 };
 
 // Serial port configuration
+template <uint8_t serial>
 struct MarlinSerialCfg {
-  static constexpr int PORT               = SERIAL_PORT;
+  static constexpr int PORT               = serial;
   static constexpr unsigned int RX_SIZE   = RX_BUFFER_SIZE;
   static constexpr unsigned int TX_SIZE   = TX_BUFFER_SIZE;
   static constexpr bool XONOFF            = bSERIAL_XON_XOFF;
@@ -173,9 +170,16 @@ struct MarlinSerialCfg {
   static constexpr bool RX_FRAMING_ERRORS = bSERIAL_STATS_RX_FRAMING_ERRORS;
   static constexpr bool MAX_RX_QUEUED     = bSERIAL_STATS_MAX_RX_QUEUED;
 };
+  
+#if SERIAL_PORT >= 0
 
-extern MarlinSerial<MarlinSerialCfg> customizedSerial;
-
+  extern MarlinSerial<MarlinSerialCfg<SERIAL_PORT>> customizedSerial1;
+  
 #endif // SERIAL_PORT >= 0
 
-#endif // MARLINSERIAL_DUE_H
+#ifdef SERIAL_PORT_2
+
+  extern MarlinSerial<MarlinSerialCfg<SERIAL_PORT_2>> customizedSerial2;
+  
+#endif
+
