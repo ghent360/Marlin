@@ -683,6 +683,24 @@
    */
   #define AUTO_REPORT_SD_STATUS
 
+  /**
+   * Support for USB thumb drives using an Arduino USB Host Shield or
+   * equivalent MAX3421E breakout board. The USB thumb drive will appear
+   * to Marlin as an SD card.
+   *
+   * The MAX3421E must be assigned the same pins as the SD card reader, with
+   * the following pin mapping:
+   *
+   *    SCLK, MOSI, MISO --> SCLK, MOSI, MISO
+   *    INT              --> SD_DETECT_PIN
+   *    SS               --> SDSS
+   */
+  //#define USB_FLASH_DRIVE_SUPPORT
+  #if ENABLED(USB_FLASH_DRIVE_SUPPORT)
+    #define USB_CS_PIN         SDSS
+    #define USB_INTR_PIN       SD_DETECT_PIN
+  #endif
+
 #endif // SDSUPPORT
 
 /**
@@ -1578,6 +1596,13 @@
 #define FASTER_GCODE_PARSER
 
 /**
+ * CNC G-code options
+ * Support CNC-style G-code dialects used by laser cutters, drawing machine cams, etc.
+ */
+//#define PAREN_COMMENTS      // Support for parentheses-delimited comments
+//#define GCODE_MOTION_MODES  // Remember the motion mode (G0 G1 G2 G3 G5 G38.X) and apply for X Y Z E F, etc.
+
+/**
  * User-defined menu items that execute custom GCode
  */
 #if ENABLED(UBL)
@@ -1589,7 +1614,7 @@
   #define USER_SCRIPT_AUDIBLE_FEEDBACK
   #define USER_SCRIPT_RETURN  // Return to status screen after a script
 
-    #define USER_DESC_1 "UBL Commission Step 1"
+  #define USER_DESC_1 "UBL Commission Step 1"
   #define USER_GCODE_1 "M502 \n M500 \n M501 \n M190 S75 \n G28 \n G29 P1 \n G29 S1 \n M117 Run Step 2 \n"
 
   #define USER_DESC_2 "UBL Commission Step 2"
