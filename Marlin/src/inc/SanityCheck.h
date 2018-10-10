@@ -602,6 +602,27 @@ static_assert(X_MAX_LENGTH >= X_BED_SIZE && Y_MAX_LENGTH >= Y_BED_SIZE,
     #error "EXTRUDERS must be 1 with HEATERS_PARALLEL."
   #endif
 
+  #if ENABLED(SINGLENOZZLE)
+    #ifndef SINGLENOZZLE_SWAP_LENGTH
+      #error "SINGLENOZZLE requires SINGLENOZZLE_SWAP_LENGTH. Please update your Configuration."
+    #elif !defined(SINGLENOZZLE_SWAP_RETRACT_SPEED)
+      #error "SINGLENOZZLE requires SINGLENOZZLE_SWAP_RETRACT_SPEED. Please update your Configuration."
+    #elif !defined(SINGLENOZZLE_SWAP_PRIME_SPEED)
+      #error "SINGLENOZZLE requires SINGLENOZZLE_SWAP_PRIME_SPEED. Please update your Configuration."
+    #endif
+    #if ENABLED(SINGLENOZZLE_SWAP_PARK)
+      #ifndef SINGLENOZZLE_TOOLCHANGE_POSITION
+        #error "SINGLENOZZLE_SWAP_PARK requires SINGLENOZZLE_TOOLCHANGE_POSITION. Please update your Configuration."
+      #elif !defined(SINGLENOZZLE_PARK_XY_FEEDRATE)
+        #error "SINGLENOZZLE_SWAP_PARK requires SINGLENOZZLE_PARK_XY_FEEDRATE. Please update your Configuration."
+      #endif
+    #else
+      #ifndef SINGLENOZZLE_TOOLCHANGE_ZRAISE
+        #error "SINGLENOZZLE requires SINGLENOZZLE_TOOLCHANGE_ZRAISE. Please update your Configuration."
+      #endif
+    #endif
+  #endif
+
 #elif ENABLED(MK2_MULTIPLEXER)
   #error "MK2_MULTIPLEXER requires 2 or more EXTRUDERS."
 #elif ENABLED(SINGLENOZZLE)
@@ -1832,6 +1853,10 @@ static_assert(COUNT(sanity_arr_3) <= XYZE_N, "DEFAULT_MAX_ACCELERATION has too m
 
 #if ENABLED(USB_FLASH_DRIVE_SUPPORT) && !(PIN_EXISTS(USB_CS) && PIN_EXISTS(USB_INTR))
   #error "USB_CS_PIN and USB_INTR_PIN are required for USB_FLASH_DRIVE_SUPPORT."
+#endif
+
+#if ENABLED(SD_FIRMWARE_UPDATE) && !defined(__AVR_ATmega2560__)
+  #error "SD_FIRMWARE_UPDATE requires an ATmega2560-based (Arduino Mega) board."
 #endif
 
 #endif // _SANITYCHECK_H_

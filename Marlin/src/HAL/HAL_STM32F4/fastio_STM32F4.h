@@ -32,7 +32,7 @@
 #undef _BV
 #define _BV(b) (1 << (b))
 
-#define PWM_PIN(p) digitalPinHasPWM(p)
+#define PWM_PIN(p) true
 #define USEABLE_HARDWARE_PWM(p) PWM_PIN(p)
 
 #define USE_FAST_IO
