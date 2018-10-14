@@ -174,11 +174,10 @@
   #define SINGLENOZZLE_SWAP_RETRACT_SPEED 3600  // (mm/m)
   #define SINGLENOZZLE_SWAP_PRIME_SPEED   3600  // (mm/m)
   //#define SINGLENOZZLE_SWAP_PARK
+  #define SINGLENOZZLE_TOOLCHANGE_ZRAISE     2  // (mm)
   #if ENABLED(SINGLENOZZLE_SWAP_PARK)
-    #define SINGLENOZZLE_TOOLCHANGE_POSITION { (X_MIN_POS + 10), (Y_MIN_POS + 10), 5 }
+    #define SINGLENOZZLE_TOOLCHANGE_XY    { X_MIN_POS + 10, Y_MIN_POS + 10 }
     #define SINGLENOZZLE_PARK_XY_FEEDRATE 6000  // (mm/m)
-  #else
-    #define SINGLENOZZLE_TOOLCHANGE_ZRAISE 2.0
   #endif
 #endif
 
@@ -700,7 +699,7 @@
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
 #define X_MIN_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
 #define Y_MIN_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
-#define Z_MIN_ENDSTOP_INVERTING (ANYCUBIC_PROBE_VERSION + 0 == 2) // V1 is NC, V2 is NO
+#define Z_MIN_ENDSTOP_INVERTING (ANYCUBIC_PROBE_VERSION + 0 == 1) // V1 is NO, V2 is NC
 #define X_MAX_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
 #define Y_MAX_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
 #define Z_MAX_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
