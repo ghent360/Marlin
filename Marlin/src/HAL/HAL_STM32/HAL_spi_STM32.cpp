@@ -49,7 +49,7 @@ static SPISettings spiConfig;
   // --------------------------------------------------------------------------
   // Software SPI
   // --------------------------------------------------------------------------
-  #error "Software SPI not supported for STM32F7. Use Hardware SPI."
+  #error "Software SPI not supported for STM32. Use Hardware SPI."
 
 #else
 

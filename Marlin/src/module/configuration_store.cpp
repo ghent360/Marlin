@@ -37,7 +37,7 @@
  */
 
 // Change EEPROM version if the structure changes
-#define EEPROM_VERSION "V59"
+#define EEPROM_VERSION "V60"
 #define EEPROM_OFFSET 0
 
 // Check the integrity of data offsets.
@@ -96,6 +96,11 @@ typedef struct {  int16_t X, Y, Z;                                         } tmc
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   #include "../feature/pause.h"
+#endif
+
+#if ENABLED(SINGLENOZZLE)
+  #include "tool_change.h"
+  void M217_report(const bool eeprom);
 #endif
 
 #if ENABLED(PID_EXTRUSION_SCALING)
@@ -214,8 +219,8 @@ typedef struct SettingsDataStruct {
   // ULTIPANEL
   //
   int16_t lcd_preheat_hotend_temp[2],                   // M145 S0 H
-          lcd_preheat_bed_temp[2],                      // M145 S0 B
-          lcd_preheat_fan_speed[2];                     // M145 S0 F
+          lcd_preheat_bed_temp[2];                      // M145 S0 B
+  uint8_t lcd_preheat_fan_speed[2];                     // M145 S0 F
 
   //
   // PIDTEMP
@@ -289,6 +294,15 @@ typedef struct SettingsDataStruct {
   float filament_change_unload_length[EXTRUDERS],       // M603 T U
         filament_change_load_length[EXTRUDERS];         // M603 T L
 
+  //
+  // SINGLENOZZLE toolchange values
+  //
+  #if ENABLED(SINGLENOZZLE)
+    float singlenozzle_swap_length;                     // M217 S
+    int16_t singlenozzle_prime_speed,                   // M217 P
+            singlenozzle_retract_speed;                 // M217 R
+  #endif
+
 } SettingsData;
 
 #pragma pack(pop)
@@ -361,6 +375,32 @@ void MarlinSettings::postprocess() {
   if (memcmp(oldpos, current_position, sizeof(oldpos)))
     report_current_position();
 }
+
+#if ENABLED(SD_FIRMWARE_UPDATE)
+
+  #if ENABLED(EEPROM_SETTINGS)
+    static_assert(
+      !WITHIN(SD_FIRMWARE_UPDATE_EEPROM_ADDR, EEPROM_OFFSET, EEPROM_OFFSET + sizeof(SettingsData)),
+      "SD_FIRMWARE_UPDATE_EEPROM_ADDR collides with EEPROM settings storage."
+    );
+  #endif
+
+  bool MarlinSettings::sd_update_status() {
+    uint8_t val;
+    persistentStore.read_data(SD_FIRMWARE_UPDATE_EEPROM_ADDR, &val);
+    return (val == SD_FIRMWARE_UPDATE_ACTIVE_VALUE);
+  }
+
+  bool MarlinSettings::set_sd_update_status(const bool enable) {
+    if (enable != sd_update_status())
+      persistentStore.write_data(
+        SD_FIRMWARE_UPDATE_EEPROM_ADDR,
+        enable ? SD_FIRMWARE_UPDATE_ACTIVE_VALUE : SD_FIRMWARE_UPDATE_INACTIVE_VALUE
+      );
+    return true;
+  }
+
+#endif // SD_FIRMWARE_UPDATE
 
 #if ENABLED(EEPROM_SETTINGS)
   #include "../HAL/shared/persistent_store_api.h"
@@ -630,8 +670,8 @@ void MarlinSettings::postprocess() {
 
     #if DISABLED(ULTIPANEL)
       constexpr int16_t lcd_preheat_hotend_temp[2] = { PREHEAT_1_TEMP_HOTEND, PREHEAT_2_TEMP_HOTEND },
-                        lcd_preheat_bed_temp[2] = { PREHEAT_1_TEMP_BED, PREHEAT_2_TEMP_BED },
-                        lcd_preheat_fan_speed[2] = { PREHEAT_1_FAN_SPEED, PREHEAT_2_FAN_SPEED };
+                        lcd_preheat_bed_temp[2] = { PREHEAT_1_TEMP_BED, PREHEAT_2_TEMP_BED };
+      constexpr uint8_t lcd_preheat_fan_speed[2] = { PREHEAT_1_FAN_SPEED, PREHEAT_2_FAN_SPEED };
     #endif
 
     EEPROM_WRITE(lcd_preheat_hotend_temp);
@@ -948,6 +988,17 @@ void MarlinSettings::postprocess() {
     #endif
 
     //
+    // SINGLENOZZLE
+    //
+
+    #if ENABLED(SINGLENOZZLE)
+      _FIELD_TEST(singlenozzle_swap_length);
+      EEPROM_WRITE(singlenozzle_swap_length);
+      EEPROM_WRITE(singlenozzle_prime_speed);
+      EEPROM_WRITE(singlenozzle_retract_speed);
+    #endif
+
+    //
     // Validate CRC and Data Size
     //
     if (!eeprom_error) {
@@ -1238,16 +1289,12 @@ void MarlinSettings::postprocess() {
       _FIELD_TEST(lcd_preheat_hotend_temp);
 
       #if DISABLED(ULTIPANEL)
-        int16_t lcd_preheat_hotend_temp[2], lcd_preheat_bed_temp[2], lcd_preheat_fan_speed[2];
+        int16_t lcd_preheat_hotend_temp[2], lcd_preheat_bed_temp[2];
+        uint8_t lcd_preheat_fan_speed[2];
       #endif
       EEPROM_READ(lcd_preheat_hotend_temp); // 2 floats
       EEPROM_READ(lcd_preheat_bed_temp);    // 2 floats
       EEPROM_READ(lcd_preheat_fan_speed);   // 2 floats
-
-      //EEPROM_ASSERT(
-      //  WITHIN(lcd_preheat_fan_speed, 0, 255),
-      //  "lcd_preheat_fan_speed out of range"
-      //);
 
       //
       // Hotend PID
@@ -1586,6 +1633,17 @@ void MarlinSettings::postprocess() {
         for (uint8_t q = EXTRUDERS * 2; q--;) EEPROM_READ(dummy);
       #endif
 
+      //
+      // SINGLENOZZLE toolchange values
+      //
+
+      #if ENABLED(SINGLENOZZLE)
+        _FIELD_TEST(singlenozzle_swap_length);
+        EEPROM_READ(singlenozzle_swap_length);
+        EEPROM_READ(singlenozzle_prime_speed);
+        EEPROM_READ(singlenozzle_retract_speed);
+      #endif
+
       eeprom_error = size_error(eeprom_index - (EEPROM_OFFSET));
       if (eeprom_error) {
         #if ENABLED(EEPROM_CHITCHAT)
@@ -1842,6 +1900,12 @@ void MarlinSettings::reset(PORTARG_SOLO) {
     #if ENABLED(DUAL_X_CARRIAGE)
       hotend_offset[X_AXIS][1] = MAX(X2_HOME_POS, X2_MAX_POS);
     #endif
+  #endif
+
+  #if ENABLED(SINGLENOZZLE)
+    singlenozzle_swap_length = SINGLENOZZLE_SWAP_LENGTH;
+    singlenozzle_prime_speed = SINGLENOZZLE_SWAP_PRIME_SPEED;
+    singlenozzle_retract_speed = SINGLENOZZLE_SWAP_RETRACT_SPEED;
   #endif
 
   //
@@ -2489,7 +2553,7 @@ void MarlinSettings::reset(PORTARG_SOLO) {
         SERIAL_ECHOPAIR_P(port, "  M145 S", (int)i);
         SERIAL_ECHOPAIR_P(port, " H", TEMP_UNIT(lcd_preheat_hotend_temp[i]));
         SERIAL_ECHOPAIR_P(port, " B", TEMP_UNIT(lcd_preheat_bed_temp[i]));
-        SERIAL_ECHOLNPAIR_P(port, " F", lcd_preheat_fan_speed[i]);
+        SERIAL_ECHOLNPAIR_P(port, " F", int(lcd_preheat_fan_speed[i]));
       }
     #endif // ULTIPANEL
 
@@ -2901,6 +2965,15 @@ void MarlinSettings::reset(PORTARG_SOLO) {
         #endif // EXTRUDERS > 2
       #endif // EXTRUDERS == 1
     #endif // ADVANCED_PAUSE_FEATURE
+
+    #if ENABLED(SINGLENOZZLE)
+      CONFIG_ECHO_START;
+      if (!forReplay) {
+        SERIAL_ECHOLNPGM_P(port, "SINGLENOZZLE:");
+        CONFIG_ECHO_START;
+      }
+      M217_report(true);
+    #endif
   }
 
 #endif // !DISABLE_M503

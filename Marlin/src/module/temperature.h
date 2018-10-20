@@ -123,7 +123,7 @@ class Temperature {
     static uint8_t soft_pwm_amount[HOTENDS];
 
     #if ENABLED(AUTO_POWER_E_FANS)
-      static int16_t autofan_speed[HOTENDS];
+      static uint8_t autofan_speed[HOTENDS];
     #endif
 
     #if ENABLED(FAN_SOFT_PWM)
@@ -616,6 +616,10 @@ class Temperature {
       #endif
     #endif
 
+    #if ENABLED(ULTRA_LCD)
+      static void set_heating_message(const uint8_t e);
+    #endif
+
   private:
 
     #if ENABLED(FAST_PWM_FAN)
@@ -659,7 +663,6 @@ class Temperature {
       #endif
 
     #endif // THERMAL_PROTECTION
-
 };
 
 extern Temperature thermalManager;
