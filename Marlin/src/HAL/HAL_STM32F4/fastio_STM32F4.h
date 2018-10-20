@@ -32,7 +32,9 @@
 #undef _BV
 #define _BV(b) (1 << (b))
 
-#define USEABLE_HARDWARE_PWM(p) true
+#define PWM_PIN(p) digitalPinHasPWM(p)
+#define USEABLE_HARDWARE_PWM(p) PWM_PIN(p)
+
 #define USE_FAST_IO
 
 #ifdef USE_FAST_IO
@@ -168,6 +170,10 @@ struct FastIOPin {
 //#define GET_TIMER(IO)
 
 #ifdef REDEFINE_PIN_NAMES
+
+//
+// Pins Definitions
+//
 #define PORTA 0
 #define PORTB 1
 #define PORTC 2
