@@ -20,25 +20,22 @@
  *
  */
 
-#include "../../../inc/MarlinConfig.h"
+/*****************************************************************
+ * GT2560 V3.0 pin assignment (for Mecreator 2)
+ *****************************************************************/
 
-#if ENABLED(TMC_DEBUG)
+#define BOARD_NAME "GT2560 V3.0 (MC2)"
 
-#include "../../gcode.h"
-#include "../../../feature/tmc_util.h"
+#include "pins_GT2560_V3.h"
 
-/**
- * M122: Debug TMC drivers
- */
-void GcodeSuite::M122() {
+#undef X_MIN_PIN
+#define X_MIN_PIN          22
 
-  #if ENABLED(MONITOR_DRIVER_STATUS)
-    if (parser.seen('S'))
-      tmc_set_report_status(parser.value_bool());
-    else
-  #endif
-      tmc_report_all();
+#undef X_MAX_PIN
+#define X_MAX_PIN          24
 
-}
+#undef Y_MIN_PIN
+#define Y_MIN_PIN          26
 
-#endif // TMC_DEBUG
+#undef Y_MAX_PIN
+#define Y_MAX_PIN          28
