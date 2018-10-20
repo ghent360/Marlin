@@ -20,7 +20,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include "../platforms.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
