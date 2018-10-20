@@ -17,7 +17,8 @@
  *
  */
 
-#if defined(STM32F4) || defined(STM32F4xx)
+#include "../platforms.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32F4)
 
 /**
  * Description: functions for I2C connected external EEPROM.

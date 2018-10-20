@@ -27,7 +27,8 @@
 
 //#include "Arduino.h"
 
-#ifdef STM32F4xx
+#include "../platforms.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32F4)
 
 #include <stdbool.h>
 #include <SPI.h>
