@@ -738,6 +738,7 @@ void setup() {
 
   #if HAS_DRIVER(TMC2130)
     #if DISABLED(TMC_USE_SW_SPI)
+      spiBegin();
       SPI.begin();
     #endif
     tmc_init_cs_pins();
