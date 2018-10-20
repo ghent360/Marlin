@@ -49,12 +49,20 @@ namespace UI {
   float getAxisMaxAcceleration_mm_s2(const axis_t axis);
   float getMinFeedrate_mm_s();
   float getMinTravelFeedrate_mm_s();
-  float getPrintingAcceleration_mm_per_s2();
-  float getRetractAcceleration_mm_per_s2();
-  float getTravelAcceleration_mm_per_s2();
+  float getPrintingAcceleration_mm_s2();
+  float getRetractAcceleration_mm_s2();
+  float getTravelAcceleration_mm_s2();
   float getFeedRate_percent();
   uint8_t getProgress_percent();
   uint32_t getProgress_seconds_elapsed();
+
+  #if ENABLED(PRINTCOUNTER)
+    char *getTotalPrints_str(char buffer[21]);
+    char *getFinishedPrints_str(char buffer[21]);
+    char *getTotalPrintTime_str(char buffer[21]);
+    char *getLongestPrint_str(char buffer[21]);
+    char *getFilamentUsed_str(char buffer[21]);
+  #endif
 
   void setTargetTemp_celsius(const uint8_t extruder, float temp);
   void setFan_percent(const uint8_t fan, const float percent);
@@ -109,6 +117,16 @@ namespace UI {
     #endif
   #endif
 
+  #if ENABLED(FILAMENT_RUNOUT_SENSOR)
+    bool isFilamentRunoutEnabled();
+    void toggleFilamentRunout(const bool state);
+
+    #if FILAMENT_RUNOUT_DISTANCE_MM > 0
+      float getFilamentRunoutDistance_mm();
+      void setFilamentRunoutDistance_mm(const float distance);
+    #endif
+  #endif
+
   void delay_ms(unsigned long ms);
   void yield(); // Within lengthy loop, call this periodically
 
@@ -147,7 +165,7 @@ namespace UI {
   // module and will be called by Marlin.
 
   void onStartup();
-  void onUpdate();
+  void onIdle();
   void onMediaInserted();
   void onMediaError();
   void onMediaRemoved();
@@ -161,4 +179,5 @@ namespace UI {
   void onStatusChanged(progmem_str msg);
   void onFactoryReset();
   void onStoreSettings();
+  void onLoadSettings();
 };
