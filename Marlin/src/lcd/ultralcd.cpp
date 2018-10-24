@@ -2226,9 +2226,9 @@ void lcd_quick_feedback(const bool clear_buttons) {
     void _lcd_ubl_custom_mesh() {
       START_MENU();
       MENU_BACK(MSG_UBL_BUILD_MESH_MENU);
-      MENU_ITEM_EDIT(int3, MSG_UBL_CUSTOM_HOTEND_TEMP, &custom_hotend_temp, EXTRUDE_MINTEMP, (HEATER_0_MAXTEMP - 10));
+      MENU_ITEM_EDIT(int3, MSG_UBL_HOTEND_TEMP_CUSTOM, &custom_hotend_temp, EXTRUDE_MINTEMP, (HEATER_0_MAXTEMP - 10));
       #if HAS_HEATED_BED
-        MENU_ITEM_EDIT(int3, MSG_UBL_CUSTOM_BED_TEMP, &custom_bed_temp, BED_MINTEMP, (BED_MAXTEMP - 15));
+        MENU_ITEM_EDIT(int3, MSG_UBL_BED_TEMP_CUSTOM, &custom_bed_temp, BED_MINTEMP, (BED_MAXTEMP - 15));
       #endif
       MENU_ITEM(function, MSG_UBL_BUILD_CUSTOM_MESH, _lcd_ubl_build_custom_mesh);
       END_MENU();
@@ -2301,8 +2301,8 @@ void lcd_quick_feedback(const bool clear_buttons) {
      * UBL Validate Mesh submenu
      *
      * << UBL Tools
-     *    PLA Mesh Validation
-     *    ABS Mesh Validation
+     *    Mesh Validation with Material 1
+     *    Mesh Validation with Material 2
      *    Validate Custom Mesh
      * << Info Screen
      */
@@ -2310,11 +2310,11 @@ void lcd_quick_feedback(const bool clear_buttons) {
       START_MENU();
       MENU_BACK(MSG_UBL_TOOLS);
       #if HAS_HEATED_BED
-        MENU_ITEM(gcode, MSG_UBL_VALIDATE_PLA_MESH, PSTR("G28\nG26 C B" STRINGIFY(PREHEAT_1_TEMP_BED) " H" STRINGIFY(PREHEAT_1_TEMP_HOTEND) " P"));
-        MENU_ITEM(gcode, MSG_UBL_VALIDATE_ABS_MESH, PSTR("G28\nG26 C B" STRINGIFY(PREHEAT_2_TEMP_BED) " H" STRINGIFY(PREHEAT_2_TEMP_HOTEND) " P"));
+        MENU_ITEM(gcode, MSG_UBL_VALIDATE_MESH_M1, PSTR("G28\nG26 C B" STRINGIFY(PREHEAT_1_TEMP_BED) " H" STRINGIFY(PREHEAT_1_TEMP_HOTEND) " P"));
+        MENU_ITEM(gcode, MSG_UBL_VALIDATE_MESH_M2, PSTR("G28\nG26 C B" STRINGIFY(PREHEAT_2_TEMP_BED) " H" STRINGIFY(PREHEAT_2_TEMP_HOTEND) " P"));
       #else
-        MENU_ITEM(gcode, MSG_UBL_VALIDATE_PLA_MESH, PSTR("G28\nG26 C B0 H" STRINGIFY(PREHEAT_1_TEMP_HOTEND) " P"));
-        MENU_ITEM(gcode, MSG_UBL_VALIDATE_ABS_MESH, PSTR("G28\nG26 C B0 H" STRINGIFY(PREHEAT_2_TEMP_HOTEND) " P"));
+        MENU_ITEM(gcode, MSG_UBL_VALIDATE_MESH_M1, PSTR("G28\nG26 C B0 H" STRINGIFY(PREHEAT_1_TEMP_HOTEND) " P"));
+        MENU_ITEM(gcode, MSG_UBL_VALIDATE_MESH_M2, PSTR("G28\nG26 C B0 H" STRINGIFY(PREHEAT_2_TEMP_HOTEND) " P"));
       #endif
       MENU_ITEM(function, MSG_UBL_VALIDATE_CUSTOM_MESH, _lcd_ubl_validate_custom_mesh);
       MENU_ITEM(function, MSG_WATCH, lcd_return_to_status);
@@ -2400,8 +2400,8 @@ void lcd_quick_feedback(const bool clear_buttons) {
      * UBL Build Mesh submenu
      *
      * << UBL Tools
-     *    Build PLA Mesh
-     *    Build ABS Mesh
+     *    Build Mesh with Material 1
+     *    Build Mesh with Material 2
      *  - Build Custom Mesh >>
      *    Build Cold Mesh
      *  - Fill-in Mesh >>
@@ -2414,7 +2414,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
       START_MENU();
       MENU_BACK(MSG_UBL_TOOLS);
       #if HAS_HEATED_BED
-        MENU_ITEM(gcode, MSG_UBL_BUILD_PLA_MESH, PSTR(
+        MENU_ITEM(gcode, MSG_UBL_BUILD_MESH_M1, PSTR(
           "G28\n"
           "M190 S" STRINGIFY(PREHEAT_1_TEMP_BED) "\n"
           "M109 S" STRINGIFY(PREHEAT_1_TEMP_HOTEND) "\n"
@@ -2422,7 +2422,7 @@ void lcd_quick_feedback(const bool clear_buttons) {
           "M104 S0\n"
           "M140 S0"
         ));
-        MENU_ITEM(gcode, MSG_UBL_BUILD_ABS_MESH, PSTR(
+        MENU_ITEM(gcode, MSG_UBL_BUILD_MESH_M2, PSTR(
           "G28\n"
           "M190 S" STRINGIFY(PREHEAT_2_TEMP_BED) "\n"
           "M109 S" STRINGIFY(PREHEAT_2_TEMP_HOTEND) "\n"
@@ -2431,13 +2431,13 @@ void lcd_quick_feedback(const bool clear_buttons) {
           "M140 S0"
         ));
       #else
-        MENU_ITEM(gcode, MSG_UBL_BUILD_PLA_MESH, PSTR(
+        MENU_ITEM(gcode, MSG_UBL_BUILD_MESH_M1, PSTR(
           "G28\n"
           "M109 S" STRINGIFY(PREHEAT_1_TEMP_HOTEND) "\n"
           "G29 P1\n"
           "M104 S0"
         ));
-        MENU_ITEM(gcode, MSG_UBL_BUILD_ABS_MESH, PSTR(
+        MENU_ITEM(gcode, MSG_UBL_BUILD_MESH_M2, PSTR(
           "G28\n"
           "M109 S" STRINGIFY(PREHEAT_2_TEMP_HOTEND) "\n"
           "G29 P1\n"
