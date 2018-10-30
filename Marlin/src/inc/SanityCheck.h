@@ -458,7 +458,7 @@ static_assert(X_MAX_LENGTH >= X_BED_SIZE && Y_MAX_LENGTH >= Y_BED_SIZE,
  * LCD Info Screen Style
  */
 #if LCD_INFO_SCREEN_STYLE > 0
-  #if ENABLED(DOGLCD) || LCD_WIDTH < 20 || LCD_HEIGHT < 4
+  #if HAS_GRAPHICAL_LCD || LCD_WIDTH < 20 || LCD_HEIGHT < 4
     #error "Alternative LCD_INFO_SCREEN_STYLE requires 20x4 Character LCD."
   #elif LCD_INFO_SCREEN_STYLE > 1
     #error "LCD_INFO_SCREEN_STYLE only has options 0 and 1 at this time."
@@ -471,14 +471,14 @@ static_assert(X_MAX_LENGTH >= X_BED_SIZE && Y_MAX_LENGTH >= Y_BED_SIZE,
 #if ENABLED(LCD_PROGRESS_BAR)
   #if DISABLED(SDSUPPORT) && DISABLED(LCD_SET_PROGRESS_MANUALLY)
     #error "LCD_PROGRESS_BAR requires SDSUPPORT or LCD_SET_PROGRESS_MANUALLY."
-  #elif DISABLED(ULTRA_LCD)
+  #elif !HAS_CHARACTER_LCD
     #error "LCD_PROGRESS_BAR requires a character LCD."
-  #elif ENABLED(DOGLCD)
+  #elif HAS_GRAPHICAL_LCD
     #error "LCD_PROGRESS_BAR does not apply to graphical displays."
   #elif ENABLED(FILAMENT_LCD_DISPLAY)
     #error "LCD_PROGRESS_BAR and FILAMENT_LCD_DISPLAY are not fully compatible. Comment out this line to use both."
   #endif
-#elif ENABLED(LCD_SET_PROGRESS_MANUALLY) && DISABLED(DOGLCD)
+#elif ENABLED(LCD_SET_PROGRESS_MANUALLY) && !HAS_GRAPHICAL_LCD
   #error "LCD_SET_PROGRESS_MANUALLY requires LCD_PROGRESS_BAR or Graphical LCD."
 #endif
 
@@ -1878,6 +1878,19 @@ static_assert(COUNT(sanity_arr_3) <= XYZE_N, "DEFAULT_MAX_ACCELERATION has too m
 
 #if ENABLED(FAST_PWM_FAN) && !(defined(ARDUINO) && !defined(ARDUINO_ARCH_SAM))
   #error "FAST_PWM_FAN only supported by 8 bit CPUs."
+#endif
+
+#if ENABLED(Z_STEPPER_AUTO_ALIGN)
+  #if !Z_MULTI_STEPPER_DRIVERS
+    #error "Z_STEPPER_AUTO_ALIGN requires Z_DUAL_STEPPER_DRIVERS or Z_TRIPLE_STEPPER_DRIVERS."
+  #elif !HAS_BED_PROBE
+    #error "Z_STEPPER_AUTO_ALIGN requires a Z-bed probe."
+  #endif
+  constexpr float sanity_arr_z_align_x[] = Z_STEPPER_ALIGN_X, sanity_arr_z_align_y[] = Z_STEPPER_ALIGN_Y;
+  static_assert(
+    COUNT(sanity_arr_z_align_x) == Z_STEPPER_COUNT && COUNT(sanity_arr_z_align_y) == Z_STEPPER_COUNT,
+    "Z_STEPPER_ALIGN_[XY]POS settings require one element per Z stepper."
+  );
 #endif
 
 #if ENABLED(PRINTCOUNTER) && DISABLED(EEPROM_SETTINGS)
