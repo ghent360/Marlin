@@ -224,10 +224,27 @@ bool lcd_blink() {
   volatile uint8_t buttons_reprapworld_keypad;
 #endif
 
-#if ENABLED(ADC_KEYPAD)
+#if ENABLED(REPRAPWORLD_KEYPAD) || ENABLED(ADC_KEYPAD)
+  #define REPRAPWORLD_BTN_OFFSET         0 // bit offset into buttons for shift register values
 
-  #define KEYPAD_HOME EN_REPRAPWORLD_KEYPAD_F1
-  #define KEYPAD_EN_C EN_REPRAPWORLD_KEYPAD_MIDDLE
+  #define BLEN_REPRAPWORLD_KEYPAD_F3     0
+  #define BLEN_REPRAPWORLD_KEYPAD_F2     1
+  #define BLEN_REPRAPWORLD_KEYPAD_F1     2
+
+  #define BLEN_REPRAPWORLD_KEYPAD_DOWN   3
+  #define BLEN_REPRAPWORLD_KEYPAD_RIGHT  4
+  #define BLEN_REPRAPWORLD_KEYPAD_MIDDLE 5
+  #define BLEN_REPRAPWORLD_KEYPAD_UP     6
+  #define BLEN_REPRAPWORLD_KEYPAD_LEFT   7
+  #define EN_REPRAPWORLD_KEYPAD_DOWN     (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_DOWN))
+  #define EN_REPRAPWORLD_KEYPAD_RIGHT    (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_RIGHT))
+  #define EN_REPRAPWORLD_KEYPAD_MIDDLE   (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_MIDDLE))
+  #define EN_REPRAPWORLD_KEYPAD_UP       (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_UP))
+  #define EN_REPRAPWORLD_KEYPAD_LEFT     (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_LEFT))
+  
+#endif // REPRAPWORLD_KEYPAD || ADC_KEYPAD
+
+#if ENABLED(ADC_KEYPAD)
 
   inline bool handle_adc_keypad() {
     #define ADC_MIN_KEY_DELAY 100
@@ -259,48 +276,37 @@ bool lcd_blink() {
 
 #elif ENABLED(REPRAPWORLD_KEYPAD)
 
-  #define REPRAPWORLD_BTN_OFFSET 0 // bit offset into buttons for shift register values
+  #define KEYPAD_HOME EN_REPRAPWORLD_KEYPAD_F1
+  #define KEYPAD_EN_C EN_REPRAPWORLD_KEYPAD_MIDDLE
 
-  #define BLEN_REPRAPWORLD_KEYPAD_F3     0
-  #define BLEN_REPRAPWORLD_KEYPAD_F2     1
-  #define BLEN_REPRAPWORLD_KEYPAD_F1     2
-  #define BLEN_REPRAPWORLD_KEYPAD_DOWN   3
-  #define BLEN_REPRAPWORLD_KEYPAD_RIGHT  4
-  #define BLEN_REPRAPWORLD_KEYPAD_MIDDLE 5
-  #define BLEN_REPRAPWORLD_KEYPAD_UP     6
-  #define BLEN_REPRAPWORLD_KEYPAD_LEFT   7
-
-  #define EN_REPRAPWORLD_KEYPAD_F3      (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F3))
-  #define EN_REPRAPWORLD_KEYPAD_F2      (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F2))
-  #define EN_REPRAPWORLD_KEYPAD_F1      (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F1))
-  #define EN_REPRAPWORLD_KEYPAD_DOWN    (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_DOWN))
-  #define EN_REPRAPWORLD_KEYPAD_RIGHT   (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_RIGHT))
-  #define EN_REPRAPWORLD_KEYPAD_MIDDLE  (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_MIDDLE))
-  #define EN_REPRAPWORLD_KEYPAD_UP      (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_UP))
-  #define EN_REPRAPWORLD_KEYPAD_LEFT    (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_LEFT))
-
-  #define REPRAPWORLD_KEYPAD_MOVE_Z_DOWN  (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_F3)
+  #define EN_REPRAPWORLD_KEYPAD_F1        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F1))
+  #define EN_REPRAPWORLD_KEYPAD_F2        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F2))
+  #define EN_REPRAPWORLD_KEYPAD_F3        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F3))
+  
   #define REPRAPWORLD_KEYPAD_MOVE_Z_UP    (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_F2)
+  #define REPRAPWORLD_KEYPAD_MOVE_Z_DOWN  (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_F3)
   #define REPRAPWORLD_KEYPAD_MOVE_Y_DOWN  (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_DOWN)
   #define REPRAPWORLD_KEYPAD_MOVE_X_RIGHT (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_RIGHT)
   #define REPRAPWORLD_KEYPAD_MOVE_Y_UP    (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_UP)
   #define REPRAPWORLD_KEYPAD_MOVE_X_LEFT  (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_LEFT)
 
-  #define KEYPAD_HOME EN_REPRAPWORLD_KEYPAD_MIDDLE
-  #define KEYPAD_EN_C EN_REPRAPWORLD_KEYPAD_F1
   #define REPRAPWORLD_KEYPAD_MOVE_HOME    (buttons_reprapworld_keypad & KEYPAD_HOME)
   #define REPRAPWORLD_KEYPAD_MOVE_MENU    (buttons_reprapworld_keypad & KEYPAD_EN_C)
 
   #define REPRAPWORLD_KEYPAD_PRESSED      (buttons_reprapworld_keypad & ( \
-                                            EN_REPRAPWORLD_KEYPAD_F3 | \
-                                            EN_REPRAPWORLD_KEYPAD_F2 | \
                                             EN_REPRAPWORLD_KEYPAD_F1 | \
+                                            EN_REPRAPWORLD_KEYPAD_F2 | \
+                                            EN_REPRAPWORLD_KEYPAD_F3 | \
                                             EN_REPRAPWORLD_KEYPAD_DOWN | \
                                             EN_REPRAPWORLD_KEYPAD_RIGHT | \
                                             EN_REPRAPWORLD_KEYPAD_MIDDLE | \
                                             EN_REPRAPWORLD_KEYPAD_UP | \
                                             EN_REPRAPWORLD_KEYPAD_LEFT) \
                                           )
+
+  void lcd_move_x();
+  void lcd_move_y();
+  void lcd_move_z();
 
   void _reprapworld_keypad_move(const AxisEnum axis, const int16_t dir) {
     move_menu_scale = REPRAPWORLD_KEYPAD_MOVE_STEP;
@@ -347,9 +353,7 @@ bool lcd_blink() {
         if (REPRAPWORLD_KEYPAD_MOVE_Y_DOWN)   reprapworld_keypad_move_y_down();
         if (REPRAPWORLD_KEYPAD_MOVE_Y_UP)     reprapworld_keypad_move_y_up();
       }
-      else {
-        if (REPRAPWORLD_KEYPAD_MOVE_HOME)     reprapworld_keypad_move_home();
-      }
+      else if (REPRAPWORLD_KEYPAD_MOVE_HOME)  reprapworld_keypad_move_home();
     }
   }
 
@@ -660,7 +664,7 @@ void lcd_update() {
     // Handle any queued Move Axis motion
     manage_manual_move();
 
-    // Update button states for LCD_CLICKED, etc.
+    // Update button states for LCD_CLICKED(), etc.
     // After state changes the next button update
     // may be delayed 300-500ms.
     lcd_buttons_update();
@@ -673,7 +677,7 @@ void lcd_update() {
     #endif
 
     // If the action button is pressed...
-    if (UBL_CONDITION && LCD_CLICKED) {
+    if (UBL_CONDITION && LCD_CLICKED()) {
       if (!wait_for_unclick) {           // If not waiting for a debounce release:
         wait_for_unclick = true;         //  Set debounce flag to ignore continous clicks
         lcd_clicked = !wait_for_user && !no_reentry; //  Keep the click if not waiting for a user-click
@@ -1102,7 +1106,7 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
   #endif
 
   #if ENABLED(AUTO_BED_LEVELING_UBL) || ENABLED(G26_MESH_VALIDATION)
-    bool is_lcd_clicked() { return LCD_CLICKED; }
+    bool is_lcd_clicked() { return LCD_CLICKED(); }
     void wait_for_release() {
       while (is_lcd_clicked()) safe_delay(50);
       safe_delay(50);
