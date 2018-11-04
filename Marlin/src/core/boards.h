@@ -19,9 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-#ifndef BOARDS_H
-#define BOARDS_H
+#pragma once
 
 #define BOARD_UNKNOWN -1
 
@@ -248,5 +246,3 @@
 #define BOARD_ESP32            1900
 
 #define MB(board) (defined(BOARD_##board) && MOTHERBOARD==BOARD_##board)
-
-#endif // __BOARDS_H
