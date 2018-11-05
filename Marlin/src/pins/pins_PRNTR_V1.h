@@ -24,12 +24,18 @@
   #error "Oops!  Make sure you have an STM32F4 board selected from the 'Tools -> Boards' menu."
 #endif
 
+#define PRNTR_BOARD_REV_3
+
 /**
  * 21017 Venelin Efremov Marlin for stm32f4 test
  */
 
 #define DEFAULT_MACHINE_NAME "STM32F4"
+#ifndef PRNTR_BOARD_REV_3
 #define BOARD_NAME "Marlin for PrntrBoard V1(STM32F4)"
+#else
+#define BOARD_NAME "Marlin for PrntrBoard V1.3(STM32F4)"
+#endif
 #define DEFAULT_WEBSITE_URL "http://blog.pcbxprt.com/index.php/category/prntrboard/"
 
 // Enable I2C_EEPROM for testing
@@ -87,9 +93,13 @@
 #define X_CS_PIN           SLOW_PIN(A, 10)
 #define Y_CS_PIN           SLOW_PIN(A, 11)
 #define Z_CS_PIN           SLOW_PIN(A, 12)
+#ifndef PRNTR_BOARD_REV_3
 #define E0_CS_PIN          SLOW_PIN(B, 8)
 #define E1_CS_PIN          SLOW_PIN(B, 9)
-
+#else
+#define E0_CS_PIN          SLOW_PIN(B, 3)
+#define E1_CS_PIN          SLOW_PIN(B, 1)
+#endif
 //
 // Misc. Functions
 //
