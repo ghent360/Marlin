@@ -749,7 +749,7 @@ inline void get_serial_commands() {
 
           card.printingHasFinished();
 
-          if (card.sdprinting)
+          if (IS_SD_PRINTING())
             sd_count = 0; // If a sub-file was printing, continue from call point
           else {
             SERIAL_PROTOCOLLNPGM(MSG_FILE_PRINTED);
@@ -757,7 +757,7 @@ inline void get_serial_commands() {
               printerEventLEDs.onPrintCompleted();
               #if HAS_RESUME_CONTINUE
                 enqueue_and_echo_commands_P(PSTR("M0 S"
-                  #if ENABLED(NEWPANEL)
+                  #if HAS_LCD_MENU
                     "1800"
                   #else
                     "60"
@@ -888,7 +888,7 @@ void advance_command_queue() {
     else {
       gcode.process_next_command();
       #if ENABLED(POWER_LOSS_RECOVERY)
-        if (card.cardOK && card.sdprinting) save_job_recovery_info();
+        if (card.cardOK && IS_SD_PRINTING()) save_job_recovery_info();
       #endif
     }
 

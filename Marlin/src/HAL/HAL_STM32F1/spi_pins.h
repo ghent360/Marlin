@@ -16,22 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
 /**
  * HAL for stm32duino.com based on Libmaple and compatible (STM32F1)
  */
-
-#ifndef SPI_PINS_H_
-#define SPI_PINS_H_
 
 /**
  * Define SPI Pins: SCK, MISO, MOSI, SS
  *
  * Any PIN can be used for Chip Select (SS)
  */
+#ifndef SCK_PIN
 #define SCK_PIN   PA5
+#endif
+#ifndef MISO_PIN
 #define MISO_PIN  PA6
+#endif
+#ifndef MOSI_PIN
 #define MOSI_PIN  PA7
+#endif
+#ifndef SS_PIN
 #define SS_PIN    PA4
-
-#endif // SPI_PINS_H_
+#endif
