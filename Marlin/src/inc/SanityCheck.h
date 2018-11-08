@@ -660,6 +660,10 @@ static_assert(X_MAX_LENGTH >= X_BED_SIZE && Y_MAX_LENGTH >= Y_BED_SIZE,
     #error "TOOLCHANGE_ZRAISE required for EXTRUDERS > 1. Please update your Configuration."
   #endif
 
+  #ifndef TOOLCHANGE_ZRAISE
+    #error "TOOLCHANGE_ZRAISE required for EXTRUDERS > 1. Please update your Configuration."
+  #endif
+
 #elif ENABLED(MK2_MULTIPLEXER)
   #error "MK2_MULTIPLEXER requires 2 or more EXTRUDERS."
 #elif ENABLED(SINGLENOZZLE)
