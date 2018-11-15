@@ -63,8 +63,6 @@
   #endif
 
   #define LCD_UPDATE_INTERVAL 100
-  #define BUTTON_EXISTS(BN) (defined(BTN_## BN) && BTN_## BN >= 0)
-  #define BUTTON_PRESSED(BN) !READ(BTN_## BN)
 
   #if HAS_LCD_MENU
 
@@ -98,6 +96,9 @@
 
   #define EN_A _BV(BLEN_A)
   #define EN_B _BV(BLEN_B)
+
+  #define BUTTON_EXISTS(BN) (defined(BTN_## BN) && BTN_## BN >= 0)
+  #define BUTTON_PRESSED(BN) !READ(BTN_## BN)
 
   #if BUTTON_EXISTS(ENC)
     #define BLEN_C 2
@@ -303,7 +304,7 @@ public:
       #if ENABLED(STATUS_MESSAGE_SCROLLING)
         static uint8_t status_scroll_offset;
       #endif
-      static bool hasstatus();
+      static bool has_status();
 
       static uint8_t lcd_status_update_delay;
       static uint8_t status_message_level;      // Higher levels block lower levels
@@ -346,7 +347,7 @@ public:
 
       static void refresh() {}
       static inline void reset_alert_level() {}
-      static constexpr bool hasstatus() { return true; }
+      static constexpr bool has_status() { return true; }
 
     #endif
 
@@ -366,7 +367,7 @@ public:
     static inline void status_printf_P(const uint8_t level, PGM_P const fmt, ...) { UNUSED(level); UNUSED(fmt); }
     static inline void reset_status() {}
     static inline void reset_alert_level() {}
-    static constexpr bool hasstatus() { return false; }
+    static constexpr bool has_status() { return false; }
 
   #endif
 
@@ -466,6 +467,10 @@ public:
   #if HAS_ENCODER_ACTION
 
     static volatile uint8_t buttons;
+    #if ENABLED(REPRAPWORLD_KEYPAD)
+      static volatile uint8_t buttons_reprapworld_keypad;
+      static bool handle_keypad();
+    #endif
     #if ENABLED(LCD_HAS_SLOW_BUTTONS)
       static volatile uint8_t slow_buttons;
       static uint8_t read_slow_buttons();
