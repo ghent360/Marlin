@@ -38,6 +38,10 @@
 #endif
 #define DEFAULT_WEBSITE_URL "http://blog.pcbxprt.com/index.php/category/prntrboard/"
 
+#if HOTENDS > 2 || E_STEPPERS > 2
+  #error "PRNTR Board supports up to 2 hotends / E-steppers."
+#endif
+
 // Enable I2C_EEPROM for testing
 #define I2C_EEPROM
 
@@ -100,15 +104,6 @@
 #define E0_CS_PIN          SLOW_PIN(B, 3)
 #define E1_CS_PIN          SLOW_PIN(B, 1)
 #endif
-//
-// Misc. Functions
-//
-//#define SDPOWER            -1
-#define SDSS               -1
-#define LED_PIN            -1
-
-//#define PS_ON_PIN          -1
-//#define KILL_PIN           -1
 
 //
 // Heaters / Fans
@@ -122,7 +117,9 @@
 //#define HEATER_BED3_PIN    -1    // BED3
 
 #define FAN_COUNT 2
+#ifndef FAN_PIN
 #define FAN_PIN            SLOW_PIN(B, 2)   // E0 Part
+#endif
 #define FAN1_PIN           SLOW_PIN(B, 14)  // E1 Part
 #define FAN2_PIN           SLOW_PIN(C, 6)   // E0 Cool / TC1
 #define FAN3_PIN           SLOW_PIN(A, 8)   // E1 Cool / TC2
