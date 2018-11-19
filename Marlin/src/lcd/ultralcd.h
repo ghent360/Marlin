@@ -46,7 +46,7 @@
     LCDVIEW_CALL_NO_REDRAW
   };
 
-  #if ENABLED(ADC_KEYPAD)
+  #if HAS_ADC_BUTTONS
     uint8_t get_ADC_keyValue();
   #endif
 
@@ -88,6 +88,30 @@
 
 #endif
 
+#if ENABLED(REPRAPWORLD_KEYPAD)
+  #define REPRAPWORLD_BTN_OFFSET          0 // Bit offset into buttons for shift register values
+
+  #define BLEN_REPRAPWORLD_KEYPAD_F3      0
+  #define BLEN_REPRAPWORLD_KEYPAD_F2      1
+  #define BLEN_REPRAPWORLD_KEYPAD_F1      2
+  #define BLEN_REPRAPWORLD_KEYPAD_DOWN    3
+  #define BLEN_REPRAPWORLD_KEYPAD_RIGHT   4
+  #define BLEN_REPRAPWORLD_KEYPAD_MIDDLE  5
+  #define BLEN_REPRAPWORLD_KEYPAD_UP      6
+  #define BLEN_REPRAPWORLD_KEYPAD_LEFT    7
+
+  #define EN_REPRAPWORLD_KEYPAD_F1        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F1))
+  #define EN_REPRAPWORLD_KEYPAD_F2        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F2))
+  #define EN_REPRAPWORLD_KEYPAD_F3        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F3))
+  #define EN_REPRAPWORLD_KEYPAD_DOWN      (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_DOWN))
+  #define EN_REPRAPWORLD_KEYPAD_RIGHT     (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_RIGHT))
+  #define EN_REPRAPWORLD_KEYPAD_MIDDLE    (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_MIDDLE))
+  #define EN_REPRAPWORLD_KEYPAD_UP        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_UP))
+  #define EN_REPRAPWORLD_KEYPAD_LEFT      (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_LEFT))
+
+  #define RRK(B) (keypad_buttons & (B))
+#endif
+
 #if HAS_DIGITAL_BUTTONS
 
   // Wheel spin pins where BA is 00, 10, 11, 01 (1 bit always changes)
@@ -112,27 +136,6 @@
   #endif
 
   #if ENABLED(REPRAPWORLD_KEYPAD)
-    #define REPRAPWORLD_BTN_OFFSET          0 // Bit offset into buttons for shift register values
-
-    #define BLEN_REPRAPWORLD_KEYPAD_F3      0
-    #define BLEN_REPRAPWORLD_KEYPAD_F2      1
-    #define BLEN_REPRAPWORLD_KEYPAD_F1      2
-    #define BLEN_REPRAPWORLD_KEYPAD_DOWN    3
-    #define BLEN_REPRAPWORLD_KEYPAD_RIGHT   4
-    #define BLEN_REPRAPWORLD_KEYPAD_MIDDLE  5
-    #define BLEN_REPRAPWORLD_KEYPAD_UP      6
-    #define BLEN_REPRAPWORLD_KEYPAD_LEFT    7
-
-    #define EN_REPRAPWORLD_KEYPAD_F1        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F1))
-    #define EN_REPRAPWORLD_KEYPAD_F2        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F2))
-    #define EN_REPRAPWORLD_KEYPAD_F3        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_F3))
-    #define EN_REPRAPWORLD_KEYPAD_DOWN      (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_DOWN))
-    #define EN_REPRAPWORLD_KEYPAD_RIGHT     (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_RIGHT))
-    #define EN_REPRAPWORLD_KEYPAD_MIDDLE    (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_MIDDLE))
-    #define EN_REPRAPWORLD_KEYPAD_UP        (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_UP))
-    #define EN_REPRAPWORLD_KEYPAD_LEFT      (_BV(REPRAPWORLD_BTN_OFFSET + BLEN_REPRAPWORLD_KEYPAD_LEFT))
-
-    #define RRK(B) (buttons_reprapworld_keypad & (B))
 
     #ifdef EN_C
       #define BUTTON_CLICK() ((buttons & EN_C) || RRK(EN_REPRAPWORLD_KEYPAD_MIDDLE))
@@ -180,6 +183,8 @@
 
 #else
 
+  #define BUTTON_EXISTS(BN) 0
+
   // Shift register bits correspond to buttons:
   #define BL_LE 7   // Left
   #define BL_UP 6   // Up
@@ -210,6 +215,12 @@
     FONT_STATUSMENU = 1,
     FONT_EDIT,
     FONT_MENU
+  };
+#else
+  enum HD44780CharSet : uint8_t {
+    CHARSET_MENU,
+    CHARSET_INFO,
+    CHARSET_BOOT
   };
 #endif
 
@@ -282,23 +293,15 @@ public:
 
         static constexpr bool drawing_screen = false, first_page = true;
 
-        enum HD44780CharSet : uint8_t { CHARSET_MENU, CHARSET_INFO, CHARSET_BOOT };
-
-        static void set_custom_characters(
-          #if ENABLED(LCD_PROGRESS_BAR) || ENABLED(SHOW_BOOTSCREEN)
-            const HD44780CharSet screen_charset=CHARSET_INFO
-          #endif
-        );
+        static void set_custom_characters(const HD44780CharSet screen_charset=CHARSET_INFO);
 
         #if ENABLED(LCD_PROGRESS_BAR)
           static millis_t progress_bar_ms;  // Start time for the current progress bar cycle
+          static void draw_progress_bar(const uint8_t percent);
           #if PROGRESS_MSG_EXPIRE > 0
             static millis_t MarlinUI::expire_status_ms; // = 0
             static inline void reset_progress_bar_timeout() { expire_status_ms = 0; }
           #endif
-          #define LCD_SET_CHARSET(C) set_custom_characters(C)
-        #else
-          #define LCD_SET_CHARSET(C) set_custom_characters()
         #endif
 
       #endif
@@ -465,7 +468,7 @@ public:
 
     static volatile uint8_t buttons;
     #if ENABLED(REPRAPWORLD_KEYPAD)
-      static volatile uint8_t buttons_reprapworld_keypad;
+      static volatile uint8_t keypad_buttons;
       static bool handle_keypad();
     #endif
     #if ENABLED(LCD_HAS_SLOW_BUTTONS)
