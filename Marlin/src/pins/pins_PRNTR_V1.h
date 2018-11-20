@@ -146,9 +146,9 @@
 #if ENABLED(ULTRA_LCD)
 
   #if ENABLED(REPRAPWORLD_GRAPHICAL_LCD)
-    #define LCD_PINS_RS         49   // CS chip select /SS chip slave select
-    #define LCD_PINS_ENABLE     51   // SID (MOSI)
-    #define LCD_PINS_D4         52   // SCK (CLK) clock
+    #define LCD_PINS_RS         SLOW_PIN(C, 3)   // CS chip select /SS chip slave select
+    #define LCD_PINS_ENABLE     SLOW_PIN(C, 1)   // SID (MOSI)
+    #define LCD_PINS_D4         SLOW_PIN(B, 10)  // SCK (CLK) clock
   #elif ENABLED(NEWPANEL) && ENABLED(PANEL_ONE)
     #define LCD_PINS_RS         PB8
     #define LCD_PINS_ENABLE     PD2
@@ -157,14 +157,14 @@
     #define LCD_PINS_D6         PB14
     #define LCD_PINS_D7         PB15
   #else
-    #define LCD_PINS_RS         PB8
-    #define LCD_PINS_ENABLE     PD2
-    #define LCD_PINS_D4         PB12
-    #define LCD_PINS_D5         PB13
-    #define LCD_PINS_D6         PB14
-    #define LCD_PINS_D7         PB15
+    #define LCD_PINS_RS         SLOW_PIN(C, 3)   // CS chip select /SS chip slave select
+    #define LCD_PINS_ENABLE     SLOW_PIN(C, 1)   // SID (MOSI)
+    #define LCD_PINS_D4         SLOW_PIN(B, 10)  // SCK (CLK) clock
+    //#define LCD_PINS_D5         PB13
+    //#define LCD_PINS_D6         PB14
+    //#define LCD_PINS_D7         PB15
     #if DISABLED(NEWPANEL)
-      #define BEEPER_PIN        33
+      #define BEEPER_PIN        SLOW_PIN(B, 8)   // LCD_RESET
       // Buttons are attached to a shift register
       // Not wired yet
       //#define SHIFT_CLK 38
@@ -175,20 +175,20 @@
   #endif
 
   #if ENABLED(NEWPANEL)
-
     #if ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER)
 
-      #define BEEPER_PIN        37
+      #define BEEPER_PIN        SLOW_PIN(B, 8)   // LCD_RESET
 
-      #define BTN_EN1           31
-      #define BTN_EN2           33
-      #define BTN_ENC           35
+      #define BTN_EN1           SLOW_PIN(A, 13)
+      #define BTN_EN2           SLOW_PIN(A, 14)
+      #define BTN_ENC           SLOW_PIN(C, 14)
 
-      #define SD_DETECT_PIN     49
-      #define KILL_PIN          41
+      #define SD_DETECT_PIN     -1
+      #define KILL_PIN          -1
 
       #if ENABLED(BQ_LCD_SMART_CONTROLLER)
         #define LCD_BACKLIGHT_PIN 39
+#error "Not supported!!!"
       #endif
 
     #elif ENABLED(REPRAPWORLD_GRAPHICAL_LCD)
@@ -208,7 +208,6 @@
       #define KILL_PIN          41
 
     #elif ENABLED(LCD_I2C_VIKI)
-
       #define BTN_EN1           22   // http://files.panucatt.com/datasheets/viki_wiring_diagram.pdf explains 40/42.
       #define BTN_EN2            7   // 22/7 are unused on RAMPS_14. 22 is unused and 7 the SERVO0_PIN on RAMPS_13.
 
@@ -217,7 +216,6 @@
       #define SD_DETECT_PIN     49
 
     #elif ENABLED(VIKI2) || ENABLED(miniVIKI)
-
       #define BEEPER_PIN        33
 
       // Pins for DOGM SPI LCD Support
@@ -238,7 +236,6 @@
       #define STAT_LED_BLUE_PIN 35
 
     #elif ENABLED(ELB_FULL_GRAPHIC_CONTROLLER)
-
       #define BTN_EN1           35
       #define BTN_EN2           37
       #define BTN_ENC           31
@@ -251,7 +248,6 @@
       #define LCD_BACKLIGHT_PIN 33
 
     #elif ENABLED(MINIPANEL)
-
       #define BEEPER_PIN        42
       // Pins for DOGM SPI LCD Support
       #define DOGLCD_A0         44
@@ -274,7 +270,6 @@
       #define SD_DETECT_PIN     49
 
     #else
-
       // Beeper on AUX-4
       #define BEEPER_PIN        33
 
