@@ -29,10 +29,29 @@
   #if ENABLED(SDSUPPORT)
     #include "../sd/cardreader.h"
   #endif
-
   #if ENABLED(EXTENSIBLE_UI)
     #define START_OF_UTF8_CHAR(C) (((C) & 0xC0u) != 0x80u)
   #endif
+#endif
+
+#if HAS_SPI_LCD
+  #if ENABLED(STATUS_MESSAGE_SCROLLING)
+    uint8_t MarlinUI::status_scroll_offset; // = 0
+    #if LONG_FILENAME_LENGTH > CHARSIZE * 2 * (LCD_WIDTH)
+      #define MAX_MESSAGE_LENGTH LONG_FILENAME_LENGTH
+    #else
+      #define MAX_MESSAGE_LENGTH CHARSIZE * 2 * (LCD_WIDTH)
+    #endif
+  #else
+    #define MAX_MESSAGE_LENGTH CHARSIZE * (LCD_WIDTH)
+  #endif
+#elif ENABLED(EXTENSIBLE_UI)
+  #define MAX_MESSAGE_LENGTH 63
+#endif
+
+#ifdef MAX_MESSAGE_LENGTH
+  uint8_t MarlinUI::status_message_level; // = 0
+  char MarlinUI::status_message[MAX_MESSAGE_LENGTH + 1];
 #endif
 
 #if HAS_SPI_LCD
@@ -75,24 +94,6 @@
   uint8_t lcd_sd_status;
 #endif
 
-#if ENABLED(STATUS_MESSAGE_SCROLLING)
-  uint8_t MarlinUI::status_scroll_offset; // = 0
-  #if LONG_FILENAME_LENGTH > CHARSIZE * 2 * (LCD_WIDTH)
-    #define MAX_MESSAGE_LENGTH LONG_FILENAME_LENGTH
-  #else
-    #define MAX_MESSAGE_LENGTH CHARSIZE * 2 * (LCD_WIDTH)
-  #endif
-#elif ENABLED(EXTENSIBLE_UI)
-  #define MAX_MESSAGE_LENGTH 63
-#else
-  #define MAX_MESSAGE_LENGTH CHARSIZE * (LCD_WIDTH)
-#endif
-
-#if HAS_SPI_LCD || ENABLED(EXTENSIBLE_UI)
-  uint8_t MarlinUI::status_message_level; // = 0
-  char MarlinUI::status_message[MAX_MESSAGE_LENGTH + 1];
-#endif
-
 #if HAS_LCD_MENU && LCD_TIMEOUT_TO_STATUS
   bool MarlinUI::defer_return_to_status;
 #endif
@@ -129,7 +130,7 @@ millis_t next_button_update_ms;
       uint8_t MarlinUI::filename_scroll_pos, MarlinUI::filename_scroll_max;
     #endif
 
-    const char * const MarlinUI::scrolled_filename(CardReader &theCard, const uint8_t maxlen, uint8_t hash, const bool doScroll) {
+    const char * MarlinUI::scrolled_filename(CardReader &theCard, const uint8_t maxlen, uint8_t hash, const bool doScroll) {
       const char *outstr = theCard.longest_filename();
       if (theCard.longFilename[0]) {
         #if ENABLED(SCROLL_LONG_FILENAMES)
@@ -839,13 +840,13 @@ void MarlinUI::update() {
         #endif
 
         if (do_u8g_loop) {
-          if (!drawing_screen) {                        // If not already drawing pages
-            u8g.firstPage();                            // Start the first page
-            drawing_screen = first_page = true;         // Flag as drawing pages
+          if (!drawing_screen) {                // If not already drawing pages
+            u8g.firstPage();                    // Start the first page
+            drawing_screen = first_page = true; // Flag as drawing pages
           }
-          set_font(FONT_MENU);                       // Setup font for every page draw
-          u8g.setColorIndex(1);                         // And reset the color
-          run_current_screen();                         // Draw and process the current screen
+          set_font(FONT_MENU);                  // Setup font for every page draw
+          u8g.setColorIndex(1);                 // And reset the color
+          run_current_screen();                 // Draw and process the current screen
           first_page = false;
 
           // The screen handler can clear drawing_screen for an action that changes the screen.
