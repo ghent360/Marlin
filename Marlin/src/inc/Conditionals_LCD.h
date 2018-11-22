@@ -47,6 +47,7 @@
   #define ULTIPANEL
 
   // this helps to implement ADC_KEYPAD menus
+  #define REVERSE_MENU_DIRECTION
   #define ENCODER_PULSES_PER_STEP 1
   #define ENCODER_STEPS_PER_MENU_ITEM 1
   #define ENCODER_FEEDRATE_DEADZONE 2
@@ -414,11 +415,11 @@
  */
 #if ENABLED(DISTINCT_E_FACTORS) && E_STEPPERS > 1
   #define XYZE_N (XYZ + E_STEPPERS)
-  #define E_AXIS_N(E) (E_AXIS + E)
+  #define E_AXIS_N(E) (uint8_t(E_AXIS) + E)
 #else
   #undef DISTINCT_E_FACTORS
   #define XYZE_N XYZE
-  #define E_AXIS_N(E) E_AXIS
+  #define E_AXIS_N(E) uint8_t(E_AXIS)
 #endif
 
 /**
