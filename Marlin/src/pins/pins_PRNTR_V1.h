@@ -164,7 +164,7 @@
     //#define LCD_PINS_D6         PB14
     //#define LCD_PINS_D7         PB15
     #if DISABLED(NEWPANEL)
-      //#define BEEPER_PIN        SLOW_PIN(B, 8)   // LCD_RESET
+      //#define BEEPER_PIN        SLOW_PIN(B, 9)   // LCD_A0
       // Buttons are attached to a shift register
       // Not wired yet
       //#define SHIFT_CLK 38
@@ -176,14 +176,14 @@
 
   #if ENABLED(NEWPANEL)
     #if ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER)
+      #define BEEPER_PIN          IO_PIN(B, 9)
 
-      //#define BEEPER_PIN        SLOW_PIN(B, 8)   // LCD_RESET
+      #define BTN_EN1             IO_PIN(A, 13)
+      #define BTN_EN2             IO_PIN(A, 14)
+      #define BTN_ENC             IO_PIN(B, 8) //IO_PIN(C, 14)
 
-      //#define BTN_EN1           SLOW_PIN(A, 13)
-      //#define BTN_EN2           SLOW_PIN(A, 14)
-      //#define BTN_ENC           SLOW_PIN(C, 14)
-
-      #define SD_DETECT_PIN     -1
+      #define SD_DETECT_PIN       -1
+      //#define KILL_PIN            IO_PIN(B, 8)   // LCD_RESET
       #define KILL_PIN          -1
 
       #if ENABLED(BQ_LCD_SMART_CONTROLLER)

@@ -58,10 +58,12 @@ enum PortNumber {
 struct FastIOPin {
     const intptr_t port_addr_;
     const uint16_t pin_;
+    const uint16_t port_num_;
 
     constexpr FastIOPin(uint32_t fast_io_pin)
         : port_addr_(AHB1PERIPH_BASE + GET_PORT(fast_io_pin) * 0x400),
-          pin_(1 << GET_PIN_IDX(fast_io_pin)) {}
+          pin_(1 << GET_PIN_IDX(fast_io_pin)),
+          port_num_(GET_PORT(fast_io_pin)) {}
 
     void set_mode(uint32_t ulMode) const {
         GPIO_InitTypeDef GPIO_InitStructure;
@@ -88,6 +90,7 @@ struct FastIOPin {
         default:
             return;
         }
+        set_GPIO_Port_Clock(port_num_);
         HAL_GPIO_Init(
             reinterpret_cast<GPIO_TypeDef*>(port_addr_),
             &GPIO_InitStructure);

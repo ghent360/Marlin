@@ -886,7 +886,7 @@ inline void TMC26XStepper::send262(unsigned long datagram) {
   //  SPI.setDataMode(SPI_MODE3);
   //}
 
-  STEPPER_SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE3));
+  STEPPER_SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
   //select the TMC driver
   digitalWrite(cs_pin,LOW);
 
