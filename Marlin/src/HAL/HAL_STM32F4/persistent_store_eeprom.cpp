@@ -67,4 +67,4 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uin
 size_t PersistentStore::capacity() { return E2END + 1; }
 
 #endif // EEPROM_SETTINGS
-#endif // STM32F4 || STM32F4xx
+#endif // STM32GENERIC && STM32F4

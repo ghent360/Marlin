@@ -55,4 +55,4 @@
 
 #endif // USE_WATCHDOG
 
-#endif // STM32F4 || STM32F4xx
+#endif // STM32GENERIC && STM32F4
