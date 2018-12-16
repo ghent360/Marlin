@@ -20,8 +20,8 @@
  *
  */
 
-#if !defined(STM32F7) && !defined(STM32F4xx)
-  #error "Oops!  Make sure you have an STM32F7 board selected from the 'Tools -> Boards' menu."
+#if !defined(STM32F7)
+  #error "Oops! Select an STM32F7 board in 'Tools > Board.'"
 #endif
 
 #define DEFAULT_MACHINE_NAME "The-Borge"

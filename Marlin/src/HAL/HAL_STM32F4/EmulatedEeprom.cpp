@@ -140,4 +140,4 @@ void eeprom_update_block(const void *__src, void *__dst, size_t __n) {
 }
 
 #endif // ENABLED(EEPROM_SETTINGS) && DISABLED(I2C_EEPROM) && DISABLED(SPI_EEPROM)
-#endif // STM32F4 || STM32F4xx
+#endif // STM32GENERIC && STM32F4

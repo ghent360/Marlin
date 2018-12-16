@@ -25,13 +25,13 @@
 #if HAS_CHARACTER_LCD
 
 /**
- * ultralcd_impl_HD44780.cpp
+ * ultralcd_HD44780.cpp
  *
- * Implementation of the LCD display routines for a Hitachi HD44780 display.
+ * LCD display implementations for Hitachi HD44780.
  * These are the most common LCD character displays.
  */
 
-#include "ultralcd_common_HD44780.h"
+#include "ultralcd_HD44780.h"
 #include "../ultralcd.h"
 
 #include "../../sd/cardreader.h"
@@ -40,51 +40,55 @@
 #include "../../module/planner.h"
 #include "../../module/motion.h"
 
+#if DISABLED(LCD_PROGRESS_BAR) && ENABLED(FILAMENT_LCD_DISPLAY) && ENABLED(SDSUPPORT)
+  #include "../../feature/filwidth.h"
+  #include "../../gcode/parser.h"
+#endif
+
 #if ENABLED(AUTO_BED_LEVELING_UBL)
   #include "../../feature/bedlevel/ubl/ubl.h"
 #endif
 
-////////////////////////////////////
-// Create LCD class instance and chipset-specific information
+//
+// Create LCD instance and chipset-specific information
+//
+
 #if ENABLED(LCD_I2C_TYPE_PCF8575)
+
   LCD_CLASS lcd(LCD_I2C_ADDRESS, LCD_I2C_PIN_EN, LCD_I2C_PIN_RW, LCD_I2C_PIN_RS, LCD_I2C_PIN_D4, LCD_I2C_PIN_D5, LCD_I2C_PIN_D6, LCD_I2C_PIN_D7);
 
-#elif ENABLED(LCD_I2C_TYPE_MCP23017)
-  #if ENABLED(DETECT_DEVICE)
-    LCD_CLASS lcd(LCD_I2C_ADDRESS, 1);
-  #else
-    LCD_CLASS lcd(LCD_I2C_ADDRESS);
-  #endif
+#elif ENABLED(LCD_I2C_TYPE_MCP23017) || ENABLED(LCD_I2C_TYPE_MCP23008)
 
-#elif ENABLED(LCD_I2C_TYPE_MCP23008)
-  #if ENABLED(DETECT_DEVICE)
-    LCD_CLASS lcd(LCD_I2C_ADDRESS, 1);
-  #else
-    LCD_CLASS lcd(LCD_I2C_ADDRESS);
-  #endif
+  LCD_CLASS lcd(LCD_I2C_ADDRESS
+    #ifdef DETECT_DEVICE
+      , 1
+    #endif
+  );
 
 #elif ENABLED(LCD_I2C_TYPE_PCA8574)
+
   LCD_CLASS lcd(LCD_I2C_ADDRESS, LCD_WIDTH, LCD_HEIGHT);
 
-// 2 wire Non-latching LCD SR from:
-// https://bitbucket.org/fmalpartida/new-liquidcrystal/wiki/schematics#!shiftregister-connection
 #elif ENABLED(SR_LCD_2W_NL)
-  #if PIN_EXISTS(SR_STROBE)
-    LCD_CLASS lcd(SR_DATA_PIN, SR_CLK_PIN, SR_STROBE_PIN);
-  #else
-    LCD_CLASS lcd(SR_DATA_PIN, SR_CLK_PIN);
-  #endif
+
+  // 2 wire Non-latching LCD SR from:
+  // https://bitbucket.org/fmalpartida/new-liquidcrystal/wiki/schematics#!shiftregister-connection
+
+  LCD_CLASS lcd(SR_DATA_PIN, SR_CLK_PIN
+    #if PIN_EXISTS(SR_STROBE)
+      , SR_STROBE_PIN
+    #endif
+  );
 
 #elif ENABLED(LCM1602)
+
   LCD_CLASS lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 
 #else
-  // Standard directly connected LCD implementations
-  LCD_CLASS lcd(LCD_PINS_RS, LCD_PINS_ENABLE, LCD_PINS_D4, LCD_PINS_D5, LCD_PINS_D6, LCD_PINS_D7); //RS,Enable,D4,D5,D6,D7
-#endif
 
-#if ENABLED(LCD_HAS_STATUS_INDICATORS)
-  static void lcd_implementation_update_indicators();
+  // Standard direct-connected LCD implementations
+  LCD_CLASS lcd(LCD_PINS_RS, LCD_PINS_ENABLE, LCD_PINS_D4, LCD_PINS_D5, LCD_PINS_D6, LCD_PINS_D7);
+
 #endif
 
 static void createChar_P(const char c, const byte * const ptr) {
@@ -98,11 +102,11 @@ static void createChar_P(const char c, const byte * const ptr) {
   #define LCD_STR_PROGRESS  "\x03\x04\x05"
 #endif
 
-void lcd_set_custom_characters(
-  #if ENABLED(LCD_PROGRESS_BAR) || ENABLED(SHOW_BOOTSCREEN)
-    const HD44780CharSet screen_charset/*=CHARSET_INFO*/
+void MarlinUI::set_custom_characters(const HD44780CharSet screen_charset/*=CHARSET_INFO*/) {
+  #if DISABLED(LCD_PROGRESS_BAR) && DISABLED(SHOW_BOOTSCREEN)
+    UNUSED(screen_charset);
   #endif
-) {
+
   // CHARSET_BOOT
   #if ENABLED(SHOW_BOOTSCREEN)
     const static PROGMEM byte corner[4][8] = { {
@@ -291,11 +295,11 @@ void lcd_set_custom_characters(
     else
   #endif
     { // Info Screen uses 5 special characters
-      createChar_P(LCD_BEDTEMP_CHAR, bedTemp);
-      createChar_P(LCD_DEGREE_CHAR, degree);
+      createChar_P(LCD_STR_BEDTEMP[0], bedTemp);
+      createChar_P(LCD_STR_DEGREE[0], degree);
       createChar_P(LCD_STR_THERMOMETER[0], thermometer);
-      createChar_P(LCD_FEEDRATE_CHAR, feedrate);
-      createChar_P(LCD_CLOCK_CHAR, clock);
+      createChar_P(LCD_STR_FEEDRATE[0], feedrate);
+      createChar_P(LCD_STR_CLOCK[0], clock);
 
       #if ENABLED(LCD_PROGRESS_BAR)
         if (screen_charset == CHARSET_INFO) { // 3 Progress bar characters for info screen
@@ -305,7 +309,7 @@ void lcd_set_custom_characters(
         else
       #endif
         {
-          createChar_P(LCD_UPLEVEL_CHAR, uplevel);
+          createChar_P(LCD_STR_UPLEVEL[0], uplevel);
           #if ENABLED(SDSUPPORT)
             // SD Card sub-menu special characters
             createChar_P(LCD_STR_REFRESH[0], refresh);
@@ -316,7 +320,7 @@ void lcd_set_custom_characters(
 
 }
 
-void lcd_implementation_init() {
+void MarlinUI::init_lcd() {
 
   #if ENABLED(LCD_I2C_TYPE_PCF8575)
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
@@ -328,7 +332,7 @@ void lcd_implementation_init() {
   #elif ENABLED(LCD_I2C_TYPE_MCP23017)
     lcd.setMCPType(LTI_TYPE_MCP23017);
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
-    lcd_implementation_update_indicators();
+    update_indicators();
 
   #elif ENABLED(LCD_I2C_TYPE_MCP23008)
     lcd.setMCPType(LTI_TYPE_MCP23008);
@@ -342,12 +346,12 @@ void lcd_implementation_init() {
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
   #endif
 
-  LCD_SET_CHARSET(currentScreen == lcd_status_screen ? CHARSET_INFO : CHARSET_MENU);
+  set_custom_characters(on_status_screen() ? CHARSET_INFO : CHARSET_MENU);
 
   lcd.clear();
 }
 
-void lcd_implementation_clear() { lcd.clear(); }
+void MarlinUI::clear_lcd() { lcd.clear(); }
 
 #if ENABLED(SHOW_BOOTSCREEN)
 
@@ -364,10 +368,7 @@ void lcd_implementation_clear() { lcd.clear(); }
       // Fits into,
       lcd_moveto(col, line);
       lcd_put_u8str_max_P(text, len);
-      while (slen < len) {
-        lcd_put_wchar(' ');
-        ++slen;
-      }
+      for (; slen < len; ++slen) lcd_put_wchar(' ');
       safe_delay(time);
     }
     else {
@@ -382,11 +383,7 @@ void lcd_implementation_clear() { lcd.clear(); }
         lcd_put_u8str_max_P(p, len);
 
         // Fill with spaces
-        uint8_t ix = slen - i;
-        while (ix < len) {
-          lcd_put_wchar(' ');
-          ++ix;
-        }
+        for (uint8_t ix = slen - i; ix < len; ++ix) lcd_put_wchar(' ');
 
         // Delay
         safe_delay(dly);
@@ -405,8 +402,8 @@ void lcd_implementation_clear() { lcd.clear(); }
     lcd_moveto(indent, 2); lcd_put_wchar('\x02'); lcd_put_u8str_P(PSTR( "------" ));  lcd_put_wchar('\x03');
   }
 
-  void lcd_bootscreen() {
-    LCD_SET_CHARSET(CHARSET_BOOT);
+  void MarlinUI::show_bootscreen() {
+    set_custom_characters(CHARSET_BOOT);
     lcd.clear();
 
     #define LCD_EXTRA_SPACE (LCD_WIDTH-8)
@@ -451,6 +448,9 @@ void lcd_implementation_clear() { lcd.clear(); }
         CENTER_OR_SCROLL(STRING_SPLASH_LINE1, _SPLASH_WAIT_1);
         #ifdef STRING_SPLASH_LINE2
           CENTER_OR_SCROLL(STRING_SPLASH_LINE2, 1500);
+          #ifdef STRING_SPLASH_LINE3
+            CENTER_OR_SCROLL(STRING_SPLASH_LINE3, 1500);
+          #endif
         #endif
       }
     #elif defined(STRING_SPLASH_LINE2)
@@ -475,15 +475,15 @@ void lcd_implementation_clear() { lcd.clear(); }
 
     lcd.clear();
     safe_delay(100);
-    LCD_SET_CHARSET(CHARSET_INFO);
+    set_custom_characters(CHARSET_INFO);
     lcd.clear();
   }
 
 #endif // SHOW_BOOTSCREEN
 
-void lcd_kill_screen() {
+void MarlinUI::draw_kill_screen() {
   lcd_moveto(0, 0);
-  lcd_put_u8str(lcd_status_message);
+  lcd_put_u8str(status_message);
   #if LCD_HEIGHT < 4
     lcd_moveto(0, 2);
   #else
@@ -551,7 +551,7 @@ FORCE_INLINE void _draw_heater_status(const int8_t heater, const char prefix, co
       lcd_put_u8str(itostr3left(t2 + 0.5));
 
   if (prefix >= 0) {
-    lcd_put_wchar(LCD_DEGREE_CHAR);
+    lcd_put_wchar(LCD_STR_DEGREE[0]);
     lcd_put_wchar(' ');
     if (t2 < 10) lcd_put_wchar(' ');
   }
@@ -562,20 +562,14 @@ FORCE_INLINE void _draw_bed_status(const bool blink) {
     #if HAS_LEVELING
       planner.leveling_active && blink ? '_' :
     #endif
-    LCD_BEDTEMP_CHAR
+    LCD_STR_BEDTEMP[0]
   ), blink);
 }
 
 #if HAS_PRINT_PROGRESS
 
   FORCE_INLINE void _draw_print_progress() {
-    const uint8_t percent = (
-      #if ENABLED(SDSUPPORT)
-        IS_SD_PRINTING() ? card.percentDone() : 0
-      #else
-        progress_bar_percent
-      #endif
-    );
+    const uint8_t progress = ui.get_progress();
     lcd_put_u8str_P(PSTR(
       #if ENABLED(SDSUPPORT)
         "SD"
@@ -583,8 +577,8 @@ FORCE_INLINE void _draw_bed_status(const bool blink) {
         "P:"
       #endif
     ));
-    if (percent)
-      lcd_put_u8str(itostr3(percent));
+    if (progress)
+      lcd_put_u8str(itostr3(progress));
     else
       lcd_put_u8str_P(PSTR("---"));
     lcd_put_wchar('%');
@@ -594,7 +588,7 @@ FORCE_INLINE void _draw_bed_status(const bool blink) {
 
 #if ENABLED(LCD_PROGRESS_BAR)
 
-  inline void lcd_draw_progress_bar(const uint8_t percent) {
+  void MarlinUI::draw_progress_bar(const uint8_t percent) {
     const int16_t tix = (int16_t)(percent * (LCD_WIDTH) * 3) / 100,
               cel = tix / 3,
               rem = tix % 3;
@@ -613,7 +607,7 @@ FORCE_INLINE void _draw_bed_status(const bool blink) {
 
 #endif // LCD_PROGRESS_BAR
 
-FORCE_INLINE void _draw_status_message(const bool blink) {
+void MarlinUI::draw_status_message(const bool blink) {
 
   lcd_moveto(0, LCD_HEIGHT - 1);
 
@@ -621,17 +615,15 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
 
     // Draw the progress bar if the message has shown long enough
     // or if there is no message set.
-    #if DISABLED(LCD_SET_PROGRESS_MANUALLY)
-      const uint8_t progress_bar_percent = card.percentDone();
-    #endif
-    if (progress_bar_percent > 2 && (ELAPSED(millis(), progress_bar_ms + PROGRESS_BAR_MSG_TIME) || !lcd_status_message[0]))
-      return lcd_draw_progress_bar(progress_bar_percent);
+    if (ELAPSED(millis(), progress_bar_ms + PROGRESS_BAR_MSG_TIME) || !has_status()) {
+      const uint8_t progress = get_progress();
+      if (progress > 2) return draw_progress_bar(progress);
+    }
 
   #elif ENABLED(FILAMENT_LCD_DISPLAY) && ENABLED(SDSUPPORT)
 
-    // Show Filament Diameter and Volumetric Multiplier %
-    // After allowing lcd_status_message to show for 5 seconds
-    if (ELAPSED(millis(), previous_lcd_status_ms + 5000UL)) {
+    // Alternate Status message and Filament display
+    if (ELAPSED(millis(), next_filament_display)) {
       lcd_put_u8str_P(PSTR("Dia "));
       lcd_put_u8str(ftostr12ns(filament_width_meas));
       lcd_put_u8str_P(PSTR(" V"));
@@ -651,13 +643,13 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
     static bool last_blink = false;
 
     // Get the UTF8 character count of the string
-    uint8_t slen = utf8_strlen(lcd_status_message);
+    uint8_t slen = utf8_strlen(status_message);
 
     // If the string fits into the LCD, just print it and do not scroll it
     if (slen <= LCD_WIDTH) {
 
       // The string isn't scrolling and may not fill the screen
-      lcd_put_u8str(lcd_status_message);
+      lcd_put_u8str(status_message);
 
       // Fill the rest with spaces
       while (slen < LCD_WIDTH) {
@@ -669,7 +661,7 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
       // String is larger than the available space in screen.
 
       // Get a pointer to the next valid UTF8 character
-      const char *stat = lcd_status_message + status_scroll_offset;
+      const char *stat = status_message + status_scroll_offset;
 
       // Get the string remaining length
       const uint8_t rlen = utf8_strlen(stat);
@@ -689,7 +681,7 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
         if (--chars) {                                    // Draw a second dot if there's space
           lcd_put_wchar('.');
           if (--chars)
-            lcd_put_u8str_max(lcd_status_message, chars); // Print a second copy of the message
+            lcd_put_u8str_max(status_message, chars); // Print a second copy of the message
         }
       }
       if (last_blink != blink) {
@@ -698,7 +690,7 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
         // Adjust by complete UTF8 characters
         if (status_scroll_offset < slen) {
           status_scroll_offset++;
-          while (!START_OF_UTF8_CHAR(lcd_status_message[status_scroll_offset]))
+          while (!START_OF_UTF8_CHAR(status_message[status_scroll_offset]))
             status_scroll_offset++;
         }
         else
@@ -709,10 +701,10 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
     UNUSED(blink);
 
     // Get the UTF8 character count of the string
-    uint8_t slen = utf8_strlen(lcd_status_message);
+    uint8_t slen = utf8_strlen(status_message);
 
     // Just print the string to the LCD
-    lcd_put_u8str_max(lcd_status_message, LCD_WIDTH);
+    lcd_put_u8str_max(status_message, LCD_WIDTH);
 
     // Fill the rest with spaces if there are missing spaces
     while (slen < LCD_WIDTH) {
@@ -722,34 +714,46 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
   #endif
 }
 
-#if LCD_INFO_SCREEN_STYLE == 0
+/**
+ *  LCD_INFO_SCREEN_STYLE 0 : Classic Status Screen
+ *
+ *  16x2   |000/000 B000/000|
+ *         |0123456789012345|
+ *
+ *  16x4   |000/000 B000/000|
+ *         |SD---%  Z 000.00|
+ *         |F---%     T--:--|
+ *         |0123456789012345|
+ *
+ *  20x2   |T000/000° B000/000° |
+ *         |01234567890123456789|
+ *
+ *  20x4   |T000/000° B000/000° |
+ *         |X 000 Y 000 Z000.000|
+ *         |F---%  SD---% T--:--|
+ *         |01234567890123456789|
+ *
+ *  LCD_INFO_SCREEN_STYLE 1 : Prusa-style Status Screen
+ *
+ *  |T000/000°  Z 000.00 |
+ *  |B000/000°  F---%    |
+ *  |SD---%     T--:--   |
+ *  |01234567890123456789|
+ *
+ *  |T000/000°  Z 000.00 |
+ *  |T000/000°  F---%    |
+ *  |B000/000°  SD---%   |
+ *  |01234567890123456789|
+ */
 
-  /**
-   *  LCD_INFO_SCREEN_STYLE 0 : Classic Status Screen
-   *
-   *  16x2   |000/000 B000/000|
-   *         |0123456789012345|
-   *
-   *  16x4   |000/000 B000/000|
-   *         |SD---%  Z 000.00|
-   *         |F---%     T--:--|
-   *         |0123456789012345|
-   *
-   *  20x2   |T000/000° B000/000° |
-   *         |01234567890123456789|
-   *
-   *  20x4   |T000/000° B000/000° |
-   *         |X 000 Y 000 Z000.000|
-   *         |F---%  SD---% T--:--|
-   *         |01234567890123456789|
-   */
+void MarlinUI::draw_status_screen() {
 
-  void lcd_impl_status_screen_0() {
-    const bool blink = lcd_blink();
+  const bool blink = get_blink();
+  lcd_moveto(0, 0);
+
+  #if LCD_INFO_SCREEN_STYLE == 0
 
     // ========== Line 1 ==========
-
-    lcd_moveto(0, 0);
 
     #if LCD_WIDTH < 20
 
@@ -763,11 +767,11 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
       //
       #if HOTENDS > 1
         lcd_moveto(8, 0);
-        lcd_put_wchar((char)LCD_STR_THERMOMETER[0]);
+        lcd_put_wchar(LCD_STR_THERMOMETER[0]);
         _draw_heater_status(1, -1, blink);
       #elif HAS_HEATED_BED
         lcd_moveto(8, 0);
-        lcd_put_wchar((char)LCD_BEDTEMP_CHAR);
+        lcd_put_wchar(LCD_STR_BEDTEMP[0]);
         _draw_heater_status(-1, -1, blink);
       #endif
 
@@ -844,7 +848,7 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
     #if LCD_HEIGHT > 3
 
       lcd_moveto(0, 2);
-      lcd_put_wchar(LCD_FEEDRATE_CHAR);
+      lcd_put_wchar(LCD_STR_FEEDRATE[0]);
       lcd_put_u8str(itostr3(feedrate_percentage));
       lcd_put_wchar('%');
 
@@ -853,7 +857,7 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
       const uint8_t len = elapsed.toDigital(buffer),
                     timepos = LCD_WIDTH - len - 1;
       lcd_moveto(timepos, 2);
-      lcd_put_wchar(LCD_CLOCK_CHAR);
+      lcd_put_wchar(LCD_STR_CLOCK[0]);
       lcd_put_u8str(buffer);
 
       #if LCD_WIDTH >= 20
@@ -882,39 +886,13 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
 
     #endif // LCD_HEIGHT > 3
 
-    // ========= Last Line ========
-
-    //
-    // Status Message (which may be a Progress Bar or Filament display)
-    //
-    _draw_status_message(blink);
-  }
-
-#elif LCD_INFO_SCREEN_STYLE == 1
-
-  /**
-   *  LCD_INFO_SCREEN_STYLE 1 : Prusa-style Status Screen
-   *
-   *  |T000/000°  Z 000.00 |
-   *  |B000/000°  F---%    |
-   *  |SD---%     T--:--   |
-   *  |01234567890123456789|
-   *
-   *  |T000/000°  Z 000.00 |
-   *  |T000/000°  F---%    |
-   *  |B000/000°  SD---%   |
-   *  |01234567890123456789|
-   */
-
-  void lcd_impl_status_screen_1() {
-    const bool blink = lcd_blink();
+  #elif LCD_INFO_SCREEN_STYLE == 1
 
     // ========== Line 1 ==========
 
     //
     // Hotend 0 Temperature
     //
-    lcd_moveto(0, 0);
     _draw_heater_status(0, LCD_STR_THERMOMETER[0], blink);
 
     //
@@ -941,7 +919,7 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
     #endif
 
     lcd_moveto(LCD_WIDTH - 9, 1);
-    lcd_put_wchar(LCD_FEEDRATE_CHAR);
+    lcd_put_wchar(LCD_STR_FEEDRATE[0]);
     lcd_put_u8str(itostr3(feedrate_percentage));
     lcd_put_wchar('%');
 
@@ -970,34 +948,34 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
       duration_t elapsed = print_job_timer.duration();
       char buffer[14];
       (void)elapsed.toDigital(buffer);
-      lcd_put_wchar(LCD_CLOCK_CHAR);
+      lcd_put_wchar(LCD_STR_CLOCK[0]);
       lcd_put_u8str(buffer);
     #endif
 
-    // ========== Line 4 ==========
+  #endif // LCD_INFO_SCREEN_STYLE 1
 
-    //
-    // Status Message (which may be a Progress Bar or Filament display)
-    //
-    _draw_status_message(blink);
-  }
+  // ========= Last Line ========
 
-#endif
+  //
+  // Status Message (which may be a Progress Bar or Filament display)
+  //
+  draw_status_message(blink);
+}
 
 #if HAS_LCD_MENU
 
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
-    void lcd_implementation_hotend_status(const uint8_t row, const uint8_t extruder) {
+    void MarlinUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
       if (row < LCD_HEIGHT) {
         lcd_moveto(LCD_WIDTH - 9, row);
-        _draw_heater_status(extruder, LCD_STR_THERMOMETER[0], lcd_blink());
+        _draw_heater_status(extruder, LCD_STR_THERMOMETER[0], ui.get_blink());
       }
     }
 
   #endif // ADVANCED_PAUSE_FEATURE
 
-  void lcd_implementation_drawmenu_static(const uint8_t row, PGM_P pstr, const bool center/*=true*/, const bool invert/*=false*/, const char *valstr/*=NULL*/) {
+  void draw_menu_item_static(const uint8_t row, PGM_P pstr, const bool center/*=true*/, const bool invert/*=false*/, const char *valstr/*=NULL*/) {
     UNUSED(invert);
     int8_t n = LCD_WIDTH;
     lcd_moveto(0, row);
@@ -1010,35 +988,26 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
     for (; n > 0; --n) lcd_put_wchar(' ');
   }
 
-  void lcd_implementation_drawmenu_generic(const bool sel, const uint8_t row, PGM_P pstr, const char pre_char, const char post_char) {
+  void draw_menu_item(const bool sel, const uint8_t row, PGM_P pstr, const char pre_char, const char post_char) {
     uint8_t n = LCD_WIDTH - 2;
     lcd_moveto(0, row);
     lcd_put_wchar(sel ? pre_char : ' ');
     n -= lcd_put_u8str_max_P(pstr, n);
-    while (n--) lcd_put_wchar(' ');
+    for (; n; --n) lcd_put_wchar(' ');
     lcd_put_wchar(post_char);
   }
 
-  void lcd_implementation_drawmenu_setting_edit_generic(const bool sel, const uint8_t row, PGM_P pstr, const char pre_char, const char* const data) {
-    uint8_t n = LCD_WIDTH - 2 - utf8_strlen(data);
+  void _draw_menu_item_edit(const bool sel, const uint8_t row, PGM_P pstr, const char* const data, const bool pgm) {
+    uint8_t n = LCD_WIDTH - 2 - (pgm ? utf8_strlen_P(data) : utf8_strlen(data));
     lcd_moveto(0, row);
-    lcd_put_wchar(sel ? pre_char : ' ');
+    lcd_put_wchar(sel ? LCD_STR_ARROW_RIGHT[0] : ' ');
     n -= lcd_put_u8str_max_P(pstr, n);
     lcd_put_wchar(':');
-    while (n--) lcd_put_wchar(' ');
-    lcd_put_u8str(data);
-  }
-  void lcd_implementation_drawmenu_setting_edit_generic_P(const bool sel, const uint8_t row, PGM_P pstr, const char pre_char, const char* const data) {
-    uint8_t n = LCD_WIDTH - 2 - utf8_strlen_P(data);
-    lcd_moveto(0, row);
-    lcd_put_wchar(sel ? pre_char : ' ');
-    n -= lcd_put_u8str_max_P(pstr, n);
-    lcd_put_wchar(':');
-    while (n--) lcd_put_wchar(' ');
-    lcd_put_u8str_P(data);
+    for (; n; --n) lcd_put_wchar(' ');
+    if (pgm) lcd_put_u8str_P(data); else lcd_put_u8str(data);
   }
 
-  void lcd_implementation_drawedit(PGM_P pstr, const char* const value/*=NULL*/) {
+  void draw_edit_screen(PGM_P const pstr, const char* const value/*=NULL*/) {
     lcd_moveto(1, 1);
     lcd_put_u8str_P(pstr);
     if (value != NULL) {
@@ -1053,73 +1022,22 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
 
   #if ENABLED(SDSUPPORT)
 
-    static void lcd_implementation_drawmenu_sd(const bool sel, const uint8_t row, PGM_P const pstr, CardReader &theCard, const uint8_t concat, const char post_char) {
+    void draw_sd_menu_item(const bool sel, const uint8_t row, PGM_P const pstr, CardReader &theCard, const bool isDir) {
       UNUSED(pstr);
-      lcd_moveto(0, row);
-      lcd_put_wchar(sel ? '>' : ' ');
-
-      uint8_t n = LCD_WIDTH - concat;
-      const char *outstr = theCard.longest_filename();
-      if (theCard.longFilename[0]) {
-        #if ENABLED(SCROLL_LONG_FILENAMES)
-          static uint8_t filename_scroll_hash;
-          if (sel) {
-            uint8_t name_hash = row;
-            for (uint8_t l = FILENAME_LENGTH; l--;)
-              name_hash = ((name_hash << 1) | (name_hash >> 7)) ^ theCard.filename[l];  // rotate, xor
-            if (filename_scroll_hash != name_hash) {                            // If the hash changed...
-              filename_scroll_hash = name_hash;                                 // Save the new hash
-              filename_scroll_max = MAX(0, utf8_strlen(theCard.longFilename) - n);  // Update the scroll limit
-              filename_scroll_pos = 0;                                          // Reset scroll to the start
-              lcd_status_update_delay = 8;                                      // Don't scroll right away
-            }
-            outstr += filename_scroll_pos;
-          }
-        #else
-          theCard.longFilename[n] = '\0'; // cutoff at screen edge
-        #endif
-      }
 
       lcd_moveto(0, row);
-      lcd_put_wchar(sel ? '>' : ' ');
-      n -= lcd_put_u8str_max(outstr, n);
-
-      while (n) { --n; lcd_put_wchar(' '); }
-      lcd_put_wchar(post_char);
-    }
-
-    void lcd_implementation_drawmenu_sdfile(const bool sel, const uint8_t row, PGM_P pstr, CardReader &theCard) {
-      lcd_implementation_drawmenu_sd(sel, row, pstr, theCard, 2, ' ');
-    }
-
-    void lcd_implementation_drawmenu_sddirectory(const bool sel, const uint8_t row, PGM_P pstr, CardReader &theCard) {
-      lcd_implementation_drawmenu_sd(sel, row, pstr, theCard, 2, LCD_STR_FOLDER[0]);
+      lcd_put_wchar(sel ? LCD_STR_ARROW_RIGHT[0] : ' ');
+      constexpr uint8_t maxlen = LCD_WIDTH - 2;
+      uint8_t n = maxlen - lcd_put_u8str_max(ui.scrolled_filename(theCard, maxlen, row, sel), maxlen);
+      for (; n; --n) lcd_put_wchar(' ');
+      lcd_put_wchar(isDir ? LCD_STR_FOLDER[0] : ' ');
     }
 
   #endif // SDSUPPORT
 
-  #if ENABLED(LCD_HAS_SLOW_BUTTONS)
-
-    extern millis_t next_button_update_ms;
-
-    static uint8_t lcd_implementation_read_slow_buttons() {
-      #if ENABLED(LCD_I2C_TYPE_MCP23017)
-        // Reading these buttons this is likely to be too slow to call inside interrupt context
-        // so they are called during normal lcd_update
-        uint8_t slow_bits = lcd.readButtons() << B_I2C_BTN_OFFSET;
-        #if ENABLED(LCD_I2C_VIKI)
-          if ((slow_bits & (B_MI | B_RI)) && PENDING(millis(), next_button_update_ms)) // LCD clicked
-            slow_bits &= ~(B_MI | B_RI); // Disable LCD clicked buttons if screen is updated
-        #endif // LCD_I2C_VIKI
-        return slow_bits;
-      #endif // LCD_I2C_TYPE_MCP23017
-    }
-
-  #endif // LCD_HAS_SLOW_BUTTONS
-
   #if ENABLED(LCD_HAS_STATUS_INDICATORS)
 
-    static void lcd_implementation_update_indicators() {
+    static void MarlinUI::update_indicators() {
       // Set the LEDS - referred to as backlights by the LiquidTWI2 library
       static uint8_t ledsprev = 0;
       uint8_t leds = 0;
@@ -1239,7 +1157,7 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
       lcd_put_wchar(c);
     }
 
-    void lcd_implementation_ubl_plot(const uint8_t x, const uint8_t inverted_y) {
+    void MarlinUI::ubl_plot(const uint8_t x, const uint8_t inverted_y) {
 
       #if LCD_WIDTH >= 20
         #define _LCD_W_POS 12
@@ -1289,7 +1207,7 @@ FORCE_INLINE void _draw_status_message(const bool blink) {
         lower_right.column = 0;
         lower_right.row    = 0;
 
-        lcd_implementation_clear();
+        clear_lcd();
 
         x_map_pixels = (HD44780_CHAR_WIDTH) * (MESH_MAP_COLS) - 2;          // Minus 2 because we are drawing a box around the map
         y_map_pixels = (HD44780_CHAR_HEIGHT) * (MESH_MAP_ROWS) - 2;

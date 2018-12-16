@@ -111,9 +111,9 @@
 //default values
 #define INITIAL_MICROSTEPPING 0x3ul //32th microstepping
 
-SPIClass stepperSPI(STEPPER_SPI_MOSI, STEPPER_SPI_MISO, STEPPER_SPI_SCK, NC);
+//SPIClass stepperSPI(STEPPER_SPI_MOSI, STEPPER_SPI_MISO, STEPPER_SPI_SCK, NC);
 
-#define STEPPER_SPI stepperSPI
+#define STEPPER_SPI SPI
 
 //debuging output
 
@@ -195,9 +195,6 @@ void TMC26XStepper::start() {
   digitalWrite(step_pin, LOW);
   digitalWrite(dir_pin, LOW);
   digitalWrite(cs_pin, HIGH);
-
-  STEPPER_SPI.begin();
-  STEPPER_SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
 
   //set the initial values
   send262(driver_control_register_value);
@@ -889,6 +886,7 @@ inline void TMC26XStepper::send262(unsigned long datagram) {
   //  SPI.setDataMode(SPI_MODE3);
   //}
 
+  STEPPER_SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
   //select the TMC driver
   digitalWrite(cs_pin,LOW);
 
@@ -920,6 +918,7 @@ inline void TMC26XStepper::send262(unsigned long datagram) {
 
   //deselect the TMC chip
   digitalWrite(cs_pin,HIGH);
+  STEPPER_SPI.endTransaction();
 
   //restore the previous SPI mode if neccessary
   //if the mode is not correct set it to mode 3

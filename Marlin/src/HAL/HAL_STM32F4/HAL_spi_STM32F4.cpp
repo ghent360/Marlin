@@ -171,4 +171,4 @@ void spiSendBlock(uint8_t token, const uint8_t* buf) {
 
 #endif // SOFTWARE_SPI
 
-#endif // STM32F4 || STM32F4xx
+#endif // STM32GENERIC && STM32F4

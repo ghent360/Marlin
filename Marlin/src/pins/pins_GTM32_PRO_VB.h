@@ -26,7 +26,7 @@
  */
 
 #ifndef __STM32F1__
-  #error "Oops!  Make sure you have an STM32F1 board selected from the 'Tools -> Boards' menu."
+  #error "Oops! Select an STM32F1 board in 'Tools > Board.'"
 #endif
 
 #define DEFAULT_MACHINE_NAME "STM32F103VET6"
@@ -64,17 +64,17 @@
 #define Z_DIR_PIN          PD3
 #define Z_ENABLE_PIN       PB3
 
-#define E0_STEP_PIN        PC14
-#define E0_DIR_PIN         PC13
-#define E0_ENABLE_PIN      PC15
+#define E0_STEP_PIN        PB2
+#define E0_DIR_PIN         PB11
+#define E0_ENABLE_PIN      PC4
 
 #define E1_STEP_PIN        PA0
 #define E1_DIR_PIN         PB6
 #define E1_ENABLE_PIN      PA1
 
-#define E2_STEP_PIN        PB2
-#define E2_DIR_PIN         PB11
-#define E2_ENABLE_PIN      PC4
+#define E2_STEP_PIN        PC14
+#define E2_DIR_PIN         PC13
+#define E2_ENABLE_PIN      PC15
 
 //
 // Heaters / Fans
