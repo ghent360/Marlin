@@ -24,7 +24,7 @@
   #error "Oops!  Make sure you have an STM32F4 board selected from the 'Tools -> Boards' menu."
 #endif
 
-#define PRNTR_BOARD_REV_3
+//#define PRNTR_BOARD_REV_3
 
 /**
  * 21017 Venelin Efremov Marlin for stm32f4 test
