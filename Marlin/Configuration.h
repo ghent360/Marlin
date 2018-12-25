@@ -132,7 +132,7 @@
 // The following define selects which electronics board you have.
 // Please choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_PRNTR_V1
+  #define MOTHERBOARD BOARD_PRNTR_F407_V1
 #endif
 
 // Optional custom name for your RepStrap or other custom machine
