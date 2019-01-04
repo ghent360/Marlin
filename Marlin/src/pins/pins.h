@@ -100,6 +100,8 @@
   #include "pins_BAM_DICE_DUE.h"      // ATmega1280, ATmega2560                     env:megaatmega1280 env:megaatmega2560
 #elif MB(MKS_BASE)
   #include "pins_MKS_BASE.h"          // ATmega1280, ATmega2560                     env:megaatmega1280 env:megaatmega2560
+#elif MB(MKS_BASE_14)
+  #include "pins_MKS_BASE_14.h"       // ATmega2560                                 env:megaatmega2560
 #elif MB(MKS_BASE_15)
   #include "pins_MKS_BASE_15.h"       // ATmega1280, ATmega2560                     env:megaatmega1280 env:megaatmega2560
 #elif MB(MKS_BASE_HEROIC)
@@ -158,6 +160,8 @@
   #include "pins_FYSETC_F6_13.h"      // ATmega2560                                 env:megaatmega2560
 #elif MB(DUPLICATOR_I3_PLUS)
   #include "pins_DUPLICATOR_I3_PLUS.h" // ATmega2560                                 env:megaatmega2560
+#elif MB(VORON)
+  #include "pins_VORON.h"             // ATmega2560                                 env:megaatmega2560
 
 //
 // Other ATmega1280, ATmega2560
@@ -320,6 +324,10 @@
   #include "pins_COHESION3D_MINI.h"   // LPC1769                                    env:LPC1769
 #elif MB(SMOOTHIEBOARD)
   #include "pins_SMOOTHIEBOARD.h"     // LPC1769                                    env:LPC1769
+#elif MB(BIQU_SKR_V1_1)
+  #include "pins_BIQU_SKR_V1.1.h"     // LPC1768                                    env:LPC1768
+#elif MB(BIQU_B300_V1_0)
+  #include "pins_BIQU_B300_V1.0.h"    // LPC1768                                    env:LPC1768
 
 //
 // Other 32-bit Boards
