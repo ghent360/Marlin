@@ -19,33 +19,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#pragma once
 
 /**
  * HAL for stm32duino.com based on Libmaple and compatible (STM32F1)
  */
 
-#include <libmaple/iwdg.h>
+#ifdef __STM32F1__
 
 #include "../../inc/MarlinConfig.h"
 
-/**
- *  The watchdog clock is 40Khz. We need a 4 seconds interval, so use a /256 preescaler and
- *  625 reload value (counts down to 0)
- *  use 1250 for 8 seconds
- */
-#define STM32F1_WD_RELOAD 625
+#if ENABLED(USE_WATCHDOG)
 
-// Arduino STM32F1 core now has watchdog support
+#include <libmaple/iwdg.h>
+#include "watchdog_STM32F1.h"
 
-// Initialize watchdog with a 4 second countdown time
-void watchdog_init();
-
-// Reset watchdog. MUST be called at least every 4 seconds after the
-// first watchdog_init or STM32F1 will reset.
-inline void watchdog_reset() {
+void watchdog_reset() {
   #if PIN_EXISTS(LED)
-    TOGGLE(LED_PIN);  // heart beat indicator
+    TOGGLE(LED_PIN);  // heartbeat indicator
   #endif
   iwdg_feed();
 }
+
+void watchdogSetup(void) {
+  // do whatever. don't remove this function.
+}
+
+/**
+ * @brief  Initialized the independent hardware watchdog.
+ *
+ * @return No return
+ *
+ * @details The watchdog clock is 40Khz. We need a 4 seconds interval, so use a /256 preescaler and 625 reload value (counts down to 0)
+ */
+void watchdog_init(void) {
+  //iwdg_init(IWDG_PRE_256, STM32F1_WD_RELOAD);
+}
+
+#endif // USE_WATCHDOG
+
+#endif // __STM32F1__
