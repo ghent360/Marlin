@@ -672,7 +672,9 @@ private:
     static void M351();
   #endif
 
-  static void M355();
+  #if HAS_CASE_LIGHT
+    static void M355();
+  #endif
 
   #if ENABLED(MORGAN_SCARA)
     static bool M360();
@@ -803,9 +805,6 @@ private:
     #endif
     #if USE_SENSORLESS
       static void M914();
-    #endif
-    #if ENABLED(TMC_Z_CALIBRATION)
-      static void M915();
     #endif
   #endif
 
