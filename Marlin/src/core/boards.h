@@ -243,6 +243,7 @@
 #define BOARD_PRNTR_V1         1805   // STM32F446 NUCLEO-64 shield controller
 #define BOARD_ARMED            1807   // Arm'ed STM32F4 based controller
 #define BOARD_RUMBA32          1809   // RUMBA32 STM32F4 based controller
+#define BOARD_STEVAL           1866   // STEVAL-3DP001V1 3D PRINTER BOARD
 
 //
 // ARM Cortex M7
