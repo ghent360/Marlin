@@ -103,11 +103,11 @@ void GcodeSuite::M24() {
     print_job_timer.start();
   }
 
-  ui.reset_status();
-
   #ifdef ACTION_ON_RESUME
     SERIAL_ECHOLNPGM("//action:" ACTION_ON_RESUME);
   #endif
+  
+  ui.reset_status();
 }
 
 /**
@@ -179,13 +179,9 @@ void GcodeSuite::M28() {
 
   #if ENABLED(FAST_FILE_TRANSFER)
 
-    const int16_t port =
-      #if NUM_SERIAL > 1
-        command_queue_port[cmd_queue_index_r]
-      #else
-        0
-      #endif
-    ;
+    #if NUM_SERIAL > 1
+      const int16_t port = command_queue_port[cmd_queue_index_r];
+    #endif
 
     bool binary_mode = false;
     char *p = parser.string_arg;
