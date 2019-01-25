@@ -1354,19 +1354,6 @@
     #define X2_MICROSTEPS  16
   #endif
 
-<<<<<<< HEAD
-  #define Z_CURRENT         1100
-  #define Z_MICROSTEPS        16
-
-  #define X2_CURRENT         600
-  #define X2_MICROSTEPS       16
-
-  #define Y2_CURRENT         600
-  #define Y2_MICROSTEPS       16
-
-  #define Z2_CURRENT         600
-  #define Z2_MICROSTEPS       16
-=======
   #if AXIS_IS_TMC(Y)
     #define Y_CURRENT     800
     #define Y_MICROSTEPS   16
@@ -1378,7 +1365,7 @@
   #endif
 
   #if AXIS_IS_TMC(Z)
-    #define Z_CURRENT     800
+    #define Z_CURRENT     1100
     #define Z_MICROSTEPS   16
   #endif
 
@@ -1386,7 +1373,6 @@
     #define Z2_CURRENT    800
     #define Z2_MICROSTEPS  16
   #endif
->>>>>>> 0e0cc13650cd9174114baf02b06a98310f976b6d
 
   #if AXIS_IS_TMC(Z3)
     #define Z3_CURRENT    800
