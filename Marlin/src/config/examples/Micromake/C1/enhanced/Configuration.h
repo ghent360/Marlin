@@ -194,7 +194,7 @@
   #endif
 #endif
 
-// A dual-nozzle that uses a servomotor to raise/lower one of the nozzles
+// A dual-nozzle that uses a servomotor to raise/lower one (or both) of the nozzles
 //#define SWITCHING_NOZZLE
 #if ENABLED(SWITCHING_NOZZLE)
   #define SWITCHING_NOZZLE_SERVO_NR 0
@@ -205,9 +205,6 @@
 /**
  * Two separate X-carriages with extruders that connect to a moving part
  * via a solenoid docking mechanism. Requires SOL1_PIN and SOL2_PIN.
- *
- * for cooling multi extruder with separate fans
- * see on Configuration_adv.h and look for "Part-Cooling"
  */
 //#define PARKING_EXTRUDER
 
@@ -218,9 +215,6 @@
  * project   : https://www.thingiverse.com/thing:3080893
  * movements : https://youtu.be/0xCEiG9VS3k
  *             https://youtu.be/Bqbcs0CU2FE
- *
- * for cooling multi extruder with separate fans
- * see on Configuration_adv.h and look for "Part-Cooling"
  */
 //#define MAGNETIC_PARKING_EXTRUDER
 
@@ -2083,7 +2077,7 @@
  *  - Change to green once print has finished
  *  - Turn off after the print has finished and the user has pushed a button
  */
-#if ENABLED(BLINKM) || ENABLED(RGB_LED) || ENABLED(RGBW_LED) || ENABLED(PCA9632) || ENABLED(NEOPIXEL_LED)
+#if ENABLED(BLINKM) || ENABLED(RGB_LED) || ENABLED(RGBW_LED) || ENABLED(PCA9632) || ENABLED(PCA9533)|| ENABLED(NEOPIXEL_LED)
   #define PRINTER_EVENT_LEDS
 #endif
 
