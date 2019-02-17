@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
@@ -30,7 +30,7 @@
 
 #include "../inc/MarlinConfig.h"
 
-#if ENABLED(SDSUPPORT) && DISABLED(USB_FLASH_DRIVE_SUPPORT)
+#if ENABLED(SDSUPPORT) && DISABLED(USB_FLASH_DRIVE_SUPPORT) && DISABLED(SDIO_SUPPORT)
 
 /* Enable FAST CRC computations - You can trade speed for FLASH space if
  * needed by disabling the following define */
@@ -525,10 +525,7 @@ bool Sd2Card::readStop() {
  */
 bool Sd2Card::setSckRate(const uint8_t sckRateID) {
   const bool success = (sckRateID <= 6);
-  if (success) 
-    spiRate_ = sckRateID;
-  else
-    error(SD_CARD_ERROR_SCK_RATE);
+  if (success) spiRate_ = sckRateID; else error(SD_CARD_ERROR_SCK_RATE);
   return success;
 }
 
@@ -539,9 +536,7 @@ bool Sd2Card::setSckRate(const uint8_t sckRateID) {
  */
 bool Sd2Card::waitNotBusy(const millis_t timeout_ms) {
   const millis_t wait_timeout = millis() + timeout_ms;
-  while (spiRec() != 0xFF)
-    if (ELAPSED(millis(), wait_timeout)) return false;
-
+  while (spiRec() != 0xFF) if (ELAPSED(millis(), wait_timeout)) return false;
   return true;
 }
 
