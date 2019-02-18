@@ -27,7 +27,7 @@
   #include "../HAL/shared/persistent_store_api.h"
 #endif
 
-#define ADD_PORT_ARG ENABLED(EEPROM_CHITCHAT) && NUM_SERIAL > 1
+#define ADD_PORT_ARG NUM_SERIAL > 1
 
 #if ADD_PORT_ARG
   #define PORTINIT_SOLO    const int8_t port=-1

@@ -48,7 +48,7 @@
 // Ignore temp readings during develpment.
 #define BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
 
-#define NUM_SERIAL 1
+#define NUM_SERIAL 2
 
 //
 // Steppers

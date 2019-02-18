@@ -47,7 +47,8 @@
 /** @addtogroup EEPROM_Emulation
   * @{
   */
-#if defined(STM32GENERIC) && (defined(STM32F4))
+#include "../../platforms.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32F4)
 
 /* Includes ------------------------------------------------------------------*/
 #include "eeprom_emul.h"

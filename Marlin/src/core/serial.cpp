@@ -20,6 +20,7 @@
  *
  */
 
+#include "../inc/MarlinConfig.h"
 #include "serial.h"
 #include "language.h"
 
@@ -29,7 +30,7 @@ static const char errormagic[] PROGMEM = "Error:";
 static const char echomagic[]  PROGMEM = "echo:";
 
 #if NUM_SERIAL > 1
-  void serialprintPGM_P(const int8_t p, const char * str) {
+  void serialprintPGM_P(const int8_t p, PGM_P str) {
     while (char ch = pgm_read_byte(str++)) SERIAL_CHAR_P(p, ch);
   }
 
