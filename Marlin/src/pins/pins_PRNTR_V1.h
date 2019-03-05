@@ -42,9 +42,6 @@
   #error "PRNTR Board supports up to 2 hotends / E-steppers."
 #endif
 
-// Enable I2C_EEPROM for testing
-#define I2C_EEPROM
-
 // Ignore temp readings during develpment.
 #define BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
 

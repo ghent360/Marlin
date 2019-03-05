@@ -42,9 +42,6 @@
   #error "PRNTR Board supports up to 2 hotends / E-steppers."
 #endif
 
-// Enable I2C_EEPROM for testing
-#define I2C_EEPROM
-
 // Ignore temp readings during develpment.
 #define BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
 
@@ -320,3 +317,8 @@
 #define SCK_PIN  STEPPER_SPI_SCK
 
 #define Z_MIN_PROBE_PIN  IO_PIN(C, 13)
+
+// 64K SPI EEPROM
+#define SPI_EEPROM
+#define SPI_CHAN_EEPROM1    1
+#define SPI_EEPROM1_CS     PE8
