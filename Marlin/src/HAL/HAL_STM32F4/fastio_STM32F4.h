@@ -170,12 +170,11 @@ struct FastIOPin {
 //#define GET_OUTPUT(IO)
 //#define GET_TIMER(IO)
 
-#ifdef REDEFINE_PIN_NAMES
-
 // digitalRead/Write wrappers
 #define extDigitalRead(IO)    digitalRead(IO)
 #define extDigitalWrite(IO,V) digitalWrite(IO,V)
 
+#ifdef REDEFINE_PIN_NAMES
 //
 // Pins Definitions
 //
