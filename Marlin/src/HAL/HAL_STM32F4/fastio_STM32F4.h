@@ -172,6 +172,10 @@ struct FastIOPin {
 
 #ifdef REDEFINE_PIN_NAMES
 
+// digitalRead/Write wrappers
+#define extDigitalRead(IO)    digitalRead(IO)
+#define extDigitalWrite(IO,V) digitalWrite(IO,V)
+
 //
 // Pins Definitions
 //
