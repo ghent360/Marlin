@@ -431,7 +431,7 @@
 /**
  * Default hotend offsets, if not defined
  */
-#if HOTENDS > 1
+#if HAS_HOTEND_OFFSET
   #ifndef HOTEND_OFFSET_X
     #define HOTEND_OFFSET_X { 0 } // X offsets for each extruder
   #endif
@@ -1544,9 +1544,9 @@
 #endif
 
 /**
- * VIKI2, miniVIKI, AZSMZ_12864, and MKS_12864OLED_SSD1306 require DOGLCD_SCK and DOGLCD_MOSI to be defined.
+ * Make sure DOGLCD_SCK and DOGLCD_MOSI are defined.
  */
-#if ENABLED(VIKI2) || ENABLED(miniVIKI) || ENABLED(AZSMZ_12864) || ENABLED(MKS_12864OLED_SSD1306)
+#if ENABLED(DOGLCD)
   #ifndef DOGLCD_SCK
     #define DOGLCD_SCK  SCK_PIN
   #endif
