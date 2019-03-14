@@ -213,26 +213,26 @@ namespace ExtUI {
       if (soft_endstops_enabled) switch (axis) {
         case X_AXIS:
           #if ENABLED(MIN_SOFTWARE_ENDSTOP_X)
-            min = soft_endstop_min[X_AXIS];
+            min = soft_endstop[X_AXIS].min;
           #endif
           #if ENABLED(MAX_SOFTWARE_ENDSTOP_X)
-            max = soft_endstop_max[X_AXIS];
+            max = soft_endstop[X_AXIS].max;
           #endif
           break;
         case Y_AXIS:
           #if ENABLED(MIN_SOFTWARE_ENDSTOP_Y)
-            min = soft_endstop_min[Y_AXIS];
+            min = soft_endstop[Y_AXIS].min;
           #endif
           #if ENABLED(MAX_SOFTWARE_ENDSTOP_Y)
-            max = soft_endstop_max[Y_AXIS];
+            max = soft_endstop[Y_AXIS].max;
           #endif
           break;
         case Z_AXIS:
           #if ENABLED(MIN_SOFTWARE_ENDSTOP_Z)
-            min = soft_endstop_min[Z_AXIS];
+            min = soft_endstop[Z_AXIS].min;
           #endif
           #if ENABLED(MAX_SOFTWARE_ENDSTOP_Z)
-            max = soft_endstop_max[Z_AXIS];
+            max = soft_endstop[Z_AXIS].max;
           #endif
         default: break;
       }
@@ -576,6 +576,27 @@ namespace ExtUI {
     const duration_t elapsed = print_job_timer.duration();
     return elapsed.value;
   }
+
+  #if HAS_LEVELING
+    bool getLevelingActive() { return planner.leveling_active; }
+    void setLevelingActive(const bool state) { set_bed_leveling_enabled(state) }
+    #if HAS_MESH
+      bool getMeshValid() { return leveling_is_valid(); }
+      bed_mesh_t getMeshArray() { return Z_VALUES; }
+      void setMeshPoint(const uint8_t xpos, const uint8_t ypos, const float zoff) {
+        if (WITHIN(xpos, 0, GRID_MAX_POINTS_X) && WITHIN(ypos, 0, GRID_MAX_POINTS_Y)) {
+          Z_VALUES(xpos, ypos) = zoff;
+          #if ENABLED(ABL_BILINEAR_SUBDIVISION)
+            bed_level_virt_interpolate();
+          #endif
+        }
+      }
+    #endif
+  #endif
+
+  #if ENABLED(HOST_PROMPT_SUPPORT)
+    void setHostResponse(const uint8_t response) { host_response_handler(response); }
+  #endif
 
   #if ENABLED(PRINTCOUNTER)
     char* getTotalPrints_str(char buffer[21])    { strcpy(buffer,i16tostr3left(print_job_timer.getStats().totalPrints));    return buffer; }

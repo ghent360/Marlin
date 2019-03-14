@@ -286,7 +286,7 @@ src_filter    = ${common.default_src_filter} +<src/HAL/HAL_STM32F4>
 monitor_speed = 250000
 
 #
-# ARMED
+# ARMED (STM32)
 #
 [env:ARMED]
 platform    = ststm32
@@ -332,25 +332,8 @@ src_filter    = ${common.default_src_filter} +<src/HAL/HAL_TEENSY35_36>
 monitor_speed = 250000
 
 #
-# STM Nucleo - 64 STM32F446RE
+# Malyan M200 (STM32F1)
 #
-[env:STM32F4]
-platform     = ststm32
-framework    = arduino
-board        = nucleo_f446re
-build_flags  = ${common.build_flags}
-lib_deps     = ${common.lib_deps}
-lib_ignore   = U8glib-HAL
-  c1921b4
-  libf3c
-  lib066
-  Adafruit NeoPixel_ID28
-  Adafruit NeoPixel
-  libf3e
-lib_ldf_mode = 1
-src_filter   = ${common.default_src_filter}
-monitor_baud = 250000
-
 [env:malyanm200]
 platform    = ststm32
 framework   = arduino
@@ -375,11 +358,15 @@ lib_ignore  =
 # Espressif ESP32
 #
 [env:esp32]
-platform    = https://github.com/platformio/platform-espressif32.git#feature/stage
+platform    = https://github.com/platformio/platform-espressif32.git ; #feature/stage
 board       = esp32dev
 framework   = arduino
 upload_speed = 115200
 monitor_speed = 115200
+upload_port = /dev/ttyUSB0
+lib_deps =
+  https://github.com/me-no-dev/AsyncTCP.git
+  https://github.com/me-no-dev/ESPAsyncWebServer.git
 lib_ignore  =
   LiquidCrystal_I2C
   LiquidCrystal
