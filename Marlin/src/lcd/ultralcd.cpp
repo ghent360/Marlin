@@ -1162,7 +1162,22 @@ void MarlinUI::update() {
   /////////////// Status Line ////////////////
   ////////////////////////////////////////////
 
-  void MarlinUI::finishstatus(const bool persist) {
+  #if ENABLED(STATUS_MESSAGE_SCROLLING)
+    void MarlinUI::advance_status_scroll() {
+      // Advance by one UTF8 code-word
+      if (status_scroll_offset < utf8_strlen(status_message))
+        while (!START_OF_UTF8_CHAR(status_message[++status_scroll_offset]));
+      else
+        status_scroll_offset = 0;
+    }
+    char* MarlinUI::status_and_len(uint8_t &len) {
+      char *out = status_message + status_scroll_offset;
+      len = utf8_strlen(out);
+      return out;
+    }
+  #endif
+
+  void MarlinUI::finish_status(const bool persist) {
 
     #if !(ENABLED(LCD_PROGRESS_BAR) && (PROGRESS_MSG_EXPIRE > 0))
       UNUSED(persist);
@@ -1179,7 +1194,7 @@ void MarlinUI::update() {
       next_filament_display = millis() + 5000UL; // Show status message for 5s
     #endif
 
-    #if ENABLED(STATUS_MESSAGE_SCROLLING)
+    #if HAS_SPI_LCD && ENABLED(STATUS_MESSAGE_SCROLLING)
       status_scroll_offset = 0;
     #endif
 
@@ -1214,7 +1229,7 @@ void MarlinUI::update() {
     strncpy(status_message, message, maxLen);
     status_message[maxLen] = '\0';
 
-    finishstatus(persist);
+    finish_status(persist);
   }
 
   #include <stdarg.h>
@@ -1226,7 +1241,7 @@ void MarlinUI::update() {
     va_start(args, fmt);
     vsnprintf_P(status_message, MAX_MESSAGE_LENGTH, fmt, args);
     va_end(args);
-    finishstatus(level > 0);
+    finish_status(level > 0);
   }
 
   void MarlinUI::set_status_P(PGM_P const message, int8_t level) {
@@ -1253,7 +1268,7 @@ void MarlinUI::update() {
     strncpy_P(status_message, message, maxLen);
     status_message[maxLen] = '\0';
 
-    finishstatus(level > 0);
+    finish_status(level > 0);
   }
 
   void MarlinUI::set_alert_status_P(PGM_P const message) {
