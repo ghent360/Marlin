@@ -697,14 +697,14 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4[, E5]]]]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 100, 200, 800, 195 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 100, 100, 200, 195 }
 
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4[, E5]]]]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 100, 100, 6, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 150, 150, 20, 25 }
 
 /**
  * Default Max Acceleration (change/s) change = mm/s
@@ -724,7 +724,7 @@
  */
 #define DEFAULT_ACCELERATION          100     // X, Y, Z and E acceleration for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  300     // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   200     // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_TRAVEL_ACCELERATION   300     // X, Y, Z acceleration for travel (non printing) moves
 
 //
 // Use Junction Deviation instead of traditional Jerk Limiting
