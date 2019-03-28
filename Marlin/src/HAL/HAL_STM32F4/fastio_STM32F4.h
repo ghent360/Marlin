@@ -158,7 +158,7 @@ struct FastIOPin {
 #define SET_INPUT(IO)           _SET_MODE(IO, INPUT)                              /*!< Input Floating Mode                   */
 #define SET_INPUT_PULLUP(IO)    _SET_MODE(IO, INPUT_PULLUP)                       /*!< Input with Pull-up activation         */
 #define SET_INPUT_PULLDOWN(IO)  _SET_MODE(IO, INPUT_PULLDOWN)                     /*!< Input with Pull-down activation       */
-#define SET_OUTPUT(IO)          OUT_WRITE(IO, LOW)
+#define SET_OUTPUT(IO)          _SET_MODE(IO, OUTPUT)
 #define SET_PWM(IO)             SET_OUTPUT(IO)
 
 #ifdef USE_FAST_IO
