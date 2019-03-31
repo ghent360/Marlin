@@ -714,6 +714,9 @@
  */
 #define DEFAULT_MAX_ACCELERATION      { 500, 500, 100, 500 }
 
+#define HOMING_FEEDRATE_XY (75*60)
+#define HOMING_FEEDRATE_Z  (400)
+
 /**
  * Default Acceleration (change/s) change = mm/s
  * Override with M204
