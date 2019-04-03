@@ -246,8 +246,12 @@ void HAL_enable_AdcFreerun(void);
 
 */
 
+#ifndef GET_PIN_MAP_PIN
 #define GET_PIN_MAP_PIN(index) index
+#endif
+#ifndef GET_PIN_MAP_INDEX
 #define GET_PIN_MAP_INDEX(pin) pin
+#endif
 #define PARSED_PIN_INDEX(code, dval) parser.intval(code, dval)
 
 #define JTAG_DISABLE() afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY)
