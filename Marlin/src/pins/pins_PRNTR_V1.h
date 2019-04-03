@@ -109,7 +109,8 @@
 #define HEATER_1_PIN       IO_PIN(A, 7)   // EXTRUDER 1
 //#define HEATER_2_PIN       -1
 
-#define HEATER_BED_PIN     IO_PIN(B, 0) // BED
+//#define HEATER_BED_PIN     IO_PIN(B, 0) // BED
+#define HEATER_BED_PIN       -1
 //#define HEATER_BED2_PIN    -1    // BED2
 //#define HEATER_BED3_PIN    -1    // BED3
 
