@@ -813,7 +813,11 @@ void CardReader::setroot() {
 
         // Init sort order.
         for (uint16_t i = 0; i < fileCnt; i++) {
-          sort_order[i] = i;
+          sort_order[i] = (
+            #if ENABLED(SDCARD_RATHERRECENTFIRST)
+              fileCnt - 1 -
+            #endif
+          i);
           // If using RAM then read all filenames now.
           #if ENABLED(SDSORT_USES_RAM)
             getfilename(i);
@@ -1026,6 +1030,7 @@ void CardReader::printingHasFinished() {
   // be zeroed and written instead of deleted.
   void CardReader::removeJobRecoveryFile() {
     if (jobRecoverFileExists()) {
+      recovery.init();
       removeFile(job_recovery_file_name);
       #if ENABLED(DEBUG_POWER_LOSS_RECOVERY)
         SERIAL_ECHOPGM("Power-loss file delete");
