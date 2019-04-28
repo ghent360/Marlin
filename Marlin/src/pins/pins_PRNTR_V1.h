@@ -114,7 +114,7 @@
 //#define HEATER_BED2_PIN    -1    // BED2
 //#define HEATER_BED3_PIN    -1    // BED3
 
-#define FAN_COUNT 2
+#define FAN_COUNT 3
 #ifndef FAN_PIN
 #define FAN_PIN            SLOW_PIN(B, 2)   // E0 Part
 #endif

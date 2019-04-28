@@ -1254,6 +1254,9 @@ void Planner::check_axes_activity() {
       #if HAS_FAN2
         KICKSTART_FAN(2);
       #endif
+      #if HAS_FAN3
+        KICKSTART_FAN(3);
+      #endif
 
     #endif // FAN_KICKSTART_TIME > 0
 
@@ -1274,6 +1277,9 @@ void Planner::check_axes_activity() {
       #if HAS_FAN2
         thermalManager.soft_pwm_amount_fan[2] = CALC_FAN_SPEED(2);
       #endif
+      #if HAS_FAN3
+        thermalManager.soft_pwm_amount_fan[3] = CALC_FAN_SPEED(3);
+      #endif
 
     #elif ENABLED(FAST_PWM_FAN)
 
@@ -1286,6 +1292,9 @@ void Planner::check_axes_activity() {
       #if HAS_FAN2
         set_pwm_duty(FAN2_PIN, CALC_FAN_SPEED(2));
       #endif
+      #if HAS_FAN3
+        set_pwm_duty(FAN3_PIN, CALC_FAN_SPEED(3));
+      #endif
 
     #else
 
@@ -1297,6 +1306,9 @@ void Planner::check_axes_activity() {
       #endif
       #if HAS_FAN2
         analogWrite(FAN2_PIN, CALC_FAN_SPEED(2));
+      #endif
+      #if HAS_FAN3
+        analogWrite(FAN3_PIN, CALC_FAN_SPEED(3));
       #endif
     #endif
 
