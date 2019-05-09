@@ -733,7 +733,7 @@ void kill(PGM_P const lcd_msg/*=NULL*/) {
 
   SERIAL_ERROR_MSG(MSG_ERR_KILLED);
 
-  #if HAS_SPI_LCD || ENABLED(EXTENSIBLE_UI)
+  #if HAS_DISPLAY
     ui.kill_screen(lcd_msg ? lcd_msg : PSTR(MSG_KILLED));
   #else
     UNUSED(lcd_msg);
@@ -955,7 +955,15 @@ void setup() {
 
   // Load data from EEPROM if available (or use defaults)
   // This also updates variables in the planner, elsewhere
-  (void)settings.load();
+  #if ENABLED(EEPROM_AUTO_INIT)
+    if (!settings.load()) {
+      (void)settings.reset();
+      (void)settings.save();
+      SERIAL_ECHO_MSG("EEPROM Initialized");
+    }
+  #else
+    (void)settings.load();
+  #endif
 
   #if HAS_M206_COMMAND
     // Initialize current position based on home_offset
