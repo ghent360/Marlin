@@ -150,7 +150,7 @@
 #elif defined(HEATER_0_USES_THERMISTOR)
   #error "No heater 0 thermistor table specified"
 #else
-  #define HEATER_0_TEMPTABLE NULL
+  #define HEATER_0_TEMPTABLE nullptr
   #define HEATER_0_TEMPTABLE_LEN 0
 #endif
 
@@ -160,7 +160,7 @@
 #elif defined(HEATER_1_USES_THERMISTOR)
   #error "No heater 1 thermistor table specified"
 #else
-  #define HEATER_1_TEMPTABLE NULL
+  #define HEATER_1_TEMPTABLE nullptr
   #define HEATER_1_TEMPTABLE_LEN 0
 #endif
 
@@ -170,7 +170,7 @@
 #elif defined(HEATER_2_USES_THERMISTOR)
   #error "No heater 2 thermistor table specified"
 #else
-  #define HEATER_2_TEMPTABLE NULL
+  #define HEATER_2_TEMPTABLE nullptr
   #define HEATER_2_TEMPTABLE_LEN 0
 #endif
 
@@ -180,7 +180,7 @@
 #elif defined(HEATER_3_USES_THERMISTOR)
   #error "No heater 3 thermistor table specified"
 #else
-  #define HEATER_3_TEMPTABLE NULL
+  #define HEATER_3_TEMPTABLE nullptr
   #define HEATER_3_TEMPTABLE_LEN 0
 #endif
 
@@ -190,7 +190,7 @@
 #elif defined(HEATER_4_USES_THERMISTOR)
   #error "No heater 4 thermistor table specified"
 #else
-  #define HEATER_4_TEMPTABLE NULL
+  #define HEATER_4_TEMPTABLE nullptr
   #define HEATER_4_TEMPTABLE_LEN 0
 #endif
 
@@ -200,7 +200,7 @@
 #elif defined(HEATER_5_USES_THERMISTOR)
   #error "No heater 5 thermistor table specified"
 #else
-  #define HEATER_5_TEMPTABLE NULL
+  #define HEATER_5_TEMPTABLE nullptr
   #define HEATER_5_TEMPTABLE_LEN 0
 #endif
 
