@@ -37,10 +37,6 @@
   #include "../feature/leds/printer_event_leds.h"
 #endif
 
-#if ENABLED(POWER_LOSS_RECOVERY)
-  #include "../feature/power_loss_recovery.h"
-#endif
-
 /**
  * GCode line number handling. Hosts may opt to include line numbers when
  * sending commands to Marlin, and lines will be checked for sequentiality.
@@ -80,11 +76,11 @@ static int serial_count[NUM_SERIAL] = { 0 };
 bool send_ok[BUFSIZE];
 
 /**
- * Next Injected Command pointer. NULL if no commands are being injected.
+ * Next Injected Command pointer. nullptr if no commands are being injected.
  * Used by Marlin internally to ensure that commands initiated from within
  * are enqueued ahead of any pending serial or sd card commands.
  */
-static PGM_P injected_commands_P = NULL;
+static PGM_P injected_commands_P = nullptr;
 
 void queue_setup() {
   // Send "ok" after commands by default
@@ -161,7 +157,7 @@ bool enqueue_and_echo_command(const char* cmd) {
  * Return true if any immediate commands remain to inject.
  */
 static bool drain_injected_commands_P() {
-  if (injected_commands_P != NULL) {
+  if (injected_commands_P != nullptr) {
     size_t i = 0;
     char c, cmd[60];
     strncpy_P(cmd, injected_commands_P, sizeof(cmd) - 1);
@@ -169,9 +165,9 @@ static bool drain_injected_commands_P() {
     while ((c = cmd[i]) && c != '\n') i++; // find the end of this gcode command
     cmd[i] = '\0';
     if (enqueue_and_echo_command(cmd))     // success?
-      injected_commands_P = c ? injected_commands_P + i + 1 : NULL; // next command or done
+      injected_commands_P = c ? injected_commands_P + i + 1 : nullptr; // next command or done
   }
-  return (injected_commands_P != NULL);    // return whether any more remain
+  return (injected_commands_P != nullptr);    // return whether any more remain
 }
 
 /**
@@ -530,8 +526,9 @@ void gcode_line_error(PGM_P const err, const int8_t port) {
 
 #endif // BINARY_FILE_TRANSFER
 
-FORCE_INLINE bool is_M29(const char * const cmd) {
-  return cmd[0] == 'M' && cmd[1] == '2' && cmd[2] == '9' && !WITHIN(cmd[3], '0', '9');
+FORCE_INLINE bool is_M29(const char * const cmd) {  // matches "M29" & "M29 ", but not "M290", etc
+  const char * const m29 = strstr_P(cmd, PSTR("M29"));
+  return m29 && !NUMERIC(m29[3]);
 }
 
 /**
@@ -600,18 +597,18 @@ inline void get_serial_commands() {
         char* command = serial_line_buffer[i];
 
         while (*command == ' ') command++;                // Skip leading spaces
-        char *npos = (*command == 'N') ? command : NULL;  // Require the N parameter to start the line
+        char *npos = (*command == 'N') ? command : nullptr;  // Require the N parameter to start the line
 
         if (npos) {
 
-          bool M110 = strstr_P(command, PSTR("M110")) != NULL;
+          bool M110 = strstr_P(command, PSTR("M110")) != nullptr;
 
           if (M110) {
             char* n2pos = strchr(command + 4, 'N');
             if (n2pos) npos = n2pos;
           }
 
-          gcode_N = strtol(npos + 1, NULL, 10);
+          gcode_N = strtol(npos + 1, nullptr, 10);
 
           if (gcode_N != gcode_LastN + 1 && !M110)
             return gcode_line_error(PSTR(MSG_ERR_LINE_NO), i);
@@ -620,7 +617,7 @@ inline void get_serial_commands() {
           if (apos) {
             uint8_t checksum = 0, count = uint8_t(apos - command);
             while (count) checksum ^= command[--count];
-            if (strtol(apos + 1, NULL, 10) != checksum)
+            if (strtol(apos + 1, nullptr, 10) != checksum)
               return gcode_line_error(PSTR(MSG_ERR_CHECKSUM_MISMATCH), i);
           }
           else
@@ -638,7 +635,7 @@ inline void get_serial_commands() {
         if (IsStopped()) {
           char* gpos = strchr(command, 'G');
           if (gpos) {
-            switch (strtol(gpos + 1, NULL, 10)) {
+            switch (strtol(gpos + 1, nullptr, 10)) {
               case 0:
               case 1:
               #if ENABLED(ARC_SUPPORT)

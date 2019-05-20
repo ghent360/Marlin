@@ -159,6 +159,7 @@ struct FastIOPin {
 #define SET_INPUT_PULLUP(IO)    _SET_MODE(IO, INPUT_PULLUP)                       /*!< Input with Pull-up activation         */
 #define SET_INPUT_PULLDOWN(IO)  _SET_MODE(IO, INPUT_PULLDOWN)                     /*!< Input with Pull-down activation       */
 #define SET_OUTPUT(IO)          _SET_MODE(IO, OUTPUT)
+#define SET_PWM(IO)             SET_OUTPUT(IO)
 
 #ifdef USE_FAST_IO
 #define TOGGLE(IO)              FastIOPin(IO).toggle()
@@ -166,9 +167,12 @@ struct FastIOPin {
 #define TOGGLE(IO)              OUT_WRITE(IO, !READ(IO))
 #endif
 
-//#define GET_INPUT(IO)
-//#define GET_OUTPUT(IO)
-//#define GET_TIMER(IO)
+#define IS_INPUT(IO)
+#define IS_OUTPUT(IO)
+#define HAS_TIMER(IO)           true
+
+#define PWM_PIN(P)              HAS_TIMER(P)
+#define USEABLE_HARDWARE_PWM(P) PWM_PIN(P)
 
 // digitalRead/Write wrappers
 #define extDigitalRead(IO)    digitalRead(IO)

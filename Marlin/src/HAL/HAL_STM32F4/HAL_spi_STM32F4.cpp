@@ -163,7 +163,7 @@ void spiSendBlock(uint8_t token, const uint8_t* buf) {
   #ifdef STM32GENERIC
     SPI.dmaSend(const_cast<uint8_t*>(buf), 512);
   #else
-    SPI.transfer((void*)buf, (void*)0, 512);
+    SPI.transfer((uint8_t*)buf, nullptr, 512);
   #endif
 
   SPI.endTransaction();

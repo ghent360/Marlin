@@ -32,21 +32,20 @@
 // Includes
 // --------------------------------------------------------------------------
 
-#include <stdint.h>
-
-#include "Arduino.h"
-
-#ifdef USBCON
-  #include <USBSerial.h>
-#endif
-
-#include "../../inc/MarlinConfigPre.h"
+#include "../shared/Marduino.h"
 #include "../shared/math_32bit.h"
 #include "../shared/HAL_SPI.h"
 #include "fastio_STM32F4.h"
 #include "watchdog_STM32F4.h"
-
 #include "HAL_timers_STM32F4.h"
+
+#include "../../inc/MarlinConfigPre.h"
+
+#include <stdint.h>
+
+#ifdef USBCON
+  #include <USBSerial.h>
+#endif
 
 // --------------------------------------------------------------------------
 // Defines
@@ -164,7 +163,7 @@ extern uint16_t HAL_adc_result;
 void HAL_clear_reset_source (void);
 
 /** reset reason */
-uint8_t HAL_get_reset_source (void);
+uint8_t HAL_get_reset_source(void);
 
 void _delay_ms(const int delay);
 
@@ -243,8 +242,12 @@ void HAL_enable_AdcFreerun(void);
 
 */
 
+#ifndef GET_PIN_MAP_PIN
 #define GET_PIN_MAP_PIN(index) index
+#endif
+#ifndef GET_PIN_MAP_INDEX
 #define GET_PIN_MAP_INDEX(pin) pin
+#endif
 #define PARSED_PIN_INDEX(code, dval) parser.intval(code, dval)
 
 #define JTAG_DISABLE() afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY)
