@@ -253,7 +253,8 @@
 #define BOARD_TEENSY35_36       841   // Teensy3.5 and Teensy3.6
 #define BOARD_BEAST            1802   // STM32FxxxVxT6 Libmaple based stm32f4 controller
 #define BOARD_STM32F4          1804   // STM32 STM32GENERIC based STM32F4 controller
-#define BOARD_PRNTR_V1         1805   // STM32F446 NUCLEO-64 shield controller
+#define BOARD_PRNTR_V1         1895   // STM32F446 NUCLEO-64 shield controller
+#define BOARD_PRNTR_F407_V1    1896   // STM32F407 NUCLEO-64-like shield controller
 #define BOARD_ARMED            1807   // Arm'ed STM32F4 based controller
 #define BOARD_RUMBA32          1809   // RUMBA32 STM32F4 based controller
 #define BOARD_BLACK_STM32F407VE 1810  // BLACK_STM32F407VE
