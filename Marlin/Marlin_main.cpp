@@ -10671,23 +10671,23 @@ void quickstop_stepper() {
         pattern.part[1] = 0;
         pattern.part[2] = 0;
         pattern.part[3] = 0;
-        if (code_seen('P')) {
-          pattern.part[0] = code_value_byte();
+        if (parser.seen('P')) {
+          pattern.part[0] = parser.value_byte();
         }
-        if (code_seen('T')) {
-          timer = (long)code_value_byte();
+        if (parser.seen('T')) {
+          timer = (long)parser.value_byte();
         }
-        if (code_seen('C')) {
-          control = code_value_byte();
+        if (parser.seen('C')) {
+          control = parser.value_byte();
         }
-        if (code_seen('R')) {
-          pattern.part[1] = code_value_byte();
+        if (parser.seen('R')) {
+          pattern.part[1] = parser.value_byte();
         }
-        if (code_seen('E')) {
-          pattern.part[2] = code_value_byte();
+        if (parser.seen('E')) {
+          pattern.part[2] = parser.value_byte();
         }
-        if (code_seen('B')) {
-          pattern.part[3] = code_value_byte();
+        if (parser.seen('B')) {
+          pattern.part[3] = parser.value_byte();
         }
         MTWLEDUpdate(pattern,timer,control);
       }
