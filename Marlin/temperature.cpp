@@ -50,6 +50,10 @@
   #include "emergency_parser.h"
 #endif
 
+#ifdef MTWLED
+  #include "mtwled.h"
+#endif
+
 #if HOTEND_USES_THERMISTOR
   #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
     static void* heater_ttbl_map[2] = { (void*)HEATER_0_TEMPTABLE, (void*)HEATER_1_TEMPTABLE };
@@ -801,6 +805,13 @@ void Temperature::manage_heater() {
     #endif
 
   } // HOTEND_LOOP
+
+  #ifdef MTWLED
+    #ifndef MTWLED_disableheatup
+      MTWLEDTemp();
+    #endif
+  #endif
+  
 
   #if HAS_AUTO_FAN
     if (ELAPSED(ms, next_auto_fan_check_ms)) { // only need to check fan state very infrequently
