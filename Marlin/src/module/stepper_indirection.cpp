@@ -236,6 +236,9 @@
     chopconf.intpol = INTERPOLATE;
     chopconf.hend = chopper_timing.hend + 3;
     chopconf.hstrt = chopper_timing.hstrt - 1;
+    #if ENABLED(SQUARE_WAVE_STEPPING)
+      chopconf.dedge = true;
+    #endif
     st.CHOPCONF(chopconf.sr);
 
     st.rms_current(mA, HOLD_MULTIPLIER);
@@ -276,6 +279,9 @@
     chopconf.intpol = INTERPOLATE;
     chopconf.hend = timings[1] + 3;
     chopconf.hstrt = timings[2] - 1;
+    #if ENABLED(SQUARE_WAVE_STEPPING)
+      chopconf.dedge = true;
+    #endif
     st.CHOPCONF(chopconf.sr);
 
     st.rms_current(mA, HOLD_MULTIPLIER);
@@ -517,6 +523,9 @@
     chopconf.intpol = INTERPOLATE;
     chopconf.hend = chopper_timing.hend + 3;
     chopconf.hstrt = chopper_timing.hstrt - 1;
+    #if ENABLED(SQUARE_WAVE_STEPPING)
+      chopconf.dedge = true;
+    #endif
     st.CHOPCONF(chopconf.sr);
 
     st.rms_current(mA, HOLD_MULTIPLIER);
@@ -555,6 +564,9 @@
     chopconf.toff = chopper_timing.toff;
     chopconf.hend = chopper_timing.hend + 3;
     chopconf.hstrt = chopper_timing.hstrt - 1;
+    #if ENABLED(SQUARE_WAVE_STEPPING)
+      chopconf.dedge = true;
+    #endif
     st.CHOPCONF(chopconf.sr);
 
     st.rms_current(mA);
@@ -579,6 +591,9 @@
     chopconf.intpol = INTERPOLATE;
     chopconf.hend = chopper_timing.hend + 3;
     chopconf.hstrt = chopper_timing.hstrt - 1;
+    #if ENABLED(SQUARE_WAVE_STEPPING)
+      chopconf.dedge = true;
+    #endif
     st.CHOPCONF(chopconf.sr);
 
     st.rms_current(mA, HOLD_MULTIPLIER);
@@ -619,6 +634,9 @@
     chopconf.intpol = INTERPOLATE;
     chopconf.hend = timings[1] + 3;
     chopconf.hstrt = timings[2] - 1;
+    #if ENABLED(SQUARE_WAVE_STEPPING)
+      chopconf.dedge = true;
+    #endif
     st.CHOPCONF(chopconf.sr);
 
     st.rms_current(mA, HOLD_MULTIPLIER);
