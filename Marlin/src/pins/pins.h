@@ -414,8 +414,8 @@
   #include "pins_STM32F1R.h"          // STM32F1                                    env:STM32F1
 #elif MB(STM3R_MINI)
   #include "pins_STM3R_MINI.h"        // STM32F1                                    env:STM32F1
-#elif MB(PRNTR_V1)
-  #include "pins_PRNTR_V1.h"          // STM32F4                                    env:STM32F4
+#elif MB(BIGTREE_SKR_MINI_V1_1)
+  #include "pins_BIGTREE_SKR_MINI_V1_1.h" // STM32F1                                env:BIGTREE_SKR_MINI
 #elif MB(MALYAN_M200)
   #include "pins_MALYAN_M200.h"       // STM32F1                                    env:malyanm200
 #elif MB(CHITU3D)
@@ -447,6 +447,8 @@
   #include "pins_BLACK_STM32F407VE.h" // STM32F4                                    env:black_stm32f407ve
 #elif MB(STEVAL)
   #include "pins_STEVAL.h"            // STM32F4                                    env:STM32F4
+#elif MB(PRNTR_V1)
+  #include "pins_PRNTR_V1.h"          // STM32F4                                    env:STM32F4
 
 
 
