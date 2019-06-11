@@ -90,10 +90,6 @@
   #define CHAMBER_BETA                 3950    // Beta value
 #endif
 
-#define HEATER_BED_INVERTING true
-#define HEATER_0_INVERTING true
-#define HEATER_1_INVERTING true
-
 //
 // Hephestos 2 24V heated bed upgrade kit.
 // https://store.bq.com/en/heated-bed-kit-hephestos2
@@ -349,7 +345,7 @@
  * Multiple extruders can be assigned to the same pin in which case
  * the fan will turn on when any selected extruder is above the threshold.
  */
-#define E0_AUTO_FAN_PIN -1
+#define E0_AUTO_FAN_PIN 7
 #define E1_AUTO_FAN_PIN -1
 #define E2_AUTO_FAN_PIN -1
 #define E3_AUTO_FAN_PIN -1
@@ -379,13 +375,16 @@
   #define INVERT_CASE_LIGHT false             // Set true if Case Light is ON when pin is LOW
   #define CASE_LIGHT_DEFAULT_ON true          // Set default power-up state on
   #define CASE_LIGHT_DEFAULT_BRIGHTNESS 105   // Set default power-up brightness (0-255, requires PWM pin)
-  //#define CASE_LIGHT_MENU                   // Add Case Light options to the LCD menu
-  //#define CASE_LIGHT_NO_BRIGHTNESS          // Disable brightness control. Enable for non-PWM lighting.
+  //#define MENU_ITEM_CASE_LIGHT              // Add a Case Light option to the LCD main menu
   //#define CASE_LIGHT_USE_NEOPIXEL           // Use Neopixel LED as case light, requires NEOPIXEL_LED.
   #if ENABLED(CASE_LIGHT_USE_NEOPIXEL)
     #define CASE_LIGHT_NEOPIXEL_COLOR { 255, 255, 255, 255 } // { Red, Green, Blue, White }
   #endif
 #endif
+
+//===========================================================================
+//============================ Mechanical Settings ==========================
+//===========================================================================
 
 // @section homing
 
@@ -439,7 +438,7 @@
   #endif
 #endif
 
-//#define Z_DUAL_STEPPER_DRIVERS
+#define Z_DUAL_STEPPER_DRIVERS
 #if ENABLED(Z_DUAL_STEPPER_DRIVERS)
   //#define Z_DUAL_ENDSTOPS
   #if ENABLED(Z_DUAL_ENDSTOPS)
@@ -519,7 +518,7 @@
 #define Y_HOME_BUMP_MM 5
 #define Z_HOME_BUMP_MM 2
 #define HOMING_BUMP_DIVISOR { 2, 2, 4 }  // Re-Bump Speed Divisor (Divides the Homing Feedrate)
-//#define QUICK_HOME                     // If homing includes X and Y, do a diagonal move initially
+#define QUICK_HOME                     // If homing includes X and Y, do a diagonal move initially
 //#define HOMING_BACKOFF_MM { 2, 2, 2 }  // (mm) Move away from the endstops after homing
 
 // When G28 is called, this option will make Y home before X
@@ -527,73 +526,6 @@
 
 // Enable this if X or Y can't home without homing the other axis first.
 //#define CODEPENDENT_XY_HOMING
-
-#if ENABLED(BLTOUCH)
-  /**
-   * Either: Use the defaults (recommended) or: For special purposes, use the following DEFINES
-   * Do not activate settings that the probe might not understand. Clones might misunderstand
-   * advanced commands.
-   *
-   * Note: If the probe is not deploying, check a "Cmd: Reset" and "Cmd: Self-Test" and then
-   *       check the wiring of the BROWN, RED and ORANGE wires.
-   *
-   * Note: If the trigger signal of your probe is not being recognized, it has been very often
-   *       because the BLACK and WHITE wires needed to be swapped. They are not "interchangeable"
-   *       like they would be with a real switch. So please check the wiring first.
-   *
-   * Settings for all BLTouch and clone probes:
-   */
-
-  // Safety: The probe needs time to recognize the command.
-  //         Minimum command delay (ms). Enable and increase if needed.
-  //#define BLTOUCH_DELAY 500
-
-  /**
-   * Settings for BLTOUCH Classic 1.2, 1.3 or BLTouch Smart 1.0, 2.0, 2.2, 3.0, 3.1, and most clones:
-   */
-
-  // Feature: Switch into SW mode after a deploy. It makes the output pulse longer. Can be useful
-  //          in special cases, like noisy or filtered input configurations.
-  //#define BLTOUCH_FORCE_SW_MODE
-
-  /**
-   * Settings for BLTouch Smart 3.0 and 3.1
-   * Summary:
-   *   - Voltage modes: 5V and OD (open drain - "logic voltage free") output modes
-   *   - High-Speed mode
-   *   - Disable LCD voltage options
-   */
-
-  /**
-   * Danger: Don't activate 5V mode unless attached to a 5V-tolerant controller!
-   * V3.0 or 3.1: Set default mode to 5V mode at Marlin startup.
-   * If disabled, OD mode is the hard-coded default on 3.0
-   * On startup, Marlin will compare its eeprom to this vale. If the selected mode
-   * differs, a mode set eeprom write will be completed at initialization.
-   * Use the option below to force an eeprom write to a V3.1 probe regardless.
-   */
-  //#define BLTOUCH_SET_5V_MODE
-
-  /**
-   * Safety: Activate if connecting a probe with an unknown voltage mode.
-   * V3.0: Set a probe into mode selected above at Marlin startup. Required for 5V mode on 3.0
-   * V3.1: Force a probe with unknown mode into selected mode at Marlin startup ( = Probe EEPROM write )
-   * To preserve the life of the probe, use this once then turn it off and re-flash.
-   */
-  //#define BLTOUCH_FORCE_MODE_SET
-
-  /**
-   * Use "HIGH SPEED" mode for probing.
-   * Danger: Disable if your probe sometimes fails. Only suitable for stable well-adjusted systems.
-   * This feature was designed for Delta's with very fast Z moves however higher speed cartesians may function
-   * If the machine cannot raise the probe fast enough after a trigger, it may enter a fault state.
-   */
-  //#define BLTOUCH_HS_MODE
-
-  // Safety: Enable voltage mode settings in the LCD menu.
-  //#define BLTOUCH_LCD_VOLTAGE_MENU
-
-#endif // BLTOUCH
 
 /**
  * Z Steppers Auto-Alignment
@@ -645,11 +577,8 @@
 
 // @section lcd
 
-#if EITHER(ULTIPANEL, EXTENSIBLE_UI)
-  #define MANUAL_FEEDRATE {50*60, 50*60, 4*60, 60} // Feedrates for manual moves along X, Y, Z, E from panel
-#endif
-
 #if ENABLED(ULTIPANEL)
+  #define MANUAL_FEEDRATE {50*60, 50*60, 4*60, 60} // Feedrates for manual moves along X, Y, Z, E from panel
   #define MANUAL_E_MOVES_RELATIVE // Show LCD extruder moves as relative rather than absolute positions
   #define ULTIPANEL_FEEDMULTIPLY  // Comment to disable setting feedrate multiplier via encoder
 #endif
@@ -764,7 +693,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-//#define ADAPTIVE_STEP_SMOOTHING
+#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
@@ -922,7 +851,7 @@
    */
   //#define POWER_LOSS_RECOVERY
   #if ENABLED(POWER_LOSS_RECOVERY)
-    //#define POWER_LOSS_PIN         44 // Pin to detect power loss
+    //#define POWER_LOSS_PIN         44 // Pin to detect power loss (optional)
     //#define POWER_LOSS_STATE     HIGH // State of pin indicating power loss
     //#define POWER_LOSS_PURGE_LEN   20 // (mm) Length of filament to purge on resume
     //#define POWER_LOSS_RETRACT_LEN 10 // (mm) Length of filament to retract on fail. Requires backup power.
@@ -984,7 +913,7 @@
    * This feature must be enabled with "M540 S1" or from the LCD menu.
    * To have any effect, endstops must be enabled during SD printing.
    */
-  //#define SD_ABORT_ON_ENDSTOP_HIT
+  //#define ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
 
   /**
    * This option makes it easier to print the same SD Card file again.
@@ -1114,7 +1043,6 @@
   #define STATUS_HOTEND_INVERTED      // Show solid nozzle bitmaps when heating (Requires STATUS_HOTEND_ANIM)
   #define STATUS_HOTEND_ANIM          // Use a second bitmap to indicate hotend heating
   #define STATUS_BED_ANIM             // Use a second bitmap to indicate bed heating
-  #define STATUS_CHAMBER_ANIM         // Use a second bitmap to indicate chamber heating
   //#define STATUS_ALT_BED_BITMAP     // Use the alternative bed bitmap
   //#define STATUS_ALT_FAN_BITMAP     // Use the alternative fan bitmap
   //#define STATUS_FAN_FRAMES 3       // :[0,1,2,3,4] Number of fan animation frames
@@ -1153,7 +1081,7 @@
  *
  * Warning: Does not respect endstops!
  */
-//#define BABYSTEPPING
+#define BABYSTEPPING
 #if ENABLED(BABYSTEPPING)
   //#define BABYSTEP_WITHOUT_HOMING
   //#define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!
@@ -1164,7 +1092,7 @@
   #if ENABLED(DOUBLECLICK_FOR_Z_BABYSTEPPING)
     #define DOUBLECLICK_MAX_INTERVAL 1250   // Maximum interval between clicks, in milliseconds.
                                             // Note: Extra time may be added to mitigate controller latency.
-    //#define BABYSTEP_ALWAYS_AVAILABLE     // Allow babystepping at all times (not just during movement).
+    #define BABYSTEP_ALWAYS_AVAILABLE     // Allow babystepping at all times (not just during movement).
     //#define MOVE_Z_WHEN_IDLE              // Jump to the move Z menu on doubleclick when printer is idle.
     #if ENABLED(MOVE_Z_WHEN_IDLE)
       #define MOVE_Z_IDLE_MULTIPLICATOR 1   // Multiply 1mm by this factor for the move step size.
@@ -1198,10 +1126,10 @@
  * See http://marlinfw.org/docs/features/lin_advance.html for full instructions.
  * Mention @Sebastianv650 on GitHub to alert the author of any issues.
  */
-//#define LIN_ADVANCE
+#define LIN_ADVANCE
 #if ENABLED(LIN_ADVANCE)
   //#define EXTRA_LIN_ADVANCE_K // Enable for second linear advance constants
-  #define LIN_ADVANCE_K 0.22    // Unit: mm compression per 1mm/s extruder speed
+  #define LIN_ADVANCE_K 0.08    // Unit: mm compression per 1mm/s extruder speed
   //#define LA_DEBUG            // If enabled, this will generate debug information output over USB.
 #endif
 
@@ -1762,7 +1690,7 @@
    * Define you own with
    * { <off_time[1..15]>, <hysteresis_end[-3..12]>, hysteresis_start[1..8] }
    */
-  #define CHOPPER_TIMING CHOPPER_DEFAULT_12V
+  #define CHOPPER_TIMING CHOPPER_DEFAULT_24V
 
   /**
    * Monitor Trinamic drivers for error conditions,
@@ -1834,12 +1762,6 @@
     #define Y_STALL_SENSITIVITY  8
     //#define Z_STALL_SENSITIVITY  8
   #endif
-
-  /**
-   * Beta feature!
-   * Create a 50/50 square wave step pulse optimal for stepper drivers.
-   */
-  //#define SQUARE_WAVE_STEPPING
 
   /**
    * Enable M122 debugging command for TMC stepper drivers.
