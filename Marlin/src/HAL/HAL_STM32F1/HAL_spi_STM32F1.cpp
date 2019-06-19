@@ -113,9 +113,7 @@ void spiInit(uint8_t spiRate) {
  * @details
  */
 uint8_t spiRec(void) {
-  WRITE(SS_PIN, LOW);
   uint8_t returnByte = SPI.transfer(0xFF);
-  WRITE(SS_PIN, HIGH);
   return returnByte;
 }
 
@@ -129,9 +127,7 @@ uint8_t spiRec(void) {
  * @details Uses DMA
  */
 void spiRead(uint8_t* buf, uint16_t nbyte) {
-  WRITE(SS_PIN, LOW);
   SPI.dmaTransfer(0, const_cast<uint8_t*>(buf), nbyte);
-  WRITE(SS_PIN, HIGH);
 }
 
 /**
@@ -142,9 +138,7 @@ void spiRead(uint8_t* buf, uint16_t nbyte) {
  * @details
  */
 void spiSend(uint8_t b) {
-  WRITE(SS_PIN, LOW);
   SPI.send(b);
-  WRITE(SS_PIN, HIGH);
 }
 
 /**
@@ -156,23 +150,21 @@ void spiSend(uint8_t b) {
  * @details Use DMA
  */
 void spiSendBlock(uint8_t token, const uint8_t* buf) {
-  WRITE(SS_PIN, LOW);
   SPI.send(token);
   SPI.dmaSend(const_cast<uint8_t*>(buf), 512);
-  WRITE(SS_PIN, HIGH);
 }
 
 #if ENABLED(SPI_EEPROM)
 
 // Read single byte from specified SPI channel
-uint8_t spiRec(uint32_t chan) { return spiRec(); }
+uint8_t spiRec(uint32_t chan) { return SPI.transfer(ff); }
 
 // Write single byte to specified SPI channel
-void spiSend(uint32_t chan, byte b) { spiSend(b); }
+void spiSend(uint32_t chan, byte b) { SPI.send(b); }
 
 // Write buffer to specified SPI channel
 void spiSend(uint32_t chan, const uint8_t* buf, size_t n) {
-  for (size_t p = 0; p < n; p++) spiSend(buf[p]);
+  for (size_t p = 0; p < n; p++) spiSend(chan, buf[p]);
 }
 
 #endif // SPI_EEPROM
