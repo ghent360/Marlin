@@ -71,7 +71,7 @@ static void init_i2c_hw()
 {
   i2c_.sda = digitalPinToPinName(PIN_WIRE_SDA);
   i2c_.scl = digitalPinToPinName(PIN_WIRE_SCL);
-  i2c_custom_init(&i2c_, I2C_400KHz, I2C_ADDRESSINGMODE_7BIT, 0, 1);
+  i2c_custom_init(&i2c_, I2C_400KHz, I2C_ADDRESSINGMODE_7BIT, 0);
 }
 
 static void wait_i2c_ready()
