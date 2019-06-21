@@ -473,13 +473,13 @@ namespace ExtUI {
     int getTMCBumpSensitivity(const axis_t axis) {
       switch (axis) {
         #if X_SENSORLESS && AXIS_HAS_STALLGUARD(X)
-          case X: return stepperX.sgt();
+          case X: return stepperX.homing_threshold();
         #endif
         #if Y_SENSORLESS && AXIS_HAS_STALLGUARD(Y)
-          case Y: return stepperY.sgt();
+          case Y: return stepperY.homing_threshold();
         #endif
         #if Z_SENSORLESS && AXIS_HAS_STALLGUARD(Z)
-          case Z: return stepperZ.sgt();
+          case Z: return stepperZ.homing_threshold();
         #endif
         default: return 0;
       }
@@ -488,13 +488,13 @@ namespace ExtUI {
     void setTMCBumpSensitivity(const float value, const axis_t axis) {
       switch (axis) {
         #if X_SENSORLESS && AXIS_HAS_STALLGUARD(X)
-          case X: stepperX.sgt(clamp(value, -64, 63)); break;
+          case X: stepperX.homing_threshold(value); break;
         #endif
         #if Y_SENSORLESS && AXIS_HAS_STALLGUARD(Y)
-          case Y: stepperY.sgt(clamp(value, -64, 63)); break;
+          case Y: stepperY.homing_threshold(value); break;
         #endif
         #if Z_SENSORLESS && AXIS_HAS_STALLGUARD(Z)
-          case Z: stepperZ.sgt(clamp(value, -64, 63)); break;
+          case Z: stepperZ.homing_threshold(value); break;
         #endif
         default: break;
       }
@@ -777,10 +777,10 @@ namespace ExtUI {
   float getFeedrate_percent() { return feedrate_percentage; }
 
   void enqueueCommands_P(PGM_P const gcode) {
-    enqueue_and_echo_commands_P(gcode);
+    queue.inject_P(gcode);
   }
 
-  bool commandsInQueue() { return (planner.movesplanned() || commands_in_queue); }
+  bool commandsInQueue() { return (planner.movesplanned() || queue.length); }
 
   bool isAxisPositionKnown(const axis_t axis) {
     return TEST(axis_known_position, axis);
