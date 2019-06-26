@@ -593,6 +593,7 @@
     #endif
 
     st.GSTAT(0b111); // Clear
+    delay(200);
   }
 #endif // TMC2209
 
