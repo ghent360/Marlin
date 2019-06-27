@@ -39,9 +39,12 @@
   #include "../../feature/tmc_util.h"
 #endif
 
-#if HAS_BED_PROBE
+#if HOMING_Z_WITH_PROBE || ENABLED(BLTOUCH)
   #include "../../module/probe.h"
-  #define STOW_PROBE_BEFORE_HOMING NONE(Z_PROBE_ALLEN_KEY, Z_PROBE_SLED)
+#endif
+
+#if ENABLED(BLTOUCH)
+  #include "../../feature/bltouch.h"
 #endif
 
 #include "../../lcd/ultralcd.h"
@@ -200,17 +203,9 @@ void GcodeSuite::G28(const bool always_home_all) {
     }
   #endif
 
-  if (parser.boolval('O')) {
-    if (
-      #if ENABLED(HOME_AFTER_DEACTIVATE)
-        all_axes_known()  // homing needed anytime steppers deactivate
-      #else
-        all_axes_homed()  // homing needed only if never homed
-      #endif
-    ) {
-      if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("> homing not needed, skip\n<<< G28");
-      return;
-    }
+  if (!homing_needed() && parser.boolval('O')) {
+    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("> homing not needed, skip\n<<< G28");
+    return;
   }
 
   // Wait for planner moves to finish!
@@ -262,10 +257,6 @@ void GcodeSuite::G28(const bool always_home_all) {
                doX = home_all || homeX, doY = home_all || homeY, doZ = home_all || homeZ;
 
     set_destination_from_current();
-
-    #if STOW_PROBE_BEFORE_HOMING
-      STOW_PROBE();
-    #endif
 
     #if Z_HOME_DIR > 0  // If homing away from BED do Z first
 
@@ -346,6 +337,9 @@ void GcodeSuite::G28(const bool always_home_all) {
     // Home Z last if homing towards the bed
     #if Z_HOME_DIR < 0
       if (doZ) {
+        #if ENABLED(BLTOUCH)
+          bltouch.init();
+        #endif
         #if ENABLED(Z_SAFE_HOMING)
           home_z_safely();
         #else
