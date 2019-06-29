@@ -171,6 +171,9 @@ hotend_info_t Temperature::temp_hotend[HOTENDS
 
   #endif
 
+  /**
+   * Set the print fan speed for a target extruder
+   */
   void Temperature::set_fan_speed(uint8_t target, uint16_t speed) {
 
     NOMORE(speed, 255U);
@@ -1970,17 +1973,13 @@ void Temperature::disable_all_heaters() {
   #if HAS_HEATED_BED
     temp_bed.target = 0;
     temp_bed.soft_pwm_amount = 0;
-    #if HAS_HEATED_BED
-      WRITE_HEATER_BED(LOW);
-    #endif
+    WRITE_HEATER_BED(LOW);
   #endif
 
   #if HAS_HEATED_CHAMBER
     temp_chamber.target = 0;
     temp_chamber.soft_pwm_amount = 0;
-    #if HAS_HEATED_CHAMBER
-      WRITE_HEATER_CHAMBER(LOW);
-    #endif
+    WRITE_HEATER_CHAMBER(LOW);
   #endif
 }
 
@@ -2395,8 +2394,9 @@ void Temperature::isr() {
 
       #if ENABLED(FAN_SOFT_PWM)
         #define _FAN_PWM(N) do{ \
-          soft_pwm_count_fan[N] = (soft_pwm_count_fan[N] & pwm_mask) + (soft_pwm_amount_fan[N] >> 1); \
-          WRITE_FAN_N(N, soft_pwm_count_fan[N] > pwm_mask ? HIGH : LOW); \
+          uint8_t &spcf = soft_pwm_count_fan[N]; \
+          spcf = (spcf & pwm_mask) + (soft_pwm_amount_fan[N] >> 1); \
+          WRITE_FAN(N, spcf > pwm_mask ? HIGH : LOW); \
         }while(0)
         #if HAS_FAN0
           _FAN_PWM(0);
@@ -2441,13 +2441,13 @@ void Temperature::isr() {
 
       #if ENABLED(FAN_SOFT_PWM)
         #if HAS_FAN0
-          if (soft_pwm_count_fan[0] <= pwm_count_tmp) WRITE_FAN(LOW);
+          if (soft_pwm_count_fan[0] <= pwm_count_tmp) WRITE_FAN(0, LOW);
         #endif
         #if HAS_FAN1
-          if (soft_pwm_count_fan[1] <= pwm_count_tmp) WRITE_FAN1(LOW);
+          if (soft_pwm_count_fan[1] <= pwm_count_tmp) WRITE_FAN(1, LOW);
         #endif
         #if HAS_FAN2
-          if (soft_pwm_count_fan[2] <= pwm_count_tmp) WRITE_FAN2(LOW);
+          if (soft_pwm_count_fan[2] <= pwm_count_tmp) WRITE_FAN(2, LOW);
         #endif
       #endif
     }
@@ -2528,28 +2528,28 @@ void Temperature::isr() {
     #if ENABLED(FAN_SOFT_PWM)
       if (pwm_count_tmp >= 127) {
         pwm_count_tmp = 0;
-        #define _PWM_FAN(N,I) do{                               \
-          soft_pwm_count_fan[I] = soft_pwm_amount_fan[I] >> 1;  \
-          WRITE_FAN##N(soft_pwm_count_fan[I] > 0 ? HIGH : LOW); \
+        #define _PWM_FAN(N) do{                                 \
+          soft_pwm_count_fan[N] = soft_pwm_amount_fan[N] >> 1;  \
+          WRITE_FAN(N, soft_pwm_count_fan[N] > 0 ? HIGH : LOW); \
         }while(0)
         #if HAS_FAN0
-          _PWM_FAN(,0);
+          _PWM_FAN(0);
         #endif
         #if HAS_FAN1
-          _PWM_FAN(1,1);
+          _PWM_FAN(1);
         #endif
         #if HAS_FAN2
-          _PWM_FAN(2,2);
+          _PWM_FAN(2);
         #endif
       }
       #if HAS_FAN0
-        if (soft_pwm_count_fan[0] <= pwm_count_tmp) WRITE_FAN(LOW);
+        if (soft_pwm_count_fan[0] <= pwm_count_tmp) WRITE_FAN(0, LOW);
       #endif
       #if HAS_FAN1
-        if (soft_pwm_count_fan[1] <= pwm_count_tmp) WRITE_FAN1(LOW);
+        if (soft_pwm_count_fan[1] <= pwm_count_tmp) WRITE_FAN(1, LOW);
       #endif
       #if HAS_FAN2
-        if (soft_pwm_count_fan[2] <= pwm_count_tmp) WRITE_FAN2(LOW);
+        if (soft_pwm_count_fan[2] <= pwm_count_tmp) WRITE_FAN(2, LOW);
       #endif
     #endif // FAN_SOFT_PWM
 
