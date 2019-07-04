@@ -1280,6 +1280,9 @@ void Planner::check_axes_activity() {
     #if HAS_FAN2
       FAN_SET(2);
     #endif
+    #if HAS_FAN3
+      FAN_SET(3);
+    #endif
 
   #endif // FAN_COUNT > 0
 
@@ -1288,8 +1291,23 @@ void Planner::check_axes_activity() {
   #endif
 
   #if ENABLED(BARICUDA)
+    #if HAS_HEATER_1
+      analogWrite(pin_t(HEATER_1_PIN), tail_valve_pressure);
+    #endif
+    #if HAS_HEATER_2
+      analogWrite(pin_t(HEATER_2_PIN), tail_e_to_p_pressure);
+    #endif
+  #endif
+}
+
+#if DISABLED(NO_VOLUMETRICS)
+
+  /**
+   * Get a volumetric multiplier from a filament diameter.
+   * This is the reciprocal of the circular cross-section area.
    * Return 1.0 with volumetric off or a diameter of 0.0.
    */
+  inline float calculate_volumetric_multiplier(const float &diameter) {
     return (parser.volumetric_enabled && diameter) ? 1.0f / CIRCLE_AREA(diameter * 0.5f) : 1;
   }
 
