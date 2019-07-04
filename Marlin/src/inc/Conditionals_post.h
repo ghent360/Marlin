@@ -1186,7 +1186,9 @@
   #define FAN_INVERTING false
 #endif
 
-#if HAS_FAN2
+#if HAS_FAN3
+  #define FAN_COUNT 4
+#elif HAS_FAN2
   #define FAN_COUNT 3
 #elif HAS_FAN1
   #define FAN_COUNT 2
