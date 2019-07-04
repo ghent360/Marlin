@@ -142,7 +142,6 @@ struct FastIOPin {
 #define READ(IO)                digitalRead(IO)
 #define WRITE(IO,V)             digitalWrite(IO,V)
 #endif
-#define WRITE_VAR(IO,V)         WRITE(IO,V)
 
 //#define _GET_MODE(IO)
 
