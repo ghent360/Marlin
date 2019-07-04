@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ adc1_channel_t get_channel(int pin) {
 void HAL_adc_init() {
   // Configure ADC
   adc1_config_width(ADC_WIDTH_12Bit);
-  
+
   // Configure channels only if used as (re-)configuring a pin for ADC that is used elsewhere might have adverse effects
   #if HAS_TEMP_ADC_0
     adc1_config_channel_atten(get_channel(TEMP_0_PIN), ADC_ATTEN_11db);
@@ -192,7 +192,10 @@ void HAL_adc_start_conversion(uint8_t adc_pin) {
   HAL_adc_result = mv*1023.0/3300.0;
 }
 
-void analogWrite(int pin, int value) {
+void analogWrite(pin_t pin, int value) {
+
+  if (!PWM_PIN(pin)) return;
+
   static int cnt_channel = 1,
              pin_to_channel[40] = {};
   if (pin_to_channel[pin] == 0) {

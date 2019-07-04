@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,9 @@
 
 #include "HAL_Servo_ESP32.h"
 
-int Servo::channel_next_free = 0;
+// Adjacent channels (0/1, 2/3 etc.) share the same timer and therefore the same frequency and resolution settings on ESP32,
+// so we only allocate servo channels up high to avoid side effects with regards to analogWrite (fans, leds, laser pwm etc.)
+int Servo::channel_next_free = 12;
 
 Servo::Servo() {
   this->channel = channel_next_free++;
@@ -42,7 +44,7 @@ int8_t Servo::attach(const int pin) {
   return true;
 }
 
-void Servo::detach() { ledcDetachPin(this->pin) }
+void Servo::detach() { ledcDetachPin(this->pin); }
 
 int Servo::read() { return this->degrees; }
 

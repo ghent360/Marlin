@@ -1,7 +1,7 @@
 /**
  * Marlin 3D Printer Firmware
  *
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  * Copyright (c) 2016 Bob Cousins bobcousins42@googlemail.com
  * Copyright (c) 2015-2016 Nico Tonnhofer wurstnase.reprap@gmail.com
  * Copyright (c) 2017 Victor Perez
@@ -23,10 +23,6 @@
 #include "../platforms.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
-// --------------------------------------------------------------------------
-// Includes
-// --------------------------------------------------------------------------
-
 #include "HAL.h"
 
 #include "../../inc/MarlinConfig.h"
@@ -40,7 +36,7 @@
   #else
     #error "EEPROM_EMULATED_WITH_SRAM is currently only supported for STM32F4xx and STM32F7xx"
   #endif
-#endif // EEPROM_EMULATED_WITH_SRAM
+#endif
 
 // --------------------------------------------------------------------------
 // Externals
@@ -145,4 +141,4 @@ uint16_t HAL_adc_get_result(void) {
   return HAL_adc_result;
 }
 
-#endif // ARDUINO_ARCH_STM32
+#endif // ARDUINO_ARCH_STM32 && !STM32GENERIC

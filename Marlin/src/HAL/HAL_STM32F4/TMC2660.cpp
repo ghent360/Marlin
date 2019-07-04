@@ -255,7 +255,7 @@ char TMC26XStepper::move(void) {
 
     // rem if (time >= this->next_step_time) {
 
-    if (abs(time - this->last_step_time) > this->step_delay) {
+    if (abs((long)(time - this->last_step_time)) > this->step_delay) {
       // increment or decrement the step number,
       // depending on direction:
       if (this->direction == 1)

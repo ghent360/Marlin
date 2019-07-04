@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,9 +74,9 @@
 
     #include "fontutils.h"
 
-    void _wrap_string(uint8_t &x, uint8_t &y, const char * const string, read_byte_cb_t cb_read_byte);
-    inline void wrap_string_P(uint8_t &x, uint8_t &y, PGM_P const pstr) { _wrap_string(x, y, pstr, read_byte_rom); }
-    inline void wrap_string(uint8_t &x, uint8_t &y, const char * const string) { _wrap_string(x, y, string, read_byte_ram); }
+    void _wrap_string(uint8_t &x, uint8_t &y, const char * const string, read_byte_cb_t cb_read_byte, const bool wordwrap=false);
+    inline void wrap_string_P(uint8_t &x, uint8_t &y, PGM_P const pstr, const bool wordwrap=false) { _wrap_string(x, y, pstr, read_byte_rom, wordwrap); }
+    inline void wrap_string(uint8_t &x, uint8_t &y, const char * const string, const bool wordwrap=false) { _wrap_string(x, y, string, read_byte_ram, wordwrap); }
 
     #if ENABLED(SDSUPPORT)
       #include "../sd/cardreader.h"
@@ -277,14 +277,18 @@ public:
     static char status_message[];
     static bool has_status();
 
-    static uint8_t status_message_level;      // Higher levels block lower levels
-    static inline void reset_alert_level() { status_message_level = 0; }
+    static uint8_t alert_level; // Higher levels block lower levels
+    static inline void reset_alert_level() { alert_level = 0; }
 
     #if ENABLED(STATUS_MESSAGE_SCROLLING)
       static uint8_t status_scroll_offset;
       static void advance_status_scroll();
       static char* status_and_len(uint8_t &len);
     #endif
+
+    static void abort_print();
+    static void pause_print();
+    static void resume_print();
 
     #if HAS_PRINT_PROGRESS
       #if ENABLED(LCD_SET_PROGRESS_MANUALLY)

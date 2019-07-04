@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "ultralcd_DOGM.h"
 #include "../ultralcd.h"
 #include "../lcdprint.h"
+#include "../../libs/numtostr.h"
 
 #include "../../module/motion.h"
 #include "../../module/temperature.h"
@@ -74,6 +75,7 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
 #define DO_DRAW_FAN (HAS_FAN0 && STATUS_FAN_WIDTH && STATUS_FAN_FRAMES)
 #define ANIM_HOTEND (HOTENDS && ENABLED(STATUS_HOTEND_ANIM))
 #define ANIM_BED (DO_DRAW_BED && ENABLED(STATUS_BED_ANIM))
+#define ANIM_CHAMBER (HAS_HEATED_CHAMBER && ENABLED(STATUS_CHAMBER_ANIM))
 
 #if ANIM_HOTEND || ANIM_BED
   uint8_t heat_bits;
@@ -88,6 +90,11 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
 #else
   #define BED_ALT() false
 #endif
+#if ANIM_CHAMBER
+  #define CHAMBER_ALT() TEST(heat_bits, 6)
+#else
+  #define CHAMBER_ALT() false
+#endif
 
 #define MAX_HOTEND_DRAW MIN(HOTENDS, ((LCD_PIXEL_WIDTH - (STATUS_LOGO_BYTEWIDTH + STATUS_FAN_BYTEWIDTH) * 8) / (STATUS_HEATERS_XSPACE)))
 #define STATUS_HEATERS_BOT (STATUS_HEATERS_Y + STATUS_HEATERS_HEIGHT - 1)
@@ -98,7 +105,7 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
   #define SHOW_ON_STATE false
 #endif
 
-FORCE_INLINE void _draw_heater_status(const int8_t heater, const bool blink) {
+FORCE_INLINE void _draw_heater_status(const heater_ind_t heater, const bool blink) {
   #if !HEATER_IDLE_HANDLER
     UNUSED(blink);
   #endif
@@ -124,6 +131,27 @@ FORCE_INLINE void _draw_heater_status(const int8_t heater, const bool blink) {
   #else
     const float temp = IFBED(thermalManager.degBed(), thermalManager.degHotend(heater)),
                 target = IFBED(thermalManager.degTargetBed(), thermalManager.degTargetHotend(heater));
+  #endif
+
+  #if HAS_HEATED_CHAMBER
+    FORCE_INLINE void _draw_chamber_status(const bool blink) {
+      const float temp = thermalManager.degChamber(),
+                  target = thermalManager.degTargetChamber();
+      #if !HEATER_IDLE_HANDLER
+        UNUSED(blink);
+      #endif
+      if (PAGE_UNDER(7)) {
+        #if HEATER_IDLE_HANDLER
+          const bool is_idle = false, // thermalManager.chamber_idle.timed_out,
+                     dodraw = (blink || !is_idle);
+        #else
+          constexpr bool dodraw = true;
+        #endif
+        if (dodraw) _draw_centered_temp(target + 0.5, STATUS_CHAMBER_TEXT_X, 7);
+      }
+      if (PAGE_CONTAINS(28 - INFO_FONT_ASCENT, 28 - 1))
+        _draw_centered_temp(temp + 0.5f, STATUS_CHAMBER_TEXT_X, 28);
+    }
   #endif
 
   #if DISABLED(STATUS_HOTEND_ANIM)
@@ -271,13 +299,16 @@ void MarlinUI::draw_status_screen() {
 
   // At the first page, generate new display values
   if (first_page) {
-    #if ANIM_HOTEND || ANIM_BED
+    #if ANIM_HOTEND || ANIM_BED || ANIM_CHAMBER
       uint8_t new_bits = 0;
       #if ANIM_HOTEND
         HOTEND_LOOP() if (thermalManager.isHeatingHotend(e) ^ SHOW_ON_STATE) SBI(new_bits, e);
       #endif
       #if ANIM_BED
         if (thermalManager.isHeatingBed() ^ SHOW_ON_STATE) SBI(new_bits, 7);
+      #endif
+      #if ANIM_CHAMBER
+        if (thermalManager.isHeatingChamber() ^ SHOW_ON_STATE) SBI(new_bits, 6);
       #endif
       heat_bits = new_bits;
     #endif
@@ -326,6 +357,20 @@ void MarlinUI::draw_status_screen() {
       u8g.drawBitmapP(STATUS_BED_X, bedy, STATUS_BED_BYTEWIDTH, bedh, BED_BITMAP(BED_ALT()));
   #endif
 
+  #if DO_DRAW_CHAMBER
+    #if ANIM_HAMBER
+      #define CHAMBER_BITMAP(S) ((S) ? status_chamber_on_bmp : status_chamber_bmp)
+    #else
+      #define CHAMBER_BITMAP(S) status_chamber_bmp
+    #endif
+    if (PAGE_CONTAINS(STATUS_CHAMBER_Y, STATUS_CHAMBER_Y + STATUS_CHAMBER_HEIGHT - 1))
+      u8g.drawBitmapP(
+        STATUS_CHAMBER_X, STATUS_CHAMBER_Y,
+        STATUS_CHAMBER_BYTEWIDTH, STATUS_CHAMBER_HEIGHT,
+        CHAMBER_BITMAP(CHAMBER_ALT())
+      );
+  #endif
+
   #if DO_DRAW_FAN
     #if STATUS_FAN_FRAMES > 2
       static bool old_blink;
@@ -359,11 +404,15 @@ void MarlinUI::draw_status_screen() {
   if (PAGE_UNDER(6 + 1 + 12 + 1 + 6 + 1)) {
     // Extruders
     for (uint8_t e = 0; e < MAX_HOTEND_DRAW; ++e)
-      _draw_heater_status(e, blink);
+      _draw_heater_status((heater_ind_t)e, blink);
 
     // Heated bed
     #if HAS_HEATED_BED && HOTENDS < 4
-      _draw_heater_status(-1, blink);
+      _draw_heater_status(H_BED, blink);
+    #endif
+
+    #if HAS_HEATED_CHAMBER
+      _draw_chamber_status(blink);
     #endif
 
     // Fan, if a bitmap was provided
@@ -374,7 +423,7 @@ void MarlinUI::draw_status_screen() {
         if (spd) {
           #if ENABLED(ADAPTIVE_FAN_SLOWING)
             if (!blink && thermalManager.fan_speed_scaler[0] < 128) {
-              spd = (spd * thermalManager.fan_speed_scaler[0]) >> 7;
+              spd = thermalManager.scaledFanSpeed(0, spd);
               c = '*';
             }
           #endif

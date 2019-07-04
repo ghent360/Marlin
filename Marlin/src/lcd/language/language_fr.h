@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,9 +96,11 @@
 #define MSG_USER_MENU                       _UxGT("Commandes perso")
 
 #define MSG_UBL_DOING_G29                   _UxGT("G29 en cours")
-#define MSG_UBL_UNHOMED                     _UxGT("Origine XYZ d'abord")
+#define MSG_UBL_UNHOMED                     _UxGT("Origine XYZ requise")
 #define MSG_UBL_TOOLS                       _UxGT("Outils UBL")
 #define MSG_UBL_LEVEL_BED                   _UxGT("Niveau lit unifié")
+#define MSG_LCD_PROBING_MESH                _UxGT("Mesure point")
+#define MSG_LCD_TILTING_MESH                _UxGT("Touche point")
 #define MSG_IDEX_MENU                       _UxGT("Mode IDEX")
 #define MSG_IDEX_MODE_AUTOPARK              _UxGT("Auto-Park")
 #define MSG_IDEX_MODE_DUPLICATE             _UxGT("Duplication")
@@ -193,6 +195,7 @@
 #define MSG_MOVE_Z                          _UxGT("Déplacer Z")
 #define MSG_MOVE_E                          _UxGT("Extrudeur")
 #define MSG_HOTEND_TOO_COLD                 _UxGT("Buse trop froide")
+#define MSG_MOVE_0025MM                     _UxGT("Déplacer 0.025mm")
 #define MSG_MOVE_01MM                       _UxGT("Déplacer 0.1mm")
 #define MSG_MOVE_1MM                        _UxGT("Déplacer 1mm")
 #define MSG_MOVE_10MM                       _UxGT("Déplacer 10mm")
@@ -321,13 +324,22 @@
 #define MSG_ZPROBE_OUT                      _UxGT("Sonde Z hors lit")
 #define MSG_SKEW_FACTOR                     _UxGT("Facteur écart")
 #define MSG_BLTOUCH                         _UxGT("BLTouch")
-#define MSG_BLTOUCH_SELFTEST                _UxGT("Autotest BLTouch")
-#define MSG_BLTOUCH_RESET                   _UxGT("RaZ BL-Touch")
-#define MSG_BLTOUCH_DEPLOY                  _UxGT("Déployer BL-Touch")
-#define MSG_BLTOUCH_SW_MODE                 _UxGT("Mode BLTouch SW")
-#define MSG_BLTOUCH_5V_MODE                 _UxGT("Mode BLTouch 5V")
-#define MSG_BLTOUCH_OD_MODE                 _UxGT("Mode BLTouch OD")
-#define MSG_BLTOUCH_STOW                    _UxGT("Ranger BL-Touch")
+#define MSG_BLTOUCH_SELFTEST                _UxGT("Cmd: Self-Test")
+#define MSG_BLTOUCH_RESET                   _UxGT("Cmd: Reset")
+#define MSG_BLTOUCH_STOW                    _UxGT("Cmd: Ranger")
+#define MSG_BLTOUCH_DEPLOY                  _UxGT("Cmd: Déployer")
+#define MSG_BLTOUCH_SW_MODE                 _UxGT("Cmd: Mode SW")
+#define MSG_BLTOUCH_5V_MODE                 _UxGT("Cmd: Mode 5V")
+#define MSG_BLTOUCH_OD_MODE                 _UxGT("Cmd: Mode OD")
+#define MSG_BLTOUCH_MODE_STORE              _UxGT("Appliquer Mode")
+#define MSG_BLTOUCH_MODE_STORE_5V           _UxGT("Mise en 5V")
+#define MSG_BLTOUCH_MODE_STORE_OD           _UxGT("Mise en OD")
+#define MSG_BLTOUCH_MODE_ECHO               _UxGT("Afficher Mode")
+#define MSG_TOUCHMI_PROBE                   _UxGT("TouchMI")
+#define MSG_TOUCHMI_INIT                    _UxGT("Init. TouchMI")
+#define MSG_TOUCHMI_ZTEST                   _UxGT("Test décalage Z")
+#define MSG_TOUCHMI_SAVE                    _UxGT("Sauvegarde")
+#define MSG_MANUAL_DEPLOY_TOUCHMI           _UxGT("Déployer TouchMI")
 #define MSG_MANUAL_DEPLOY                   _UxGT("Déployer Sonde Z")
 #define MSG_MANUAL_STOW                     _UxGT("Ranger Sonde Z")
 #define MSG_HOME                            _UxGT("Origine")  // Used as MSG_HOME " " MSG_X MSG_Y MSG_Z " " MSG_FIRST
@@ -363,6 +375,8 @@
 #define MSG_COOLING                         _UxGT("Refroidissement")
 #define MSG_BED_HEATING                     _UxGT("Lit en chauffe...")
 #define MSG_BED_COOLING                     _UxGT("Refroid. du lit...")
+#define MSG_CHAMBER_HEATING                 _UxGT("Chauffe caisson...")
+#define MSG_CHAMBER_COOLING                 _UxGT("Refroid. caisson...")
 #define MSG_DELTA_CALIBRATE                 _UxGT("Calibration Delta")
 #define MSG_DELTA_CALIBRATE_X               _UxGT("Calibrer X")
 #define MSG_DELTA_CALIBRATE_Y               _UxGT("Calibrer Y")

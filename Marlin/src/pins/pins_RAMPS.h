@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,8 +70,12 @@
     #define SERVO0_PIN     11
   #endif
 #endif
-#define SERVO1_PIN          6
-#define SERVO2_PIN          5
+#ifndef SERVO1_PIN
+  #define SERVO1_PIN        6
+#endif
+#ifndef SERVO2_PIN
+  #define SERVO2_PIN        5
+#endif
 #ifndef SERVO3_PIN
   #define SERVO3_PIN        4
 #endif
@@ -79,14 +83,30 @@
 //
 // Limit Switches
 //
-#define X_MIN_PIN           3
-#ifndef X_MAX_PIN
-  #define X_MAX_PIN         2
+#ifndef X_STOP_PIN
+  #ifndef X_MIN_PIN
+    #define X_MIN_PIN       3
+  #endif
+  #ifndef X_MAX_PIN
+    #define X_MAX_PIN       2
+  #endif
 #endif
-#define Y_MIN_PIN          14
-#define Y_MAX_PIN          15
-#define Z_MIN_PIN          18
-#define Z_MAX_PIN          19
+#ifndef Y_STOP_PIN
+  #ifndef Y_MIN_PIN
+    #define Y_MIN_PIN      14
+  #endif
+  #ifndef Y_MAX_PIN
+    #define Y_MAX_PIN      15
+  #endif
+#endif
+#ifndef Z_STOP_PIN
+  #ifndef Z_MIN_PIN
+    #define Z_MIN_PIN      18
+  #endif
+  #ifndef Z_MAX_PIN
+    #define Z_MAX_PIN      19
+  #endif
+#endif
 
 //
 // Z Probe (when not Z_MIN_PIN)
@@ -235,17 +255,17 @@
 
 #if ENABLED(CASE_LIGHT_ENABLE) && !defined(CASE_LIGHT_PIN) && !defined(SPINDLE_LASER_ENA_PIN)
   #if NUM_SERVOS <= 1 // try to use servo connector first
-    #define CASE_LIGHT_PIN    6   // MUST BE HARDWARE PWM
+    #define CASE_LIGHT_PIN  6   // MUST BE HARDWARE PWM
   #elif AUX2_PINS_FREE
-    #define CASE_LIGHT_PIN   44   // MUST BE HARDWARE PWM
+    #define CASE_LIGHT_PIN 44   // MUST BE HARDWARE PWM
   #endif
 #endif
 
 //
 // M3/M4/M5 - Spindle/Laser Control
 //
-#if ENABLED(SPINDLE_LASER_ENABLE) && !PIN_EXISTS(SPINDLE_LASER_ENA)
-  #if !defined(NUM_SERVOS) || NUM_SERVOS == 0 // try to use servo connector first
+#if HAS_CUTTER && !defined(SPINDLE_LASER_ENA_PIN)
+  #if !NUM_SERVOS                         // Use servo connector if possible
     #define SPINDLE_LASER_ENA_PIN     4   // Pin should have a pullup/pulldown!
     #define SPINDLE_LASER_PWM_PIN     6   // MUST BE HARDWARE PWM
     #define SPINDLE_DIR_PIN           5
@@ -253,6 +273,8 @@
     #define SPINDLE_LASER_ENA_PIN    40   // Pin should have a pullup/pulldown!
     #define SPINDLE_LASER_PWM_PIN    44   // MUST BE HARDWARE PWM
     #define SPINDLE_DIR_PIN          65
+  #else
+    #error "No auto-assignable Spindle/Laser pins available."
   #endif
 #endif
 
@@ -273,9 +295,9 @@
   #endif
 #endif
 
-#if HAS_DRIVER(TMC2208)
+#if HAS_DRIVER(TMC2208) || HAS_DRIVER(TMC2209)
   /**
-   * TMC2208 stepper drivers
+   * TMC2208/TMC2209 stepper drivers
    *
    * Hardware serial communication ports.
    * If undefined software serial is used according to the pins below
@@ -340,7 +362,7 @@
 // LCDs and Controllers //
 //////////////////////////
 
-#if ENABLED(ULTRA_LCD)
+#if HAS_SPI_LCD
 
   //
   // LCD Display output pins
@@ -618,4 +640,4 @@
     #endif
   #endif // NEWPANEL
 
-#endif // ULTRA_LCD
+#endif // HAS_SPI_LCD

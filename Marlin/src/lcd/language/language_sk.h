@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
 #define MSG_BACK                            _UxGT("Naspäť")
 #define MSG_SD_INSERTED                     _UxGT("Karta vložená")
 #define MSG_SD_REMOVED                      _UxGT("Karta vybraná")
+#define MSG_SD_RELEASED                     _UxGT("Karta odpojená")
 #define MSG_LCD_ENDSTOPS                    _UxGT("Endstopy") // max 8 znakov
 #define MSG_LCD_SOFT_ENDSTOPS               _UxGT("Soft. endstopy")
 #define MSG_MAIN                            _UxGT("Hlavná ponuka")
@@ -85,7 +86,11 @@
 #define MSG_LASER_OFF                       _UxGT("Vypnúť laser")
 #define MSG_LASER_ON                        _UxGT("Zapnúť laser")
 #define MSG_LASER_POWER                     _UxGT("Výkon lasera")
-#define MSG_SPINDLE_REVERSE                 _UxGT("Spät. chod vretena")
+#define MSG_SPINDLE_MENU                    _UxGT("Nastavenie vretena")
+#define MSG_SPINDLE_OFF                     _UxGT("Vypnúť vreteno")
+#define MSG_SPINDLE_ON                      _UxGT("Zapnúť vreteno")
+#define MSG_SPINDLE_POWER                   _UxGT("Výkon vretena")
+#define MSG_SPINDLE_REVERSE                 _UxGT("Spätný chod")
 #define MSG_SWITCH_PS_ON                    _UxGT("Zapnúť napájanie")
 #define MSG_SWITCH_PS_OFF                   _UxGT("Vypnúť napájanie")
 #define MSG_EXTRUDE                         _UxGT("Vytlačiť (extr.)")
@@ -105,6 +110,8 @@
 #define MSG_UBL_UNHOMED                     _UxGT("Prejdite domov")
 #define MSG_UBL_TOOLS                       _UxGT("Nástroje UBL")
 #define MSG_UBL_LEVEL_BED                   _UxGT("UBL rovnanie")
+#define MSG_LCD_PROBING_MESH                _UxGT("Skúšam bod")
+#define MSG_LCD_TILTING_MESH                _UxGT("Vyrovnávam bod")
 #define MSG_IDEX_MENU                       _UxGT("IDEX režim")
 #define MSG_OFFSETS_MENU                    _UxGT("Offset nástrojov")
 #define MSG_IDEX_MODE_AUTOPARK              _UxGT("Auto-parkovanie")
@@ -199,6 +206,7 @@
 #define MSG_MOVE_Z                          _UxGT("Posunúť Z")
 #define MSG_MOVE_E                          _UxGT("Extrudér")
 #define MSG_HOTEND_TOO_COLD                 _UxGT("Hotend je studený")
+#define MSG_MOVE_0025MM                     _UxGT("Posunúť o 0,025mm")
 #define MSG_MOVE_01MM                       _UxGT("Posunúť o 0,1mm")
 #define MSG_MOVE_1MM                        _UxGT("Posunúť o 1mm")
 #define MSG_MOVE_10MM                       _UxGT("Posunúť o 10mm")
@@ -323,16 +331,22 @@
 
 #define MSG_INIT_SDCARD                     _UxGT("Načítať SD kartu")
 #define MSG_CHANGE_SDCARD                   _UxGT("Vymeniť SD kartu")
+#define MSG_RELEASE_SDCARD                  _UxGT("Odpojiť SD kartu")
 #define MSG_ZPROBE_OUT                      _UxGT("Sonda Z mimo podl.")
 #define MSG_SKEW_FACTOR                     _UxGT("Faktor skosenia")
 #define MSG_BLTOUCH                         _UxGT("BLTouch")
-#define MSG_BLTOUCH_SELFTEST                _UxGT("Self-Test BLTouch")
-#define MSG_BLTOUCH_RESET                   _UxGT("Reset BLTouch")
-#define MSG_BLTOUCH_DEPLOY                  _UxGT("Vysunúť BLTouch")
-#define MSG_BLTOUCH_SW_MODE                 _UxGT("SW vysun. BLTouch")
-#define MSG_BLTOUCH_5V_MODE                 _UxGT("BLTouch režim 5V")
-#define MSG_BLTOUCH_OD_MODE                 _UxGT("BLTouch režim OD")
-#define MSG_BLTOUCH_STOW                    _UxGT("Zasunúť BLTouch")
+#define MSG_BLTOUCH_SELFTEST                _UxGT("Cmd: Self-Test")
+#define MSG_BLTOUCH_RESET                   _UxGT("Cmd: Reset")
+#define MSG_BLTOUCH_STOW                    _UxGT("Cmd: Zasunúť")
+#define MSG_BLTOUCH_DEPLOY                  _UxGT("Cmd: Vysunúť")
+#define MSG_BLTOUCH_SW_MODE                 _UxGT("Cmd: Režim SW")
+#define MSG_BLTOUCH_5V_MODE                 _UxGT("Cmd: Režim 5V")
+#define MSG_BLTOUCH_OD_MODE                 _UxGT("Cmd: Režim OD")
+#define MSG_BLTOUCH_MODE_STORE              _UxGT("Cmd: Ulož. režim")
+#define MSG_BLTOUCH_MODE_STORE_5V           _UxGT("Prepnúť do 5V")
+#define MSG_BLTOUCH_MODE_STORE_OD           _UxGT("Prepnúť do OD")
+#define MSG_BLTOUCH_MODE_ECHO               _UxGT("Zobraziť režim")
+#define MSG_BLTOUCH_MODE_CHANGE             _UxGT("POZOR: Zlé nastav. môže spôsobiť poškoden. Pokračovať?")
 #define MSG_MANUAL_DEPLOY                   _UxGT("Inštalovať sondu Z")
 #define MSG_MANUAL_STOW                     _UxGT("Odstrániť sondu Z")
 #define MSG_HOME                            _UxGT("Najskôr os")  // Used as MSG_HOME " " MSG_X MSG_Y MSG_Z " " MSG_FIRST
@@ -366,6 +380,8 @@
 #define MSG_COOLING                         _UxGT("Ochladzovanie...")
 #define MSG_BED_HEATING                     _UxGT("Ohrev podložky...")
 #define MSG_BED_COOLING                     _UxGT("Ochladz. podložky...")
+#define MSG_CHAMBER_HEATING                 _UxGT("Ohrev komory...")
+#define MSG_CHAMBER_COOLING                 _UxGT("Ochladz. komory...")
 #define MSG_DELTA_CALIBRATE                 _UxGT("Delta kalibrácia")
 #define MSG_DELTA_CALIBRATE_X               _UxGT("Kalibrovať X")
 #define MSG_DELTA_CALIBRATE_Y               _UxGT("Kalibrovať Y")
@@ -423,6 +439,7 @@
 #define MSG_FILAMENT_CHANGE_OPTION_RESUME   _UxGT("Obnoviť tlač")
 #define MSG_FILAMENT_CHANGE_NOZZLE          _UxGT("  Tryska: ")
 #define MSG_RUNOUT_SENSOR                   _UxGT("Senzor filamentu")
+#define MSG_RUNOUT_DISTANCE_MM              _UxGT("Vzd. mm fil. senz.")
 #define MSG_ERR_HOMING_FAILED               _UxGT("Parkovanie zlyhalo")
 #define MSG_ERR_PROBING_FAILED              _UxGT("Kalibrácia zlyhala")
 #define MSG_M600_TOO_COLD                   _UxGT("M600: Príliš studený")
