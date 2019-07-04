@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -278,7 +278,7 @@ void PrintJobRecovery::resume() {
   // Pretend that all axes are homed
   axis_homed = axis_known_position = xyz_bits;
 
-  char cmd[50], str_1[16], str_2[16];
+  char cmd[MAX_CMD_SIZE+16], str_1[16], str_2[16];
 
   // Select the previously active tool (with no_move)
   #if EXTRUDERS > 1
