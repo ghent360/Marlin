@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,10 +36,6 @@
 
 #if HAS_BED_PROBE
   #include "../../module/probe.h"
-#endif
-
-#if ENABLED(BLTOUCH)
-  #include "../../feature/bltouch.h"
 #endif
 
 #if HAS_LEVELING
@@ -109,7 +105,7 @@ void GcodeSuite::G34() {
     // Always home with tool 0 active
     #if HOTENDS > 1
       const uint8_t old_tool_index = active_extruder;
-      tool_change(0, 0, true);
+      tool_change(0, true);
     #endif
 
     #if HAS_DUPLICATION_MODE
@@ -136,7 +132,7 @@ void GcodeSuite::G34() {
     );
 
     // Home before the alignment procedure
-    home_all_axes();
+    if (homing_needed()) home_all_axes();
 
     // Move the Z coordinate realm towards the positive - dirty trick
     current_position[Z_AXIS] -= z_probe * 0.5;
@@ -263,7 +259,7 @@ void GcodeSuite::G34() {
 
     // Restore the active tool after homing
     #if HOTENDS > 1
-      tool_change(old_tool_index, 0, (
+      tool_change(old_tool_index, (
         #if ENABLED(PARKING_EXTRUDER)
           false // Fetch the previous toolhead
         #else
@@ -279,14 +275,12 @@ void GcodeSuite::G34() {
     // After this operation the z position needs correction
     set_axis_is_not_at_home(Z_AXIS);
 
-    #if BOTH(BLTOUCH, BLTOUCH_HS_MODE)
-      // In BLTOUCH HS mode, the pin is still deployed at this point.
-      // The upcoming G28 means travel, so it is better to stow the pin.
-      bltouch._stow();
-    #endif
+    // Stow the probe, as the last call to probe_pt(...) left
+    // the probe deployed if it was successful.
+    STOW_PROBE();
 
-    // Home after the alignment procedure
-    home_all_axes();
+    // Home Z after the alignment procedure
+    process_subcommands_now_P(PSTR("G28 Z"));
 
   } while(0);
 
