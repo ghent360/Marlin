@@ -51,7 +51,7 @@
     The continue bit is always 0 so that a (re)start is equired for the change from cmd to/data mode
 */
 
-#include "../../platforms.h"
+#include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32F4)
 
 #include <U8glib.h>
