@@ -21,7 +21,6 @@
  *
  */
 #include "../platforms.h"
-
 #if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 #include "HAL.h"
