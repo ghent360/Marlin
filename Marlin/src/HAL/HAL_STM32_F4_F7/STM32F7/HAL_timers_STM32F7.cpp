@@ -20,7 +20,7 @@
  *
  */
 
-#if defined(STM32GENERIC) && defined(STM32F7)
+#if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && defined(STM32F7)
 
 #include "../HAL.h"
 #include "HAL_timers_STM32F7.h"

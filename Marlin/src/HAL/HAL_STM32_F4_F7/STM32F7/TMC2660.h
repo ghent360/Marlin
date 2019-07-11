@@ -26,6 +26,8 @@
  */
 #pragma once
 
+#if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && defined(STM32F7)
+
 #include <stdint.h>
 
 //! return value for TMC26XStepper.getOverTemperature() if there is a overtemperature situation in the TMC chip
@@ -592,3 +594,5 @@ class TMC26XStepper {
     // SPI sender
     inline void send262(uint32_t datagram);
 };
+
+#endif

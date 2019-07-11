@@ -21,6 +21,8 @@
  */
 #pragma once
 
+#if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && defined(STM32F7)
+
 #include <stdint.h>
 
 // ------------------------
@@ -95,3 +97,5 @@ hal_timer_t HAL_timer_get_compare(const uint8_t timer_num);
 uint32_t HAL_timer_get_count(const uint8_t timer_num);
 void HAL_timer_isr_prologue(const uint8_t timer_num);
 #define HAL_timer_isr_epilogue(TIMER_NUM)
+
+#endif

@@ -25,7 +25,7 @@
  *
  */
 
-#if defined(STM32GENERIC) && defined(STM32F7)
+#if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && defined(STM32F7)
 
 #include "../../../inc/MarlinConfigPre.h"
 
@@ -895,4 +895,5 @@ inline void TMC26XStepper::send262(uint32_t datagram) {
   driver_status_result = i_datagram;
 }
 
+#endif // HAS_DRIVER(TMC2660)
 #endif // STM32GENERIC && STM32F7
