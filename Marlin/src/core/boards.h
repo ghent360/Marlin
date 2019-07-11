@@ -270,17 +270,6 @@
 
 #define BOARD_TEENSY31_32             4100  // Teensy3.1 and Teensy3.2
 #define BOARD_TEENSY35_36             4101  // Teensy3.5 and Teensy3.6
-<<<<<<< HEAD
-#define BOARD_BEAST                   4102  // STM32F4xxVxT6 Libmaple-based STM32F4 controller
-#define BOARD_STM32F4                 4103  // STM32 STM32GENERIC-based STM32F4 controller
-#define BOARD_ARMED                   4104  // Arm'ed STM32F4-based controller
-#define BOARD_RUMBA32                 4105  // RUMBA32 STM32F4-based controller
-#define BOARD_BLACK_STM32F407VE       4106  // BLACK_STM32F407VE
-#define BOARD_BLACK_STM32F407ZE       4107  // BLACK_STM32F407ZE
-#define BOARD_STEVAL                  4108  // STEVAL-3DP001V1 3D PRINTER BOARD
-#define BOARD_BIGTREE_SKR_PRO_V1_1    4109  // BigTreeTech SKR Pro v1.1 (STM32F407ZG)
-#define BOARD_PRNTR_V1                4125  // STM32F446 NUCLEO-64 shield controller
-=======
 
 //
 // STM32 ARM Cortex-M4F
@@ -294,7 +283,7 @@
 #define BOARD_BLACK_STM32F407ZE       4205  // BLACK_STM32F407ZE
 #define BOARD_STEVAL                  4206  // STEVAL-3DP001V1 3D PRINTER BOARD
 #define BOARD_BIGTREE_SKR_PRO_V1_1    4207  // BigTreeTech SKR Pro v1.1 (STM32F407ZG)
->>>>>>> cd36809c06ecf5419afbd77b347f85b7e1982438
+#define BOARD_PRNTR_V1                4225  // STM32F446 NUCLEO-64 shield controller
 
 //
 // ARM Cortex M7
