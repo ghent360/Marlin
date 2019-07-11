@@ -896,4 +896,5 @@ inline void TMC26XStepper::send262(uint32_t datagram) {
 }
 
 #endif // HAS_DRIVER(TMC2660)
+
 #endif // STM32GENERIC && STM32F7
