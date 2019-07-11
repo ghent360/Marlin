@@ -25,15 +25,13 @@
   #error "Oops! Select an STM32F1 board in 'Tools > Board.'"
 #endif
 
-#ifndef BOARD_NAME
-  #define BOARD_NAME "BIGTREE SKR mini V1.1"
-#endif
+#define BOARD_NAME "BIGTREE SKR Mini 1.1"
 
 //#define DISABLE_DEBUG
 #define DISABLE_JTAG
 
-// Ignore temp readings during develpment.
-//#define BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
+// Ignore temp readings during development.
+//#define BOGUS_TEMPERATURE_GRACE_PERIOD 2000
 
 //
 // Limit Switches

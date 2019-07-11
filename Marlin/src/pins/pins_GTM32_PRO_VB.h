@@ -30,8 +30,8 @@
   #error "Oops! Select an STM32F1 board in 'Tools > Board.'"
 #endif
 
+#define BOARD_NAME           "GTM32 Pro VB"
 #define DEFAULT_MACHINE_NAME "STM32F103VET6"
-#define BOARD_NAME "GTM32 Pro VB"
 
 //#define DISABLE_DEBUG
 
@@ -49,11 +49,11 @@
 //#define DISABLE_JTAGSWD
 
 // Ignore temp readings during development.
-#define BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
+//#define BOGUS_TEMPERATURE_GRACE_PERIOD 2000
 
 // Enable EEPROM Emulation for this board as it doesn't have EEPROM
 #define FLASH_EEPROM_EMULATION
-#define E2END 0xFFF // EEPROM end address (4kB)
+#define E2END 0xFFF // 4KB
 
 //
 // Limit Switches
@@ -224,7 +224,7 @@
 #endif
 
 #define SDSS               SS_PIN
- 
+
 //
 // ESP WiFi can be soldered to J9 connector which is wired to USART2.
 // Must define WIFISUPPORT in Configuration.h for the printer.

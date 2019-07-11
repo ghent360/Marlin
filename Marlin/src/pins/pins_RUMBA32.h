@@ -26,12 +26,11 @@
 #endif
 
 #define RUMBA32_V1_0
-#define DEFAULT_MACHINE_NAME "RUMBA32"
-#define BOARD_NAME "RUMBA32"
+#define BOARD_NAME           "RUMBA32"
+#define DEFAULT_MACHINE_NAME BOARD_NAME
 
 //#define I2C_EEPROM
-
-#define E2END 0xFFF // EEPROM end address (4kB)
+#define E2END 0xFFF // 4KB
 
 #if HOTENDS > 3 || E_STEPPERS > 3
   #error "RUMBA32 supports up to 3 hotends / E-steppers."

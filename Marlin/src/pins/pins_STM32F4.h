@@ -25,15 +25,15 @@
   #error "Oops! Select an STM32F4 board in 'Tools > Board.'"
 #endif
 
+#define BOARD_NAME           "Misc. STM32F4"
 #define DEFAULT_MACHINE_NAME "STM32F407VET6"
-#define BOARD_NAME "STM32F4 Board"
 
 //#define I2C_EEPROM
 
-#define E2END 0xFFF // EEPROM end address (4kB)
+#define E2END 0xFFF // 4KB
 
-// Ignore temp readings during develpment.
-//#define BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
+// Ignore temp readings during development.
+//#define BOGUS_TEMPERATURE_GRACE_PERIOD 2000
 
 #if HOTENDS > 2 || E_STEPPERS > 2
   #error "STM32F4 supports up to 2 hotends / E-steppers."
