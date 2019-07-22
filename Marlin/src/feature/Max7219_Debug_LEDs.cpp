@@ -48,6 +48,28 @@
 #include "../Marlin.h"
 #include "../HAL/shared/Delay.h"
 
+#define HAS_SIDE_BY_SIDE (ENABLED(MAX7219_SIDE_BY_SIDE) && MAX7219_NUMBER_UNITS > 1)
+
+#if _ROT == 0 || _ROT == 180
+  #if HAS_SIDE_BY_SIDE
+    #define MAX7219_X_LEDS  8
+    #define MAX7219_Y_LEDS  MAX7219_LINES
+  #else
+    #define MAX7219_Y_LEDS  8
+    #define MAX7219_X_LEDS  MAX7219_LINES
+  #endif
+#elif _ROT == 90 || _ROT == 270
+  #if HAS_SIDE_BY_SIDE
+    #define MAX7219_Y_LEDS  8
+    #define MAX7219_X_LEDS  MAX7219_LINES
+  #else
+    #define MAX7219_X_LEDS  8
+    #define MAX7219_Y_LEDS  MAX7219_LINES
+  #endif
+#else
+  #error "MAX7219_ROTATE must be a multiple of +/- 90°."
+#endif
+
 Max7219 max7219;
 
 uint8_t Max7219::led_line[MAX7219_LINES]; // = { 0 };
@@ -59,25 +81,41 @@ uint8_t Max7219::led_line[MAX7219_LINES]; // = { 0 };
 #else
   #define _LED_BIT(Q)   ((Q) & 0x7)
 #endif
-
-#if (_ROT == 0 || _ROT == 270) == ENABLED(MAX7219_REVERSE_ORDER)
-  #define _LED_UNIT(Q)  ((MAX7219_NUMBER_UNITS - 1 - ((Q) >> 3)) << 3)
-#else
-  #define _LED_UNIT(Q)  ((Q) & ~0x7)
-#endif
-
-#if _ROT < 180
-  #define _LED_IND(P,Q) (_LED_UNIT(P) + (Q))
-#else
-  #define _LED_IND(P,Q) (_LED_UNIT(P) + (7 - ((Q) & 0x7)))
-#endif
 #if _ROT == 0 || _ROT == 180
-  #define LED_IND(X,Y)  _LED_IND(X,Y)
   #define LED_BIT(X,Y)  _LED_BIT(X)
-#elif _ROT == 90 || _ROT == 270
-  #define LED_IND(X,Y)  _LED_IND(Y,X)
+#else
   #define LED_BIT(X,Y)  _LED_BIT(Y)
 #endif
+#if _ROT == 0 || _ROT == 90
+  #define _LED_IND(P,Q) (_LED_TOP(P) + ((Q) & 0x7))
+#else
+  #define _LED_IND(P,Q) (_LED_TOP(P) + (7 - ((Q) & 0x7)))
+#endif
+
+#if HAS_SIDE_BY_SIDE
+  #if (_ROT == 0 || _ROT == 90) == DISABLED(MAX7219_REVERSE_ORDER)
+    #define _LED_TOP(Q)  ((MAX7219_NUMBER_UNITS - 1 - ((Q) >> 3)) << 3)
+  #else
+    #define _LED_TOP(Q)  ((Q) & ~0x7)
+  #endif
+  #if _ROT == 0 || _ROT == 180
+    #define LED_IND(X,Y)  _LED_IND(Y,Y)
+  #elif _ROT == 90 || _ROT == 270
+    #define LED_IND(X,Y)  _LED_IND(X,X)
+  #endif
+#else
+  #if (_ROT == 0 || _ROT == 270) == DISABLED(MAX7219_REVERSE_ORDER)
+    #define _LED_TOP(Q)  ((Q) & ~0x7)
+  #else
+    #define _LED_TOP(Q)  ((MAX7219_NUMBER_UNITS - 1 - ((Q) >> 3)) << 3)
+  #endif
+  #if _ROT == 0 || _ROT == 180
+    #define LED_IND(X,Y)  _LED_IND(X,Y)
+  #elif _ROT == 90 || _ROT == 270
+    #define LED_IND(X,Y)  _LED_IND(Y,X)
+  #endif
+#endif
+
 #define XOR_7219(X,Y) do{ led_line[LED_IND(X,Y)] ^=  _BV(LED_BIT(X,Y)); }while(0)
 #define SET_7219(X,Y) do{ led_line[LED_IND(X,Y)] |=  _BV(LED_BIT(X,Y)); }while(0)
 #define CLR_7219(X,Y) do{ led_line[LED_IND(X,Y)] &= ~_BV(LED_BIT(X,Y)); }while(0)
@@ -464,18 +502,18 @@ void Max7219::init() {
  */
 
 // Apply changes to update a marker
-void Max7219::mark16(const uint8_t y, const uint8_t v1, const uint8_t v2) {
+void Max7219::mark16(const uint8_t pos, const uint8_t v1, const uint8_t v2) {
   #if MAX7219_X_LEDS == 8
     #if MAX7219_Y_LEDS == 8
-      led_off(v1 & 0x7, y + (v1 >= 8));
-       led_on(v2 & 0x7, y + (v2 >= 8));
+      led_off(v1 & 0x7, pos + (v1 >= 8));
+       led_on(v2 & 0x7, pos + (v2 >= 8));
     #else
-      led_off(y, v1 & 0xF); // At least 16 LEDs down. Use a single column.
-       led_on(y, v2 & 0xF);
+      led_off(pos, v1 & 0xF); // At least 16 LEDs down. Use a single column.
+       led_on(pos, v2 & 0xF);
     #endif
   #else
-    led_off(v1 & 0xF, y);   // At least 16 LEDs across. Use a single row.
-     led_on(v2 & 0xF, y);
+    led_off(v1 & 0xF, pos);   // At least 16 LEDs across. Use a single row.
+     led_on(v2 & 0xF, pos);
   #endif
 }
 
@@ -502,16 +540,16 @@ void Max7219::range16(const uint8_t y, const uint8_t ot, const uint8_t nt, const
 }
 
 // Apply changes to update a quantity
-void Max7219::quantity16(const uint8_t y, const uint8_t ov, const uint8_t nv) {
+void Max7219::quantity16(const uint8_t pos, const uint8_t ov, const uint8_t nv) {
   for (uint8_t i = _MIN(nv, ov); i < _MAX(nv, ov); i++)
     #if MAX7219_X_LEDS == 8
       #if MAX7219_Y_LEDS == 8
-        led_set(i >> 1, y + (i & 1), nv >= ov); // single 8x8 LED matrix.  Use two lines to get 16 LED's
+        led_set(i >> 1, pos + (i & 1), nv >= ov); // single 8x8 LED matrix.  Use two lines to get 16 LED's
       #else
-        led_set(y, i, nv >= ov);                // The Max7219 Y-Axis has at least 16 LED's.  So use a single column
+        led_set(pos, i, nv >= ov);                // The Max7219 Y-Axis has at least 16 LED's.  So use a single column
       #endif
     #else
-      led_set(i, y, nv >= ov);                // LED matrix has at least 16 LED's on the X-Axis.  Use single line of LED's
+      led_set(i, pos, nv >= ov);                // LED matrix has at least 16 LED's on the X-Axis.  Use single line of LED's
     #endif
 }
 
