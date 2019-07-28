@@ -54,6 +54,10 @@
     inline const char* strchr_P(const char *s, int c) { return strchr(s,c); }
     //#define strchr_P(s,c) strchr(s,c)
   #endif
+
+  #ifndef vsnprintf_P
+    #define vsnprintf_P vsnprintf
+  #endif
 #endif
 
 // Restart causes

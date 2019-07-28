@@ -32,6 +32,7 @@
 #define HAL_ID_STM32 9
 #define HAL_ID_ESP32 10
 #define HAL_ID_LINUX 11
+#define HAL_ID_STM32_F4_F7 12
 
 #ifdef __AVR__
   #define HAL_PLATFORM HAL_AVR
@@ -51,12 +52,9 @@
 #elif defined(__STM32F1__) || defined(TARGET_STM32F1)
   #define HAL_PLATFORM HAL_STM32F1
   #define HAL_PLATFORM_ID HAL_ID_STM32F1
-#elif /*defined(STM32GENERIC) &&*/ defined(STM32F4) || defined(STM32F4xx)
-  #define HAL_PLATFORM HAL_STM32F4
-  #define HAL_PLATFORM_ID HAL_ID_STM32F4
-#elif defined(STM32GENERIC) && defined(STM32F7)
-  #define HAL_PLATFORM HAL_STM32F7
-  #define HAL_PLATFORM_ID HAL_ID_STM32F7
+#elif /*defined(STM32GENERIC) &&*/ defined(STM32F4) || defined(STM32F4xx) || defined(STM32F7)
+  #define HAL_PLATFORM HAL_STM32_F4_F7
+  #define HAL_PLATFORM_ID HAL_ID_STM32_F4_F7
 #elif defined(ARDUINO_ARCH_STM32)
   #define HAL_PLATFORM HAL_STM32
   #define HAL_PLATFORM_ID HAL_ID_STM32
