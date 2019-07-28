@@ -1640,6 +1640,9 @@ void Temperature::init() {
   #if HAS_FAN2
     INIT_FAN_PIN(FAN2_PIN);
   #endif
+  #if HAS_FAN3
+    INIT_FAN_PIN(FAN3_PIN);
+  #endif
   #if ENABLED(USE_CONTROLLER_FAN)
     INIT_FAN_PIN(CONTROLLER_FAN_PIN);
   #endif
@@ -2440,6 +2443,9 @@ void Temperature::isr() {
         #if HAS_FAN2
           _FAN_PWM(2);
         #endif
+        #if HAS_FAN3
+          _FAN_PWM(3);
+        #endif
       #endif
     }
     else {
@@ -2481,6 +2487,9 @@ void Temperature::isr() {
         #endif
         #if HAS_FAN2
           if (soft_pwm_count_fan[2] <= pwm_count_tmp) WRITE_FAN(2, LOW);
+        #endif
+        #if HAS_FAN3
+          if (soft_pwm_count_fan[3] <= pwm_count_tmp) WRITE_FAN(3, LOW);
         #endif
       #endif
     }
@@ -2574,6 +2583,9 @@ void Temperature::isr() {
         #if HAS_FAN2
           _PWM_FAN(2);
         #endif
+        #if HAS_FAN3
+          _PWM_FAN(3);
+        #endif
       }
       #if HAS_FAN0
         if (soft_pwm_count_fan[0] <= pwm_count_tmp) WRITE_FAN(0, LOW);
@@ -2583,6 +2595,9 @@ void Temperature::isr() {
       #endif
       #if HAS_FAN2
         if (soft_pwm_count_fan[2] <= pwm_count_tmp) WRITE_FAN(2, LOW);
+      #endif
+      #if HAS_FAN3
+        if (soft_pwm_count_fan[3] <= pwm_count_tmp) WRITE_FAN(3, LOW);
       #endif
     #endif // FAN_SOFT_PWM
 
