@@ -114,9 +114,8 @@
 //#define HEATER_BED2_PIN    -1    // BED2
 //#define HEATER_BED3_PIN    -1    // BED3
 
-#define FAN_COUNT 2
 #ifndef FAN_PIN
-#define FAN_PIN            SLOW_PIN(B, 14)   // E0 Part
+#define FAN_PIN            SLOW_PIN(B, 14)  // E0 Part
 #endif
 #define FAN1_PIN           SLOW_PIN(B, 15)  // E1 Part
 #define FAN2_PIN           SLOW_PIN(C, 6)   // E0 Cool / TC1
@@ -134,6 +133,7 @@
 
 // Laser control
 #if ENABLED(SPINDLE_LASER_ENABLE)
+#error PRNTRboard does not support SPINDLE_LASER
 //#define SPINDLE_LASER_PWM_PIN       PB8
 //#define SPINDLE_LASER_ENABLE_PIN    PD5
 #endif
