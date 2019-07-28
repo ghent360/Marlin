@@ -73,7 +73,6 @@
 
   void _lcd_babystep(const AxisEnum axis, PGM_P const msg) {
     if (ui.use_click()) return ui.goto_previous_screen_no_defer();
-    ui.encoder_direction_normal();
     if (ui.encoderPosition) {
       const int16_t steps = int16_t(ui.encoderPosition) * (BABYSTEP_MULTIPLICATOR);
       ui.encoderPosition = 0;
@@ -194,6 +193,12 @@ void menu_tune() {
       MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(uint8, MSG_FAN_SPEED " 3", &thermalManager.lcd_tmpfan_speed[2], 0, 255, thermalManager.lcd_setFanSpeed2);
       #if ENABLED(EXTRA_FAN_SPEED)
         MENU_MULTIPLIER_ITEM_EDIT(uint8, MSG_EXTRA_FAN_SPEED " 3", &thermalManager.new_fan_speed[2], 3, 255);
+      #endif
+    #endif
+    #if HAS_FAN3 || (ENABLED(SINGLENOZZLE) && EXTRUDERS > 2)
+      MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(uint8, MSG_FAN_SPEED " 4", &thermalManager.lcd_tmpfan_speed[3], 0, 255, thermalManager.lcd_setFanSpeed3);
+      #if ENABLED(EXTRA_FAN_SPEED)
+        MENU_MULTIPLIER_ITEM_EDIT(uint8, MSG_EXTRA_FAN_SPEED " 4", &thermalManager.new_fan_speed[3], 3, 255);
       #endif
     #endif
   #endif // FAN_COUNT > 0

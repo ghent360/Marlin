@@ -84,6 +84,8 @@
                        || HAS_DRIVER(TMC5130) \
                        || HAS_DRIVER(TMC5160) )
 
+#define HAS_TMC220x (HAS_DRIVER(TMC2208) || HAS_DRIVER(TMC2209))
+
 #define AXIS_IS_TMC(A)   (    AXIS_DRIVER_TYPE(A,TMC2130) \
                            || AXIS_DRIVER_TYPE(A,TMC2160) \
                            || AXIS_DRIVER_TYPE(A,TMC2208) \
@@ -118,7 +120,7 @@
                                    || AXIS_DRIVER_TYPE(A,TMC5160) )
 
 //
-// Stretching 'drivers.h' to include LPC SD options
+// Stretching 'drivers.h' to include LPC/SAMD51 SD options
 //
 #define _SDCARD_LCD          1
 #define _SDCARD_ONBOARD      2

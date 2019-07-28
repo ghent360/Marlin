@@ -89,7 +89,6 @@
   // Step 7: Get the Z coordinate, click goes to the next point or exits
   //
   void _lcd_level_bed_get_z() {
-    ui.encoder_direction_normal();
 
     if (ui.use_click()) {
 
@@ -239,7 +238,7 @@ void menu_bed_leveling() {
   const bool is_homed = all_axes_known();
 
   // Auto Home if not using manual probing
-  #if DISABLED(PROBE_MANUALLY, MESH_BED_LEVELING)
+  #if NONE(PROBE_MANUALLY, MESH_BED_LEVELING)
     if (!is_homed) MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
   #endif
 

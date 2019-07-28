@@ -74,7 +74,6 @@ struct measurements_t {
   float nozzle_outer_dimension[2] = {CALIBRATION_NOZZLE_OUTER_DIAMETER, CALIBRATION_NOZZLE_OUTER_DIAMETER};
 };
 
-#define TEMPORARY_BED_LEVELING_STATE(enable) TemporaryBedLevelingState tbls(enable)
 #define TEMPORARY_SOFT_ENDSTOP_STATE(enable) REMEMBER(tes, soft_endstops_enabled, enable);
 
 #if ENABLED(BACKLASH_GCODE)
@@ -88,20 +87,6 @@ struct measurements_t {
 #else
   #define TEMPORARY_BACKLASH_SMOOTHING(value)
 #endif
-
-/**
- * A class to save and change the bed leveling state,
- * then restore it when it goes out of scope.
- */
-class TemporaryBedLevelingState {
-  bool saved;
-
-  public:
-    TemporaryBedLevelingState(const bool enable) : saved(planner.leveling_active) {
-      set_bed_leveling_enabled(enable);
-    }
-    ~TemporaryBedLevelingState() { set_bed_leveling_enabled(saved); }
-};
 
 /**
  * Move to a particular location. Up to three individual axes
@@ -120,9 +105,9 @@ inline void move_to(
   if (a3 != NO_AXIS) destination[a3] = p3;
 
   // Make sure coordinates are within bounds
-  destination[X_AXIS] = MAX(MIN(destination[X_AXIS], X_MAX_POS), X_MIN_POS);
-  destination[Y_AXIS] = MAX(MIN(destination[Y_AXIS], Y_MAX_POS), Y_MIN_POS);
-  destination[Z_AXIS] = MAX(MIN(destination[Z_AXIS], Z_MAX_POS), Z_MIN_POS);
+  destination[X_AXIS] = _MAX(_MIN(destination[X_AXIS], X_MAX_POS), X_MIN_POS);
+  destination[Y_AXIS] = _MAX(_MIN(destination[Y_AXIS], Y_MAX_POS), Y_MIN_POS);
+  destination[Z_AXIS] = _MAX(_MIN(destination[Z_AXIS], Z_MAX_POS), Z_MIN_POS);
 
   // Move to position
   do_blocking_move_to(destination, MMM_TO_MMS(CALIBRATION_FEEDRATE_TRAVEL));

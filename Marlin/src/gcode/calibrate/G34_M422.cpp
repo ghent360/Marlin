@@ -123,7 +123,7 @@ void GcodeSuite::G34() {
 
     float z_probe = Z_BASIC_CLEARANCE + (G34_MAX_GRADE) * 0.01f * (
       #if ENABLED(Z_TRIPLE_STEPPER_DRIVERS)
-         SQRT(MAX(HYPOT2(z_auto_align_xpos[0] - z_auto_align_ypos[0], z_auto_align_xpos[1] - z_auto_align_ypos[1]),
+         SQRT(_MAX(HYPOT2(z_auto_align_xpos[0] - z_auto_align_ypos[0], z_auto_align_xpos[1] - z_auto_align_ypos[1]),
                   HYPOT2(z_auto_align_xpos[1] - z_auto_align_ypos[1], z_auto_align_xpos[2] - z_auto_align_ypos[2]),
                   HYPOT2(z_auto_align_xpos[2] - z_auto_align_ypos[2], z_auto_align_xpos[0] - z_auto_align_ypos[0])))
       #else
@@ -142,6 +142,8 @@ void GcodeSuite::G34() {
           z_maxdiff = 0.0f,
           amplification = z_auto_align_amplification;
 
+    const ProbePtRaise raise_after = parser.boolval('E') ? PROBE_PT_STOW : PROBE_PT_RAISE;
+
     uint8_t iteration;
     bool err_break = false;
     for (iteration = 0; iteration < z_auto_align_iterations; ++iteration) {
@@ -159,22 +161,22 @@ void GcodeSuite::G34() {
         // Safe clearance even on an incline
         if (iteration == 0 || izstepper > 0) do_blocking_move_to_z(z_probe);
 
-        // Probe a Z height for each stepper
-        if (isnan(probe_pt(z_auto_align_xpos[zstepper], z_auto_align_ypos[zstepper], PROBE_PT_RAISE, 0, true))) {
+        // Probe a Z height for each stepper.
+        const float z_probed_height = probe_pt(z_auto_align_xpos[zstepper], z_auto_align_ypos[zstepper], raise_after, 0, true);
+        if (isnan(z_probed_height)) {
           SERIAL_ECHOLNPGM("Probing failed.");
           err_break = true;
           break;
         }
 
-        // This is not the trigger Z value. It is the position of the probe after raising it.
-        // It is higher than the trigger value by a constant value (not known here). This value
-        // is more useful for determining the desired next iteration Z position for probing. It is
-        // equally well suited for determining the misalignment, just like the trigger position would be.
-        z_measured[zstepper] = current_position[Z_AXIS];
+        // Add height to each value, to provide a more useful target height for
+        // the next iteration of probing. This allows adjustments to be made away from the bed.
+        z_measured[zstepper] = z_probed_height + Z_CLEARANCE_BETWEEN_PROBES;
+
         if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPAIR("> Z", int(zstepper + 1), " measured position is ", z_measured[zstepper]);
 
         // Remember the minimum measurement to calculate the correction later on
-        z_measured_min = MIN(z_measured_min, z_measured[zstepper]);
+        z_measured_min = _MIN(z_measured_min, z_measured[zstepper]);
       } // for (zstepper)
 
       if (err_break) break;
@@ -182,11 +184,11 @@ void GcodeSuite::G34() {
       // Adapt the next probe clearance height based on the new measurements.
       // Safe_height = lowest distance to bed (= highest measurement) plus highest measured misalignment.
       #if ENABLED(Z_TRIPLE_STEPPER_DRIVERS)
-        z_maxdiff = MAX(ABS(z_measured[0] - z_measured[1]), ABS(z_measured[1] - z_measured[2]), ABS(z_measured[2] - z_measured[0]));
-        z_probe = Z_BASIC_CLEARANCE + MAX(z_measured[0], z_measured[1], z_measured[2]) + z_maxdiff;
+        z_maxdiff = _MAX(ABS(z_measured[0] - z_measured[1]), ABS(z_measured[1] - z_measured[2]), ABS(z_measured[2] - z_measured[0]));
+        z_probe = Z_BASIC_CLEARANCE + _MAX(z_measured[0], z_measured[1], z_measured[2]) + z_maxdiff;
       #else
         z_maxdiff = ABS(z_measured[0] - z_measured[1]);
-        z_probe = Z_BASIC_CLEARANCE + MAX(z_measured[0], z_measured[1]) + z_maxdiff;
+        z_probe = Z_BASIC_CLEARANCE + _MAX(z_measured[0], z_measured[1]) + z_maxdiff;
       #endif
 
       SERIAL_ECHOPAIR("\n"
@@ -210,7 +212,7 @@ void GcodeSuite::G34() {
                     z_align_abs = ABS(z_align_move);
 
         // Optimize one iterations correction based on the first measurements
-        if (z_align_abs > 0.0f) amplification = iteration == 1 ? MIN(last_z_align_move[zstepper] / z_align_abs, 2.0f) : z_auto_align_amplification;
+        if (z_align_abs > 0.0f) amplification = iteration == 1 ? _MIN(last_z_align_move[zstepper] / z_align_abs, 2.0f) : z_auto_align_amplification;
 
         // Check for less accuracy compared to last move
         if (last_z_align_move[zstepper] < z_align_abs - 1.0) {

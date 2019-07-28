@@ -353,8 +353,8 @@ void CardReader::initsd() {
   else {
     flag.detected = true;
     SERIAL_ECHO_MSG(MSG_SD_CARD_OK);
-    #if ENABLED(EEPROM_SETTINGS) && DISABLED(FLASH_EEPROM_EMULATION)
-      (void)settings.load();
+    #if ENABLED(EEPROM_SETTINGS) && NONE(FLASH_EEPROM_EMULATION, SPI_EEPROM, I2C_EEPROM)
+      settings.first_load();
     #endif
   }
   setroot();
@@ -560,10 +560,8 @@ void CardReader::checkautostart() {
   if (autostart_index < 0 || flag.sdprinting) return;
 
   if (!isDetected()) initsd();
-
-  #if ENABLED(EEPROM_SETTINGS) && DISABLED(FLASH_EEPROM_EMULATION)
-    SERIAL_ECHOLNPGM("Loading settings from SD");
-    (void)settings.load();
+  #if ENABLED(EEPROM_SETTINGS) && NONE(FLASH_EEPROM_EMULATION, SPI_EEPROM, I2C_EEPROM)
+    else settings.first_load();
   #endif
 
   if (isDetected()
@@ -1010,17 +1008,15 @@ void CardReader::printingHasFinished() {
     #endif
 
     print_job_timer.stop();
-    if (print_job_timer.duration() > 60) queue.inject_P(PSTR("M31"));
+    queue.enqueue_now_P(print_job_timer.duration() > 60 ? PSTR("M31") : PSTR("M117"));
 
     #if ENABLED(SDCARD_SORT_ALPHA)
       presort();
     #endif
 
-    #if EITHER(ULTRA_LCD, EXTENSIBLE_UI) && ENABLED(LCD_SET_PROGRESS_MANUALLY)
-      ui.progress_bar_percent = 0;
+    #if ENABLED(LCD_SET_PROGRESS_MANUALLY)
+      ui.set_progress_done();
     #endif
-
-    ui.reset_status();
 
     #if ENABLED(SD_REPRINT_LAST_SELECTED_FILE)
       ui.reselect_last_file();

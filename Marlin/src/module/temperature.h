@@ -140,7 +140,7 @@ enum ADCSensorState : char {
 // get all oversampled sensor readings
 #define MIN_ADC_ISR_LOOPS 10
 
-#define ACTUAL_ADC_SAMPLES MAX(int(MIN_ADC_ISR_LOOPS), int(SensorsReady))
+#define ACTUAL_ADC_SAMPLES _MAX(int(MIN_ADC_ISR_LOOPS), int(SensorsReady))
 
 #if HAS_PID_HEATING
   #define PID_K2 (1-float(PID_K1))
@@ -496,7 +496,7 @@ class Temperature {
 
         static uint8_t lcd_tmpfan_speed[
           #if ENABLED(SINGLENOZZLE)
-            MAX(EXTRUDERS, FAN_COUNT)
+            _MAX(EXTRUDERS, FAN_COUNT)
           #else
             FAN_COUNT
           #endif
@@ -512,6 +512,9 @@ class Temperature {
         #endif
         #if HAS_FAN2 || (ENABLED(SINGLENOZZLE) && EXTRUDERS > 2)
           FORCE_INLINE static void lcd_setFanSpeed2() { lcd_setFanSpeed(2); }
+        #endif
+        #if HAS_FAN3 || (ENABLED(SINGLENOZZLE) && EXTRUDERS > 2)
+          FORCE_INLINE static void lcd_setFanSpeed2() { lcd_setFanSpeed(3); }
         #endif
 
       #endif // HAS_LCD_MENU
@@ -613,7 +616,7 @@ class Temperature {
       #if ENABLED(AUTO_POWER_CONTROL)
         powerManager.power_on();
       #endif
-      temp_hotend[ee].target = MIN(celsius, temp_range[ee].maxtemp - 15);
+      temp_hotend[ee].target = _MIN(celsius, temp_range[ee].maxtemp - 15);
       start_watching_hotend(ee);
     }
 
@@ -627,7 +630,7 @@ class Temperature {
       static void setTargetChamber(const int16_t celsius) {
         temp_chamber.target =
           #ifdef CHAMBER_MAXTEMP
-            MIN(celsius, CHAMBER_MAXTEMP)
+            _MIN(celsius, CHAMBER_MAXTEMP)
           #else
             celsius
           #endif
@@ -676,7 +679,7 @@ class Temperature {
         #endif
         temp_bed.target =
           #ifdef BED_MAXTEMP
-            MIN(celsius, BED_MAXTEMP - 10)
+            _MIN(celsius, BED_MAXTEMP - 10)
           #else
             celsius
           #endif
@@ -785,7 +788,7 @@ class Temperature {
       #endif
     #endif
 
-    #if EITHER(ULTRA_LCD, EXTENSIBLE_UI)
+    #if HAS_DISPLAY
       static void set_heating_message(const uint8_t e);
     #endif
 
@@ -828,7 +831,9 @@ class Temperature {
     static void min_temp_error(const heater_ind_t e);
     static void max_temp_error(const heater_ind_t e);
 
-    #if ENABLED(THERMAL_PROTECTION_HOTENDS) || HAS_THERMALLY_PROTECTED_BED || ENABLED(THERMAL_PROTECTION_CHAMBER)
+    #define HAS_THERMAL_PROTECTION (EITHER(THERMAL_PROTECTION_HOTENDS, THERMAL_PROTECTION_CHAMBER) || HAS_THERMALLY_PROTECTED_BED)
+
+    #if HAS_THERMAL_PROTECTION
 
       enum TRState : char { TRInactive, TRFirstHeating, TRStable, TRRunaway };
 
@@ -849,7 +854,7 @@ class Temperature {
 
       static void thermal_runaway_protection(tr_state_machine_t &state, const float &current, const float &target, const heater_ind_t heater_id, const uint16_t period_seconds, const uint16_t hysteresis_degc);
 
-    #endif // THERMAL_PROTECTION
+    #endif // HAS_THERMAL_PROTECTION
 };
 
 extern Temperature thermalManager;
