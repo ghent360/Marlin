@@ -1642,7 +1642,7 @@
   #if AXIS_IS_TMC(X)
     #define X_CURRENT     600  // (mA) RMS current. Multiply by 1.414 for peak current.
     #define X_MICROSTEPS   16  // 0..256
-    #define X_RSENSE     0.15
+    #define X_RSENSE     0.051
   #endif
 
   #if AXIS_IS_TMC(X2)
@@ -1654,7 +1654,7 @@
   #if AXIS_IS_TMC(Y)
     #define Y_CURRENT     600
     #define Y_MICROSTEPS    8
-    #define Y_RSENSE     0.15
+    #define Y_RSENSE     0.051
   #endif
 
   #if AXIS_IS_TMC(Y2)
@@ -1666,7 +1666,7 @@
   #if AXIS_IS_TMC(Z)
     #define Z_CURRENT     800
     #define Z_MICROSTEPS    4
-    #define Z_RSENSE     0.15
+    #define Z_RSENSE     0.051
   #endif
 
   #if AXIS_IS_TMC(Z2)
@@ -1684,13 +1684,13 @@
   #if AXIS_IS_TMC(E0)
     #define E0_CURRENT    500
     #define E0_MICROSTEPS  16
-    #define E0_RSENSE    0.15
+    #define E0_RSENSE    0.051
   #endif
 
   #if AXIS_IS_TMC(E1)
     #define E1_CURRENT    800
     #define E1_MICROSTEPS  16
-    #define E1_RSENSE    0.15
+    #define E1_RSENSE    0.051
   #endif
 
   #if AXIS_IS_TMC(E2)

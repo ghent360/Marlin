@@ -612,7 +612,7 @@
       st.dedge(true);
     #endif
     st.intpol(INTERPOLATE);
-    st.diss2g(true); // Disable short to ground protection. Too many false readings?
+    st.diss2g(false); // Enable short to ground protection. Too many false readings?
 
     #if ENABLED(TMC_DEBUG)
       st.rdsel(0b01);
