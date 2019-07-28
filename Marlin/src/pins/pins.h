@@ -499,7 +499,7 @@
 #elif MB(BIGTREE_SKR_PRO_V1_1)
   #include "stm32/pins_BIGTREE_SKR_PRO_V1.1.h"  // STM32F4                                env:BIGTREE_SKR_PRO
 #elif MB(PRNTR_V1)
-  #include "pins_PRNTR_V1.h"                    // STM32F4                                env:STM32F4
+  #include "stm32/pins_PRNTR_V1.h"              // STM32F4                                env:STM32F4
 
 //
 // ARM Cortex M7
