@@ -309,6 +309,6 @@ struct FastIOPin {
   #define PG13 _STM32_PIN(G, 13)
   #define PG14 _STM32_PIN(G, 14)
   #define PG15 _STM32_PIN(G, 15)
+#endif // STM32F7
 
-#endif // STM32GENERIC && STM32F7
 #endif // REDEFINE_PIN_NAMES
