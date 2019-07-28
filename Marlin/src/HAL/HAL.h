@@ -33,6 +33,7 @@
 #define HAL_ID_ESP32 10
 #define HAL_ID_LINUX 11
 #define HAL_ID_STM32_F4_F7 12
+#define HAL_ID_SAMD51 13
 
 #ifdef __AVR__
   #define HAL_PLATFORM HAL_AVR
@@ -64,6 +65,9 @@
 #elif defined(__PLAT_LINUX__)
   #define HAL_PLATFORM HAL_LINUX
   #define HAL_PLATFORM_ID HAL_ID_LINUX
+#elif defined(__SAMD51__)
+  #define HAL_PLATFORM HAL_SAMD51
+  #define HAL_PLATFORM_ID HAL_ID_SAMD51
 #else
   #error "Unsupported Platform!"
 #endif
