@@ -27,7 +27,7 @@
 //#define PRNTR_BOARD_REV_3
 
 /**
- * 21017 Venelin Efremov Marlin for stm32f4 test
+ * 2018 Venelin Efremov Marlin for stm32f4 test
  */
 
 #define DEFAULT_MACHINE_NAME "STM32F4"
