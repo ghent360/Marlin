@@ -45,10 +45,8 @@
 #if HAS_DRIVER(TMC26X)
   #include <SPI.h>
 
-  #ifdef STM32F7
-    #include "../HAL/HAL_STM32F7/TMC2660.h"
-  #elif defined(STM32F4xx)
-    #include "../HAL/HAL_STM32F4/TMC2660.h"
+  #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && defined(STM32F7)
+    #include "../HAL/HAL_STM32_F4_F7/STM32F7/TMC2660.h"
   #else
     #include <TMC26XStepper.h>
   #endif
