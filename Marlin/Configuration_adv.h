@@ -1642,7 +1642,7 @@
   #if AXIS_IS_TMC(X)
     #define X_CURRENT     800  // (mA) RMS current. Multiply by 1.414 for peak current.
     #define X_MICROSTEPS   16  // 0..256
-    #define X_RSENSE     0.15
+    #define X_RSENSE    0.051
   #endif
 
   #if AXIS_IS_TMC(X2)
@@ -1654,7 +1654,7 @@
   #if AXIS_IS_TMC(Y)
     #define Y_CURRENT     800
     #define Y_MICROSTEPS   16
-    #define Y_RSENSE     0.15
+    #define Y_RSENSE    0.051
   #endif
 
   #if AXIS_IS_TMC(Y2)
@@ -1664,9 +1664,9 @@
   #endif
 
   #if AXIS_IS_TMC(Z)
-    #define Z_CURRENT     1100
+    #define Z_CURRENT    1100
     #define Z_MICROSTEPS   16
-    #define Z_RSENSE     0.15
+    #define Z_RSENSE    0.051
   #endif
 
   #if AXIS_IS_TMC(Z2)
@@ -1684,13 +1684,13 @@
   #if AXIS_IS_TMC(E0)
     #define E0_CURRENT    800
     #define E0_MICROSTEPS  16
-    #define E0_RSENSE    0.15
+    #define E0_RSENSE   0.051
   #endif
 
   #if AXIS_IS_TMC(E1)
     #define E1_CURRENT    800
     #define E1_MICROSTEPS  16
-    #define E1_RSENSE    0.15
+    #define E1_RSENSE   0.051
   #endif
 
   #if AXIS_IS_TMC(E2)
@@ -1781,9 +1781,9 @@
    * Use Trinamic's ultra quiet stepping mode.
    * When disabled, Marlin will use spreadCycle stepping mode.
    */
-  #define STEALTHCHOP_XY
-  #define STEALTHCHOP_Z
-  #define STEALTHCHOP_E
+  //#define STEALTHCHOP_XY
+  //#define STEALTHCHOP_Z
+  //#define STEALTHCHOP_E
 
   /**
    * Optimize spreadCycle chopper parameters by using predefined parameter sets
@@ -1799,7 +1799,7 @@
    * Define you own with
    * { <off_time[1..15]>, <hysteresis_end[-3..12]>, hysteresis_start[1..8] }
    */
-  #define CHOPPER_TIMING CHOPPER_DEFAULT_12V
+  #define CHOPPER_TIMING CHOPPER_DEFAULT_24V
 
   /**
    * Monitor Trinamic drivers for error conditions,
