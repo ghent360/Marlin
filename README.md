@@ -12,11 +12,19 @@ Original code location: https://github.com/MarlinFirmware/Marlin.git
 
 This repo is a port of Marlin to STM32 F4 MCU. I'm using Nucleo-F446RE as a test platform. I have an addon board for the NUCLEO that converts it to a 3D printer controller in similar fashion how RAMPS addon works with an arduino board. Open source schematics for the addon board: https://github.com/ghent360/PrntrBoard.git. Both the board and this firmware are functional.
 
-I was able to print a few object with this code, it is not guaranteed bug free, but it is comparable to the official Marlin bugfix-2.x branch in terms of what works and what does not.
+I was able to print a few object with this code, it is not guaranteed bug free, but it is comparable to the official Marlin bugfix-2.0.x branch in terms of what works and what does not.
 
-I'm using Arduino 1.8.5 with the official STM32 support library from this link https://github.com/stm32duino/Arduino_Core_STM32
+To compile I'm using Arduino 1.8.9 with the official STM32 support library from this link https://github.com/stm32duino/Arduino_Core_STM32
 
 You can compile the code with the Arduino IDE or Visual Studio Code with an Arduino extension installed.
+
+Branches:
+- bugfix-2.0.x - this branch tracks Marlin's bugfix-2.0.x. Designed to work on Nucleo-F446RE dev board from STMicro with PRNTRboard with TMC2130 drivers.
+- f407 - this branch is based on my bugfix-2.0.x with modifications so it works on my Nucleo-F407 board with PRNTRboard with TMC2130 driver.
+- f407-2660 - this is based on f407 with configuration changes for PRNTRboard with TMC2660 drivers
+- sldrbot - this branch is based on bugfix-2.0.x designed to work on Nucleo-F446RE with PRNTRboard with TMC2130 drivers. Changes to the configuration are made to support my soldering machine robot.
+- sldrbot-407 - this branch is based on sldrbot, but designed to work on Nucleo-F407 with PRNTRBoard with TMC2130 drivers.
+- sldrbot-407-2660 - this branch is based on sldrbot-407, but changes are made to support TMC2660 drivers.
 
 ## ~Happy hacking
 
@@ -58,7 +66,8 @@ Marlin 2.0 introduces a layer of abstraction so that all the existing high-level
   [Selena Compact](https://github.com/Ales2-k/Selena)|LPC1768 ARM-Cortex M3|100MHz|512k|32+16+16k|3.3-5V|no
   [Teensy 3.5](https://www.pjrc.com/store/teensy35.html)|ARM-Cortex M4|120MHz|512k|192k|3.3-5V|yes
   [Teensy 3.6](https://www.pjrc.com/store/teensy36.html)|ARM-Cortex M4|180MHz|1M|256k|3.3V|yes
-  [PrntrBoard/NUCLEO-F446](https://github.com/ghent360/PrntrBoard.git)|[STM32F446 ARM-Cortex M4](https://www.st.com/en/microcontrollers/stm32f446.html)|180MHz|512k|112+16k|3.3V|yes
+  [PRNTRboard/NUCLEO-F446](https://github.com/ghent360/PrntrBoard.git)|[STM32F446RE ARM-Cortex M4](https://www.st.com/en/microcontrollers/stm32f446.html)|180MHz|512k|112+16k|3.3V|yes
+  [PRNTRboard/NUCLEO-F407](https://github.com/ghent360/PrntrBoard.git)|[STM32F407VE ARM-Cortex M4](https://www.st.com/content/st_com/en/products/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus/stm32-high-performance-mcus/stm32f4-series/stm32f407-417/stm32f407ve.html)|168MHz|512k|192+4k|3.3V|yes
 
 ### HALs in Development
 
