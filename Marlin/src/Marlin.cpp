@@ -290,6 +290,15 @@ void enable_all_steppers() {
   enable_E5();
 }
 
+void enable_e_steppers() {
+  enable_E0();
+  enable_E1();
+  enable_E2();
+  enable_E3();
+  enable_E4();
+  enable_E5();
+}
+
 void disable_e_steppers() {
   disable_E0();
   disable_E1();
@@ -659,6 +668,18 @@ void idle(
     bool no_stepper_sleep/*=false*/
   #endif
 ) {
+
+  #if ENABLED(SPI_ENDSTOPS)
+    if (endstops.tmc_spi_homing.any
+      #if ENABLED(IMPROVE_HOMING_RELIABILITY)
+        && ELAPSED(millis(), sg_guard_period)
+      #endif
+    ) {
+      for (uint8_t i = 4; i--;) // Read SGT 4 times per idle loop
+        if (endstops.tmc_spi_homing_check()) break;
+    }
+  #endif
+
   #if ENABLED(MAX7219_DEBUG)
     max7219.idle_tasks();
   #endif
@@ -681,7 +702,7 @@ void idle(
     print_job_timer.tick();
   #endif
 
-  #if HAS_BUZZER && DISABLED(LCD_USE_I2C_BUZZER)
+  #if HAS_BUZZER && DISABLED(LCD_USE_I2C_BUZZER) && DISABLED(PCA9632_BUZZER)
     buzzer.tick();
   #endif
 
@@ -1105,6 +1126,10 @@ void setup() {
     init_closedloop();
   #endif
 
+  #ifdef STARTUP_COMMANDS
+    queue.inject_P(PSTR(STARTUP_COMMANDS));
+  #endif
+
   #if ENABLED(INIT_SDCARD_ON_BOOT) && !HAS_SPI_LCD
     card.beginautostart();
   #endif
@@ -1129,6 +1154,8 @@ void setup() {
 void loop() {
 
   for (;;) {
+
+    idle(); // Do an idle first so boot is slightly faster
 
     #if ENABLED(SDSUPPORT)
 
@@ -1161,6 +1188,5 @@ void loop() {
     if (queue.length < BUFSIZE) queue.get_available_commands();
     queue.advance();
     endstops.event_handler();
-    idle();
   }
 }

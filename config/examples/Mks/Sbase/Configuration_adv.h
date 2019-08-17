@@ -1144,6 +1144,53 @@
 
 #endif // HAS_GRAPHICAL_LCD
 
+//
+// Lulzbot Touch UI
+//
+#if ENABLED(LULZBOT_TOUCH_UI)
+  // Display board used
+  //#define LCD_FTDI_VM800B35A        // FTDI 3.5" with FT800 (320x240)
+  //#define LCD_4DSYSTEMS_4DLCD_FT843 // 4D Systems 4.3" (480x272)
+  //#define LCD_HAOYU_FT800CB         // Haoyu with 4.3" or 5" (480x272)
+  //#define LCD_HAOYU_FT810CB         // Haoyu with 5" (800x480)
+  //#define LCD_ALEPHOBJECTS_CLCD_UI  // Aleph Objects Color LCD UI
+
+  // Correct the resolution if not using the stock TFT panel.
+  //#define TOUCH_UI_320x240
+  //#define TOUCH_UI_480x272
+  //#define TOUCH_UI_800x480
+
+  // Mappings for boards with a standard RepRapDiscount Display connector
+  //#define AO_EXP1_PINMAP    // AlephObjects CLCD UI EXP1 mapping
+  //#define AO_EXP2_PINMAP    // AlephObjects CLCD UI EXP2 mapping
+  //#define CR10_TFT_PINMAP   // Rudolph Riedel's CR10 pin mapping
+  //#define OTHER_PIN_LAYOUT  // Define pins manually below
+  #if ENABLED(OTHER_PIN_LAYOUT)
+    // The pins for CS and MOD_RESET (PD) must be chosen.
+    #define CLCD_MOD_RESET  9
+    #define CLCD_SPI_CS    10
+
+    // If using software SPI, specify pins for SCLK, MOSI, MISO
+    //#define CLCD_USE_SOFT_SPI
+    #if ENABLED(CLCD_USE_SOFT_SPI)
+      #define CLCD_SOFT_SPI_MOSI 11
+      #define CLCD_SOFT_SPI_MISO 12
+      #define CLCD_SOFT_SPI_SCLK 13
+    #endif
+  #endif
+
+  // Display Orientation. An inverted (i.e. upside-down) display
+  // is supported on the FT800. The FT810 and beyond also support
+  // portrait and mirrored orientations.
+  //#define TOUCH_UI_INVERTED
+  //#define TOUCH_UI_PORTRAIT
+  //#define TOUCH_UI_MIRRORED
+
+  // Use a numeric passcode for "Screen lock" keypad.
+  // (recommended for smaller displays)
+  //#define TOUCH_UI_PASSCODE
+#endif
+
 // @section safety
 
 /**
@@ -1852,17 +1899,25 @@
   #define E5_HYBRID_THRESHOLD     30
 
   /**
+   * Use StallGuard2 to home / probe X, Y, Z.
+   *
    * TMC2130, TMC2160, TMC2209, TMC2660, TMC5130, and TMC5160 only
-   * Use StallGuard2 to sense an obstacle and trigger an endstop.
    * Connect the stepper driver's DIAG1 pin to the X/Y endstop pin.
    * X, Y, and Z homing will always be done in spreadCycle mode.
    *
-   * X/Y/Z_STALL_SENSITIVITY is used for tuning the trigger sensitivity.
-   * Higher values make the system LESS sensitive.
-   * Lower value make the system MORE sensitive.
-   * Too low values can lead to false positives, while too high values will collide the axis without triggering.
-   * It is advised to set X/Y/Z_HOME_BUMP_MM to 0.
-   * M914 X/Y/Z to live tune the setting
+   * X/Y/Z_STALL_SENSITIVITY is used to tune the trigger sensitivity.
+   * Use M914 X Y Z to live-adjust the sensitivity.
+   *  Higher: LESS sensitive. (Too high => failure to trigger)
+   *   Lower: MORE sensitive. (Too low  => false positives)
+   *
+   * It is recommended to set [XYZ]_HOME_BUMP_MM to 0.
+   *
+   * SPI_ENDSTOPS  *** Beta feature! *** TMC2130 Only ***
+   * Poll the driver through SPI to determine load when homing.
+   * Removes the need for a wire from DIAG1 to an endstop pin.
+   *
+   * IMPROVE_HOMING_RELIABILITY tunes acceleration and jerk when
+   * homing and adds a guard period for endstop triggering.
    */
   //#define SENSORLESS_HOMING // StallGuard capable drivers only
 
@@ -1879,6 +1934,8 @@
     #define X_STALL_SENSITIVITY  8
     #define Y_STALL_SENSITIVITY  8
     //#define Z_STALL_SENSITIVITY  8
+    //#define SPI_ENDSTOPS              // TMC2130 only
+    //#define IMPROVE_HOMING_RELIABILITY
   #endif
 
   /**
@@ -2234,6 +2291,13 @@
 #define EXTENDED_CAPABILITIES_REPORT
 
 /**
+ * Expected Printer Check
+ * Add the M16 G-code to compare a string to the MACHINE_NAME.
+ * M16 with a non-matching string causes the printer to halt.
+ */
+//#define EXPECTED_PRINTER_CHECK
+
+/**
  * Disable all Volumetric extrusion options
  */
 //#define NO_VOLUMETRICS
@@ -2286,6 +2350,13 @@
 #ifdef G0_FEEDRATE
   //#define VARIABLE_G0_FEEDRATE // The G0 feedrate is set by F in G0 motion mode
 #endif
+
+/**
+ * Startup commands
+ *
+ * Execute certain G-code commands immediately after power-on.
+ */
+//#define STARTUP_COMMANDS "M17 Z"
 
 /**
  * G-code Macros
