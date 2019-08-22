@@ -337,7 +337,7 @@
     #endif
 
     #if DISABLED(NEWPANEL)
-      // Buttons are attached to a shift register
+      // Buttons attached to a shift register
       // Not wired yet
       //#define SHIFT_CLK    38
       //#define SHIFT_LD     42
@@ -436,7 +436,7 @@
       #define DOGLCD_CS    25
 
       // GLCD features
-      //#define LCD_CONTRAST 190
+      //#define LCD_CONTRAST_INIT 190
       // Uncomment screen orientation
       //#define LCD_SCREEN_ROT_90
       //#define LCD_SCREEN_ROT_180
@@ -463,7 +463,7 @@
       #define DOGLCD_CS    66
 
       // GLCD features
-      //#define LCD_CONTRAST 190
+      //#define LCD_CONTRAST_INIT 190
       // Uncomment screen orientation
       //#define LCD_SCREEN_ROT_90
       //#define LCD_SCREEN_ROT_180
