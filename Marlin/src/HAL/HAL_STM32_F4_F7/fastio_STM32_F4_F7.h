@@ -29,6 +29,9 @@
 
 #define PWM_PIN(p) true
 #define USEABLE_HARDWARE_PWM(p) PWM_PIN(p)
+#ifndef PWM
+  #define PWM OUTPUT
+#endif
 
 #define USE_FAST_IO
 
@@ -181,6 +184,8 @@ struct FastIOPin {
 #define PORTC 2
 #define PORTD 3
 #define PORTE 4
+#define PORTF 5
+#define PORTG 6
 
 #define _STM32_PIN(P,PN) ((PORT##P * 16) + PN)
 
@@ -279,11 +284,8 @@ struct FastIOPin {
   #define PE15 _STM32_PIN(E, 15)
 #endif
 
-#ifdef STM32F7
-<<<<<<< HEAD
+#ifndef PF0
   #define PORTF 5
-  #define PORTG 6
-
   #define PF0  _STM32_PIN(F,  0)
   #define PF1  _STM32_PIN(F,  1)
   #define PF2  _STM32_PIN(F,  2)
@@ -300,7 +302,10 @@ struct FastIOPin {
   #define PF13 _STM32_PIN(F, 13)
   #define PF14 _STM32_PIN(F, 14)
   #define PF15 _STM32_PIN(F, 15)
+#endif
 
+#ifndef PG0
+  #define PORTG 6
   #define PG0  _STM32_PIN(G,  0)
   #define PG1  _STM32_PIN(G,  1)
   #define PG2  _STM32_PIN(G,  2)
@@ -317,48 +322,6 @@ struct FastIOPin {
   #define PG13 _STM32_PIN(G, 13)
   #define PG14 _STM32_PIN(G, 14)
   #define PG15 _STM32_PIN(G, 15)
-#endif // STM32F7
-=======
-
-  #ifndef PF0
-    #define PORTF 5
-    #define PF0  _STM32_PIN(F,  0)
-    #define PF1  _STM32_PIN(F,  1)
-    #define PF2  _STM32_PIN(F,  2)
-    #define PF3  _STM32_PIN(F,  3)
-    #define PF4  _STM32_PIN(F,  4)
-    #define PF5  _STM32_PIN(F,  5)
-    #define PF6  _STM32_PIN(F,  6)
-    #define PF7  _STM32_PIN(F,  7)
-    #define PF8  _STM32_PIN(F,  8)
-    #define PF9  _STM32_PIN(F,  9)
-    #define PF10 _STM32_PIN(F, 10)
-    #define PF11 _STM32_PIN(F, 11)
-    #define PF12 _STM32_PIN(F, 12)
-    #define PF13 _STM32_PIN(F, 13)
-    #define PF14 _STM32_PIN(F, 14)
-    #define PF15 _STM32_PIN(F, 15)
-  #endif
-
-  #ifndef PG0
-    #define PORTG 6
-    #define PG0  _STM32_PIN(G,  0)
-    #define PG1  _STM32_PIN(G,  1)
-    #define PG2  _STM32_PIN(G,  2)
-    #define PG3  _STM32_PIN(G,  3)
-    #define PG4  _STM32_PIN(G,  4)
-    #define PG5  _STM32_PIN(G,  5)
-    #define PG6  _STM32_PIN(G,  6)
-    #define PG7  _STM32_PIN(G,  7)
-    #define PG8  _STM32_PIN(G,  8)
-    #define PG9  _STM32_PIN(G,  9)
-    #define PG10 _STM32_PIN(G, 10)
-    #define PG11 _STM32_PIN(G, 11)
-    #define PG12 _STM32_PIN(G, 12)
-    #define PG13 _STM32_PIN(G, 13)
-    #define PG14 _STM32_PIN(G, 14)
-    #define PG15 _STM32_PIN(G, 15)
-  #endif
->>>>>>> 66bfad3ced35fca416834ea51c58077261bea761
+#endif
 
 #endif // REDEFINE_PIN_NAMES
