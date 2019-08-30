@@ -342,6 +342,10 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 12: M12(); break;                                    // M12: Synchronize and optionally force a CLC set
       #endif
 
+      #if ENABLED(EXPECTED_PRINTER_CHECK)
+        case 16: M16(); break;                                    // M16: Expected printer check
+      #endif
+
       case 17: M17(); break;                                      // M17: Enable all stepper motors
 
       #if ENABLED(SDSUPPORT)
@@ -403,7 +407,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       #if DISABLED(EMERGENCY_PARSER)
         case 108: M108(); break;                                  // M108: Cancel Waiting
-        case 112: M112(); break;                                  // M112: Emergency Stop
+        case 112: M112(); break;                                  // M112: Full Shutdown
         case 410: M410(); break;                                  // M410: Quickstop - Abort all the planned moves.
         #if ENABLED(HOST_PROMPT_SUPPORT)
           case 876: M876(); break;                                  // M876: Handle Host prompt responses
@@ -667,6 +671,10 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       #if ENABLED(SD_ABORT_ON_ENDSTOP_HIT)
         case 540: M540(); break;                                  // M540: Set abort on endstop hit for SD printing
+      #endif
+
+      #if ENABLED(BAUD_RATE_GCODE)
+        case 575: M575(); break;                                  // M575: Set serial baudrate
       #endif
 
       #if HAS_BED_PROBE

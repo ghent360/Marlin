@@ -202,6 +202,8 @@
   #include "mega/pins_CNCONTROLS_11.h"          // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
 #elif MB(CNCONTROLS_12)
   #include "mega/pins_CNCONTROLS_12.h"          // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
+#elif MB(CNCONTROLS_15)
+  #include "mega/pins_CNCONTROLS_15.h"          // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
 #elif MB(MIGHTYBOARD_REVE)
   #include "mega/pins_MIGHTYBOARD_REVE.h"       // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
 #elif MB(CHEAPTRONIC)
@@ -234,6 +236,10 @@
   #include "mega/pins_EINSTART-S.h"             // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
 #elif MB(WANHAO_ONEPLUS)
   #include "mega/pins_WANHAO_ONEPLUS.h"         // ATmega2560                             env:megaatmega2560
+#elif MB(OVERLORD)
+  #include "mega/pins_OVERLORD.h"               // ATmega2560                             env:megaatmega2560
+#elif MB(HJC2560C_REV2)
+  #include "mega/pins_HJC2560C_REV2.h"          // ATmega2560                             env:megaatmega2560
 
 //
 // ATmega1281, ATmega2561
@@ -347,8 +353,6 @@
   #include "lpc1768/pins_BIQU_B300_V1.0.h"      // LPC1768                                env:LPC1768
 #elif MB(BIGTREE_SKR_V1_3)
   #include "lpc1768/pins_BIGTREE_SKR_V1.3.h"    // LPC1768                                env:LPC1768
-#elif MB(TH3D_EZBOARD)
-  #include "lpc1768/pins_TH3D_EZBOARD.h"        // LPC1768                                env:LPC1768
 #elif MB(GMARSH_X6_REV1)
   #include "lpc1768/pins_GMARSH_X6_REV1.h"      // LPC1768                                env:LPC1768
 
@@ -370,6 +374,8 @@
   #include "lpc1769/pins_COHESION3D_MINI.h"     // LPC1769                                env:LPC1769
 #elif MB(SMOOTHIEBOARD)
   #include "lpc1769/pins_SMOOTHIEBOARD.h"       // LPC1769                                env:LPC1769
+#elif MB(TH3D_EZBOARD)
+  #include "lpc1769/pins_TH3D_EZBOARD.h"        // LPC1769                                env:LPC1769
 
 //
 // Due (ATSAM) boards
@@ -454,6 +460,8 @@
   #include "stm32/pins_MKS_ROBIN_MINI.h"        // STM32F1                                env:mks_robin_mini
 #elif MB(MKS_ROBIN_NANO)
   #include "stm32/pins_MKS_ROBIN_NANO.h"        // STM32F1                                env:mks_robin_nano
+#elif MB(MKS_ROBIN_LITE)
+  #include "stm32/pins_MKS_ROBIN_LITE.h"        // STM32F1                                env:mks_robin_lite
 #elif MB(BIGTREE_SKR_MINI_V1_1)
   #include "stm32/pins_BIGTREE_SKR_MINI_V1_1.h" // STM32F1                                env:BIGTREE_SKR_MINI
 #elif MB(BIGTREE_SKR_MINI_E3)
@@ -461,7 +469,7 @@
 #elif MB(BIGTREE_SKR_E3_DIP)
   #include "stm32/pins_BIGTREE_SKR_E3_DIP.h"    // STM32F1                                env:BIGTREE_SKR_MINI
 #elif MB(JGAURORA_A5S_A1)
-  #include "stm32/pins_JGAURORA_A5S_A1.h"       // STM32F1                                env:JGAURORA_A5S_A1
+  #include "stm32/pins_JGAURORA_A5S_A1.h"       // STM32F1                                env:jgaurora_a5s_a1
 #elif MB(FYSETC_AIO_II)
   #include "stm32/pins_FYSETC_AIO_II.h"         // STM32F1                                env:fysetc_STM32F1
 #elif MB(FYSETC_CHEETAH)
@@ -498,6 +506,8 @@
   #include "stm32/pins_STEVAL.h"                // STM32F4                                env:STM32F4
 #elif MB(BIGTREE_SKR_PRO_V1_1)
   #include "stm32/pins_BIGTREE_SKR_PRO_V1.1.h"  // STM32F4                                env:BIGTREE_SKR_PRO
+#elif MB(BIGTREE_BTT002_V1_0)
+  #include "stm32/pins_BIGTREE_BTT002_V1.0.h"   // STM32F4                                env:BIGTREE_BTT002
 #elif MB(PRNTR_V1)
   #include "stm32/pins_PRNTR_V1.h"              // STM32F4                                env:STM32F4
 
@@ -508,7 +518,7 @@
 #elif MB(THE_BORG)
   #include "stm32/pins_THE_BORG.h"              // STM32F7                                env:STM32F7
 #elif MB(REMRAM_V1)
-  #include "stm32/pins_REMRAM_V1.h"             // STM32F7                                env:STM32F7xx
+  #include "stm32/pins_REMRAM_V1.h"             // STM32F7                                env:STM32F7
 
 //
 // Espressif ESP32
@@ -516,6 +526,13 @@
 
 #elif MB(ESP32)
   #include "esp32/pins_ESP32.h"                 // ESP32                                  env:esp32
+
+//
+// Adafruit Grand Central M4 (SAMD51 ARM Cortex-M4)
+//
+
+#elif MB(AGCM4_RURAMPS4D_13)
+  #include "samd/pins_AGCM4_RURAMPS4D_13.h"     // SAMD51                                 env:adafruit_grandcentral_m4
 
 //
 // Linux Native Debug board
@@ -765,8 +782,8 @@
 #ifndef SD_DETECT_PIN
   #define SD_DETECT_PIN -1
 #endif
-#ifndef SDPOWER
-  #define SDPOWER -1
+#ifndef SDPOWER_PIN
+  #define SDPOWER_PIN -1
 #endif
 #ifndef SDSS
   #define SDSS -1
@@ -929,7 +946,7 @@
   #define LCD_PINS_D4 -1
 #endif
 
-#if HAS_CHARACTER_LCD
+#if HAS_CHARACTER_LCD || TOUCH_UI_ULTIPANEL
   #ifndef LCD_PINS_D5
     #define LCD_PINS_D5 -1
   #endif
@@ -939,10 +956,6 @@
   #ifndef LCD_PINS_D7
     #define LCD_PINS_D7 -1
   #endif
-#else
-  #undef LCD_PINS_D5
-  #undef LCD_PINS_D6
-  #undef LCD_PINS_D7
 #endif
 
 /**

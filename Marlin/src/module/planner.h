@@ -155,7 +155,9 @@ typedef struct block_t {
     uint8_t valve_pressure, e_to_p_pressure;
   #endif
 
-  uint32_t segment_time_us;
+  #if HAS_SPI_LCD
+    uint32_t segment_time_us;
+  #endif
 
 } block_t;
 
@@ -334,7 +336,7 @@ class Planner {
       static uint32_t axis_segment_time_us[2][3];
     #endif
 
-    #if ENABLED(ULTRA_LCD)
+    #if HAS_SPI_LCD
       volatile static uint32_t block_buffer_runtime_us; //Theoretical block buffer runtime in µs
     #endif
 
@@ -713,8 +715,8 @@ class Planner {
       FORCE_INLINE static float get_axis_position_degrees(const AxisEnum axis) { return get_axis_position_mm(axis); }
     #endif
 
-    // Called to force a quick stop of the machine (for example, when an emergency
-    // stop is required, or when endstops are hit)
+    // Called to force a quick stop of the machine (for example, when
+    // a Full Shutdown is required, or when endstops are hit)
     static void quick_stop();
 
     // Called when an endstop is triggered. Causes the machine to stop inmediately
@@ -773,7 +775,7 @@ class Planner {
         // No trapezoid calculated? Don't execute yet.
         if (TEST(block->flag, BLOCK_BIT_RECALCULATE)) return nullptr;
 
-        #if ENABLED(ULTRA_LCD)
+        #if HAS_SPI_LCD
           block_buffer_runtime_us -= block->segment_time_us; // We can't be sure how long an active block will take, so don't count it.
         #endif
 
@@ -789,7 +791,7 @@ class Planner {
       }
 
       // The queue became empty
-      #if ENABLED(ULTRA_LCD)
+      #if HAS_SPI_LCD
         clear_block_buffer_runtime(); // paranoia. Buffer is empty now - so reset accumulated time to zero.
       #endif
 
@@ -806,7 +808,7 @@ class Planner {
         block_buffer_tail = next_block_index(block_buffer_tail);
     }
 
-    #if ENABLED(ULTRA_LCD)
+    #if HAS_SPI_LCD
 
       static uint16_t block_buffer_runtime() {
         #ifdef __AVR__

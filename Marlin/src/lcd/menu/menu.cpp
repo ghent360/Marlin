@@ -31,7 +31,9 @@
 #include "../../module/printcounter.h"
 #include "../../gcode/queue.h"
 #include "../../sd/cardreader.h"
-#include "../../libs/buzzer.h"
+#if HAS_BUZZER
+  #include "../../libs/buzzer.h"
+#endif
 
 #if ENABLED(EEPROM_SETTINGS)
   #include "../../module/configuration_store.h"
@@ -86,10 +88,21 @@ void MarlinUI::save_previous_screen() {
     screen_history[screen_history_depth++] = { currentScreen, encoderPosition, encoderTopLine, screen_items };
 }
 
-void MarlinUI::goto_previous_screen() {
+void MarlinUI::goto_previous_screen(
+  #if ENABLED(TURBO_BACK_MENU_ITEM)
+    const bool is_back/*=false*/
+  #endif
+) {
+  #if DISABLED(TURBO_BACK_MENU_ITEM)
+    constexpr bool is_back = false;
+  #endif
   if (screen_history_depth > 0) {
     menuPosition &sh = screen_history[--screen_history_depth];
-    goto_screen(sh.menu_function, sh.encoder_position, sh.top_line, sh.items);
+    goto_screen(sh.menu_function,
+      is_back ? 0 : sh.encoder_position,
+      is_back ? 0 : sh.top_line,
+      sh.items
+    );
   }
   else
     return_to_status();
@@ -346,13 +359,15 @@ void scroll_screen(const uint8_t limit, const bool is_menu) {
     encoderTopLine = encoderLine;
 }
 
-void MarlinUI::completion_feedback(const bool good/*=true*/) {
-  if (good) {
-    BUZZ(100, 659);
-    BUZZ(100, 698);
+#if HAS_BUZZER
+  void MarlinUI::completion_feedback(const bool good/*=true*/) {
+    if (good) {
+      BUZZ(100, 659);
+      BUZZ(100, 698);
+    }
+    else BUZZ(20, 440);
   }
-  else BUZZ(20, 440);
-}
+#endif
 
 #if HAS_LINE_TO_Z
 
@@ -433,8 +448,20 @@ void MarlinUI::completion_feedback(const bool good/*=true*/) {
 #endif
 
 #if ENABLED(EEPROM_SETTINGS)
-  void lcd_store_settings()   { ui.completion_feedback(settings.save()); }
-  void lcd_load_settings()    { ui.completion_feedback(settings.load()); }
+  void lcd_store_settings() {
+    const bool saved = settings.save();
+    #if HAS_BUZZER
+      ui.completion_feedback(saved);
+    #endif
+    UNUSED(saved);
+  }
+  void lcd_load_settings() {
+    const bool loaded = settings.load();
+    #if HAS_BUZZER
+      ui.completion_feedback(loaded);
+    #endif
+    UNUSED(loaded);
+  }
 #endif
 
 void _lcd_draw_homing() {
@@ -453,6 +480,7 @@ void _lcd_draw_homing() {
 //
 bool MarlinUI::selection; // = false
 bool MarlinUI::update_selection() {
+  encoder_direction_select();
   if (encoderPosition) {
     selection = int16_t(encoderPosition) > 0;
     encoderPosition = 0;

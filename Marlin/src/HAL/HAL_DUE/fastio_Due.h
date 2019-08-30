@@ -70,14 +70,14 @@
   const uint32_t mask = MASK(DIO ## IO ## _PIN); \
   if (V) port->PIO_SODR = mask; \
   else port->PIO_CODR = mask; \
-} while(0)
+}while(0)
 
 // Toggle a pin
 #define _TOGGLE(IO) _WRITE(IO, !READ(IO))
 
 #if MB(PRINTRBOARD_G2)
 
-  #include "G2_pins.h"
+  #include "fastio/G2_pins.h"
 
   // Set pin as input
   #define _SET_INPUT(IO) do{ \
