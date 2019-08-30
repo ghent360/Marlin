@@ -22,6 +22,7 @@ default_envs = megaatmega2560
 
 [common]
 default_src_filter = +<src/*> -<src/config> -<src/HAL> +<src/HAL/shared>
+extra_scripts = pre:buildroot/share/PlatformIO/scripts/common-cxxflags.py
 build_flags = -fmax-errors=5
   -g
   -ggdb
@@ -590,8 +591,21 @@ platform      = atmelsam
 board         = adafruit_grandcentral_m4
 framework     = arduino
 build_flags   = ${common.build_flags} -std=gnu++17
+extra_scripts = ${common.extra_scripts}
 build_unflags = -std=gnu++11
 lib_deps      = ${common.lib_deps}
 lib_ignore    = U8glib-HAL
 src_filter    = ${common.default_src_filter} +<src/HAL/HAL_SAMD51>
 debug_tool    = jlink
+
+#
+# Just print the dependency tree
+#
+[env:include_tree]
+platform    = atmelavr
+framework   = arduino
+board       = megaatmega2560
+build_flags = -c -H -std=gnu++11 -Wall -Os
+lib_deps    = ${common.lib_deps}
+  TMC26XStepper=https://github.com/trinamic/TMC26XStepper/archive/master.zip
+src_filter  = +<src/Marlin.cpp>
