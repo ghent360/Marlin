@@ -63,10 +63,6 @@ void XPT2046::init(void) {
 uint8_t XPT2046::read_buttons() {
   int16_t tsoffsets[4] = { 0 };
 
-  static uint32_t touchtimeout = 0;
-  if (PENDING(millis(), touchtimeout)) return 0;
-  touchtimeout = millis() + 80; // ideally want to set this lower for the games... 30 or 40.
-
   if (tsoffsets[0] + tsoffsets[1] == 0) {
     // Not yet set, so use defines as fallback...
     tsoffsets[0] = XPT2046_X_CALIBRATION;
@@ -84,10 +80,11 @@ uint8_t XPT2046::read_buttons() {
 
   if (y < 175 || y > 234) return 0;
 
-       if (WITHIN(x,  11, 109)) encoderDiff = -(ENCODER_STEPS_PER_MENU_ITEM) * ENCODER_PULSES_PER_STEP;
-  else if (WITHIN(x, 111, 209)) encoderDiff =   ENCODER_STEPS_PER_MENU_ITEM  * ENCODER_PULSES_PER_STEP;
-  else if (WITHIN(x, 211, 309)) return EN_C;
-  return 0;
+  return WITHIN(x,  14,  77) ? EN_D
+       : WITHIN(x,  90, 153) ? EN_A
+       : WITHIN(x, 166, 229) ? EN_B
+       : WITHIN(x, 242, 305) ? EN_C
+       : 0;
 }
 
 bool XPT2046::isTouched() {
