@@ -24,16 +24,15 @@
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
-#include "../../inc/MarlinConfigPre.h"
+#include "../../inc/MarlinConfig.h"
 
-#if ENABLED(EEPROM_SETTINGS)
-
+#if ENABLED(EEPROM_SETTINGS) && ANY(SPI_EEPROM, I2C_EEPROM)
 #include "../shared/persistent_store_api.h"
 
 bool PersistentStore::access_start() { return true; }
 bool PersistentStore::access_finish() { return true; }
 
-bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t size, uint16_t *crc) {
+bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc) {
   while (size--) {
     uint8_t * const p = (uint8_t * const)pos;
     uint8_t v = *value;

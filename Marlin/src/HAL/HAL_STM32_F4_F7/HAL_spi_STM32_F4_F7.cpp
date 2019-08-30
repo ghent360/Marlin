@@ -159,5 +159,30 @@ void spiSendBlock(uint8_t token, const uint8_t* buf) {
   SPI.endTransaction();
 }
 
+#if ENABLED(SPI_EEPROM)
+
+// Read single byte from specified SPI channel
+uint8_t spiRec(uint32_t chan) {
+  return SPI.transfer(0xff);
+}
+
+// Write single byte to specified SPI channel
+void spiSend(uint32_t chan, byte b) { 
+  spiSend(b);
+}
+
+// Write buffer to specified SPI channel
+void spiSend(uint32_t chan, const uint8_t* buf, size_t n) {
+  SPI.beginTransaction(spiConfig);
+  #ifdef STM32GENERIC
+    SPI.dmaSend(const_cast<uint8_t*>(buf), n);
+  #else
+    SPI.transfer((uint8_t*)buf, nullptr, n);
+  #endif
+  SPI.endTransaction();
+}
+
+#endif // SPI_EEPROM
+
 #endif // SOFTWARE_SPI
 #endif // STM32GENERIC && (STM32F4 || STM32F7)
