@@ -21,64 +21,58 @@
  */
 
 /**
+ * HAL for stm32duino.com based on Libmaple and compatible (STM32F1)
  * Implementation of EEPROM settings in SD Card
  */
 
 #include "../HAL.h"
-#if (HAL_PLATFORM_ID == HAL_ID_STM32)
+#if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
 #include "../../inc/MarlinConfig.h"
 
-#if ENABLED(EEPROM_SETTINGS) && NONE(FLASH_EEPROM_EMULATION, SRAM_EEPROM_EMULATION, SPI_EEPROM, I2C_EEPROM)
-
+#if ENABLED(EEPROM_SETTINGS) && NONE(FLASH_EEPROM_EMULATION, SPI_EEPROM, I2C_EEPROM)
 #include "../shared/persistent_store_api.h"
 
 #ifndef E2END
   #define E2END 0xFFF // 4KB
 #endif
-#define HAL_EEPROM_SIZE int(E2END + 1)
+#define HAL_EEPROM_SIZE (E2END + 1)
 
-#define _ALIGN(x) __attribute__ ((aligned(x)))
+#define _ALIGN(x) __attribute__ ((aligned(x))) // SDIO uint32_t* compat.
 static char _ALIGN(4) HAL_eeprom_data[HAL_EEPROM_SIZE];
 
 #if ENABLED(SDSUPPORT)
 
-  #include "../../sd/cardreader.h"
+#include "../../sd/cardreader.h"
 
-  #define EEPROM_FILENAME "eeprom.dat"
+#define EEPROM_FILENAME "eeprom.dat"
 
-  bool PersistentStore::access_start() {
-    if (!card.isDetected()) return false;
+bool PersistentStore::access_start() {
+  if (!card.isDetected()) return false;
 
-    SdFile file, root = card.getroot();
-    if (!file.open(&root, EEPROM_FILENAME, O_RDONLY))
-      return true;
+  SdFile file, root = card.getroot();
+  if (!file.open(&root, EEPROM_FILENAME, O_RDONLY))
+    return true; // false aborts the save
 
-    int bytes_read = file.read(HAL_eeprom_data, HAL_EEPROM_SIZE);
-    if (bytes_read < 0) return false;
-    for (; bytes_read < HAL_EEPROM_SIZE; bytes_read++)
-      HAL_eeprom_data[bytes_read] = 0xFF;
+  int bytes_read = file.read(HAL_eeprom_data, HAL_EEPROM_SIZE);
+  if (bytes_read < 0) return false;
+  for (; bytes_read < HAL_EEPROM_SIZE; bytes_read++)
+    HAL_eeprom_data[bytes_read] = 0xFF;
+  file.close();
+  return true;
+}
+
+bool PersistentStore::access_finish() {
+  if (!card.isDetected()) return false;
+
+  SdFile file, root = card.getroot();
+  int bytes_written = 0;
+  if (file.open(&root, EEPROM_FILENAME, O_CREAT | O_WRITE | O_TRUNC)) {
+    bytes_written = file.write(HAL_eeprom_data, HAL_EEPROM_SIZE);
     file.close();
-    return true;
   }
-
-  bool PersistentStore::access_finish() {
-    if (!card.isDetected()) return false;
-
-    SdFile file, root = card.getroot();
-    int bytes_written = 0;
-    if (file.open(&root, EEPROM_FILENAME, O_CREAT | O_WRITE | O_TRUNC)) {
-      bytes_written = file.write(HAL_eeprom_data, HAL_EEPROM_SIZE);
-      file.close();
-    }
-    return (bytes_written == HAL_EEPROM_SIZE);
-  }
-
-#else // !SDSUPPORT
-
-  #error "Please define an EEPROM, a SDCARD or disable EEPROM_SETTINGS."
-
-#endif // !SDSUPPORT
+  return (bytes_written == HAL_EEPROM_SIZE);
+}
 
 bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc) {
   for (size_t i = 0; i < size; i++)
@@ -99,6 +93,12 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uin
 }
 
 size_t PersistentStore::capacity() { return HAL_EEPROM_SIZE; }
+#else // !SDSUPPORT
+
+  #error "Please define SPI_EEPROM (in Configuration.h) or disable EEPROM_SETTINGS."
+
+#endif // !SDSUPPORT
 
 #endif // EEPROM_SETTINGS
-#endif // STM32
+
+#endif // __STM32F1__
