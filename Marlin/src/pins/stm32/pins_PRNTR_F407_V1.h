@@ -320,9 +320,10 @@
 #define Z_MIN_PROBE_PIN  IO_PIN(C, 13)
 
 // 16Mbit SPI FLASH
-//#define SPI_EEPROM
-#define SPI_CHAN_EEPROM1    1
-#define SPI_EEPROM1_CS      PE8
+#define SPI_FLASH
+#define SPI_FLASH_CS_PIN    PE8
+// Emulate 4k EEPROM emulation
+#define E2END (0xfff - 8)
 
 #define SD_DETECT_PIN       PE7
 #if ENABLED(SD_DETECT_INVERTED)
