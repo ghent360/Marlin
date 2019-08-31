@@ -101,4 +101,4 @@ size_t PersistentStore::capacity() { return HAL_EEPROM_SIZE; }
 
 #endif // EEPROM_SETTINGS
 
-#endif // __STM32F1__
+#endif // HAL_PLATFORM_ID
