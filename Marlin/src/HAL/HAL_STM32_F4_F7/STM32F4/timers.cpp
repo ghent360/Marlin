@@ -53,7 +53,9 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
         // STEPPER TIMER TIM5 - use a 32bit timer
         TimerHandle[timer_num] = new HardwareTimer(TIM5);
         TimerHandle[timer_num]->attachInterrupt(TC5_Handler);
-        TimerHandle[timer_num]->setOverflow(frequency, HERTZ_FORMAT);
+        TimerHandle[timer_num]->setPrescaleFactor(STEPPER_TIMER_PRESCALE);
+        TimerHandle[timer_num]->setOverflow(
+          HAL_stepper_timer_rate(timer_num) / frequency - 1, TICK_FORMAT);
         TimerHandle[timer_num]->resume();
         HAL_NVIC_SetPriority(STEP_TIMER_IRQ_ID, 1, 0);
         break;
@@ -62,7 +64,9 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
         // TEMP TIMER TIM7 - any available 16bit Timer (1 already used for PWM)
         TimerHandle[timer_num] = new HardwareTimer(TIM7);
         TimerHandle[timer_num]->attachInterrupt(TC7_Handler);
-        TimerHandle[timer_num]->setOverflow(frequency, HERTZ_FORMAT);
+        TimerHandle[timer_num]->setPrescaleFactor(TEMP_TIMER_PRESCALE);
+        TimerHandle[timer_num]->setOverflow(
+          HAL_stepper_timer_rate(timer_num) / frequency - 1, TICK_FORMAT);
         TimerHandle[timer_num]->resume();
         HAL_NVIC_SetPriority(TEMP_TIMER_IRQ_ID, 2, 0);
         break;

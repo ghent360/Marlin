@@ -33,20 +33,19 @@
 #define hal_timer_t uint32_t  // TODO: One is 16-bit, one 32-bit - does this need to be checked?
 #define HAL_TIMER_TYPE_MAX 0xFFFF
 
-#define HAL_TIMER_RATE         (HAL_RCC_GetSysClockFreq() / 2)  // frequency of timer peripherals
-
 #define STEP_TIMER_NUM 0  // index of timer to use for stepper
 #define TEMP_TIMER_NUM 1  // index of timer to use for temperature
 #define PULSE_TIMER_NUM STEP_TIMER_NUM
 
-//#define TEMP_TIMER_PRESCALE     1000 // prescaler for setting Temp timer, 72Khz
+// prescaler for setting Temp timer, 72Khz
+#define TEMP_TIMER_PRESCALE     HAL_stepper_timer_prescaler(TEMP_TIMER_NUM, 72000)
 #define TEMP_TIMER_FREQUENCY    1000 // temperature interrupt frequency
 
-#define STEPPER_TIMER_PRESCALE HAL_stepper_timer_prescale()
-#define STEPPER_TIMER_RATE     HAL_stepper_timer_rate()
+#define STEPPER_TIMER_PRESCALE HAL_stepper_timer_prescaler(STEP_TIMER_NUM, 2000000)
+#define STEPPER_TIMER_RATE     HAL_stepper_timer_rate(STEP_TIMER_NUM)
 #define STEPPER_TIMER_TICKS_PER_US ((STEPPER_TIMER_RATE) / 1000000) // stepper timer ticks per µs
 
-//#define PULSE_TIMER_RATE       STEPPER_TIMER_RATE   // frequency of pulse timer
+#define PULSE_TIMER_RATE       STEPPER_TIMER_RATE   // frequency of pulse timer
 #define PULSE_TIMER_PRESCALE   STEPPER_TIMER_PRESCALE
 #define PULSE_TIMER_TICKS_PER_US STEPPER_TIMER_TICKS_PER_US
 
@@ -93,13 +92,15 @@ FORCE_INLINE static hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
   return TimerHandle[timer_num]->getOverflow(TICK_FORMAT);
 }
 
-FORCE_INLINE static uint32_t HAL_stepper_timer_rate() {
-  return TimerHandle[STEP_TIMER_NUM]->getTimerClkFreq()
-    / TimerHandle[STEP_TIMER_NUM]->getPrescaleFactor();
+FORCE_INLINE static uint32_t HAL_stepper_timer_rate(const uint8_t timer_num) {
+  return TimerHandle[timer_num]->getTimerClkFreq()
+    / TimerHandle[timer_num]->getPrescaleFactor();
 }
 
-FORCE_INLINE static uint32_t HAL_stepper_timer_prescale() {
-  return TimerHandle[STEP_TIMER_NUM]->getPrescaleFactor();
+FORCE_INLINE static uint32_t HAL_stepper_timer_prescaler(
+  const uint8_t timer_num, const uint32_t desired_freq) {
+  // Make it 2MHz
+  return TimerHandle[timer_num]->getTimerClkFreq() / desired_freq;
 }
 
 #define HAL_timer_isr_prologue(TIMER_NUM)
