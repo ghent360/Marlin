@@ -22,6 +22,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <HardwareTimer.h>
 
 // ------------------------
 // Defines
@@ -38,14 +39,14 @@
 #define TEMP_TIMER_NUM 1  // index of timer to use for temperature
 #define PULSE_TIMER_NUM STEP_TIMER_NUM
 
-#define TEMP_TIMER_PRESCALE     1000 // prescaler for setting Temp timer, 72Khz
+//#define TEMP_TIMER_PRESCALE     1000 // prescaler for setting Temp timer, 72Khz
 #define TEMP_TIMER_FREQUENCY    1000 // temperature interrupt frequency
 
-#define STEPPER_TIMER_PRESCALE 54 // was 40,prescaler for setting stepper timer, 2Mhz
-#define STEPPER_TIMER_RATE     (HAL_TIMER_RATE / STEPPER_TIMER_PRESCALE)   // frequency of stepper timer
+#define STEPPER_TIMER_PRESCALE HAL_stepper_timer_prescale()
+#define STEPPER_TIMER_RATE     HAL_stepper_timer_rate()
 #define STEPPER_TIMER_TICKS_PER_US ((STEPPER_TIMER_RATE) / 1000000) // stepper timer ticks per µs
 
-#define PULSE_TIMER_RATE       STEPPER_TIMER_RATE   // frequency of pulse timer
+//#define PULSE_TIMER_RATE       STEPPER_TIMER_RATE   // frequency of pulse timer
 #define PULSE_TIMER_PRESCALE   STEPPER_TIMER_PRESCALE
 #define PULSE_TIMER_TICKS_PER_US STEPPER_TIMER_TICKS_PER_US
 
@@ -56,34 +57,14 @@
 #define ENABLE_TEMPERATURE_INTERRUPT() HAL_timer_enable_interrupt(TEMP_TIMER_NUM)
 #define DISABLE_TEMPERATURE_INTERRUPT() HAL_timer_disable_interrupt(TEMP_TIMER_NUM)
 
-// TODO change this
-
-#ifdef STM32GENERIC
-  extern void TC5_Handler();
-  extern void TC7_Handler();
-  #define HAL_STEP_TIMER_ISR() void TC5_Handler()
-  #define HAL_TEMP_TIMER_ISR() void TC7_Handler()
-#else
-  extern void TC5_Handler(stimer_t *htim);
-  extern void TC7_Handler(stimer_t *htim);
-  #define HAL_STEP_TIMER_ISR() void TC5_Handler(stimer_t *htim)
-  #define HAL_TEMP_TIMER_ISR() void TC7_Handler(stimer_t *htim)
-#endif
+#define HAL_STEP_TIMER_ISR() void TC5_Handler(stm32_timer_t htim)
+#define HAL_TEMP_TIMER_ISR() void TC7_Handler(stm32_timer_t htim)
 
 
 // ------------------------
 // Types
 // ------------------------
-
-#ifdef STM32GENERIC
-  typedef struct {
-    TIM_HandleTypeDef handle;
-    uint32_t callback;
-  } tTimerConfig;
-  typedef tTimerConfig stm32_timer_t;
-#else
-  typedef stimer_t stm32_timer_t;
-#endif
+typedef HardwareTimer* stm32_timer_t;
 
 // ------------------------
 // Public Variables
@@ -101,26 +82,25 @@ void HAL_timer_disable_interrupt(const uint8_t timer_num);
 bool HAL_timer_interrupt_enabled(const uint8_t timer_num);
 
 FORCE_INLINE static uint32_t HAL_timer_get_count(const uint8_t timer_num) {
-  return __HAL_TIM_GET_COUNTER(&TimerHandle[timer_num].handle);
+  return TimerHandle[timer_num]->getCount(TICK_FORMAT);
 }
 
 FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
-  __HAL_TIM_SET_AUTORELOAD(&TimerHandle[timer_num].handle, compare);
-  if (HAL_timer_get_count(timer_num) >= compare)
-    TimerHandle[timer_num].handle.Instance->EGR |= TIM_EGR_UG; // Generate an immediate update interrupt
+  TimerHandle[timer_num]->setOverflow(compare + 1, TICK_FORMAT);
 }
 
 FORCE_INLINE static hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
-  return __HAL_TIM_GET_AUTORELOAD(&TimerHandle[timer_num].handle);
+  return TimerHandle[timer_num]->getOverflow(TICK_FORMAT);
 }
 
-#ifdef STM32GENERIC
-  FORCE_INLINE static void HAL_timer_isr_prologue(const uint8_t timer_num) {
-    if (__HAL_TIM_GET_FLAG(&TimerHandle[timer_num].handle, TIM_FLAG_UPDATE) == SET)
-      __HAL_TIM_CLEAR_FLAG(&TimerHandle[timer_num].handle, TIM_FLAG_UPDATE);
-  }
-#else
-  #define HAL_timer_isr_prologue(TIMER_NUM)
-#endif
+FORCE_INLINE static uint32_t HAL_stepper_timer_rate() {
+  return TimerHandle[STEP_TIMER_NUM]->getTimerClkFreq()
+    / TimerHandle[STEP_TIMER_NUM]->getPrescaleFactor();
+}
 
+FORCE_INLINE static uint32_t HAL_stepper_timer_prescale() {
+  return TimerHandle[STEP_TIMER_NUM]->getPrescaleFactor();
+}
+
+#define HAL_timer_isr_prologue(TIMER_NUM)
 #define HAL_timer_isr_epilogue(TIMER_NUM)
