@@ -34,8 +34,6 @@
 #define STEP_TIMER_IRQ_ID TIM5_IRQn
 #define TEMP_TIMER_IRQ_ID TIM7_IRQn
 
-#define TEMP_TIMER_PRESCALE     HAL_stepper_timer_prescaler(TEMP_TIMER_NUM, 72000)
-
 // ------------------------
 // Private Variables
 // ------------------------
@@ -45,6 +43,11 @@ uint32_t TimerRates[NUM_HARDWARE_TIMERS] = {0};
 
 void TC5_Handler(stm32_timer_t htim);
 void TC7_Handler(stm32_timer_t htim);
+
+static uint32_t HAL_stepper_timer_prescaler(
+  const uint8_t timer_num, const uint32_t desired_freq) {
+  return (TimerHandle[timer_num]->getTimerClkFreq() + desired_freq / 2) / desired_freq;
+}
 
 // ------------------------
 // Public functions
@@ -56,7 +59,8 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
         // STEPPER TIMER TIM5 - use a 32bit timer
         TimerHandle[timer_num] = new HardwareTimer(TIM5);
         TimerHandle[timer_num]->attachInterrupt(TC5_Handler);
-        TimerHandle[timer_num]->setPrescaleFactor(STEPPER_TIMER_PRESCALE);
+        TimerHandle[timer_num]->setPrescaleFactor(
+          HAL_stepper_timer_prescaler(STEP_TIMER_NUM, 2000000));
         HAL_NVIC_SetPriority(STEP_TIMER_IRQ_ID, 1, 0);
         break;
 
@@ -64,7 +68,8 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
         // TEMP TIMER TIM7 - any available 16bit Timer (1 already used for PWM)
         TimerHandle[timer_num] = new HardwareTimer(TIM7);
         TimerHandle[timer_num]->attachInterrupt(TC7_Handler);
-        TimerHandle[timer_num]->setPrescaleFactor(TEMP_TIMER_PRESCALE);
+        TimerHandle[timer_num]->setPrescaleFactor(
+          HAL_stepper_timer_prescaler(TEMP_TIMER_NUM, 72000));
         HAL_NVIC_SetPriority(TEMP_TIMER_IRQ_ID, 2, 0);
         break;
     }

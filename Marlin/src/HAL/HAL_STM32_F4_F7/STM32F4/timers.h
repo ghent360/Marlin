@@ -38,9 +38,10 @@
 #define PULSE_TIMER_NUM STEP_TIMER_NUM
 
 // prescaler for setting Temp timer, 72Khz
+#define STEPPER_TIMER_PRESCALE TimerHandle[TEMP_TIMER_NUM]->getPrescaleFactor()
 #define TEMP_TIMER_FREQUENCY    1000 // temperature interrupt frequency
 
-#define STEPPER_TIMER_PRESCALE HAL_stepper_timer_prescaler(STEP_TIMER_NUM, 2000000)
+#define STEPPER_TIMER_PRESCALE TimerHandle[STEP_TIMER_NUM]->getPrescaleFactor()
 #define STEPPER_TIMER_RATE     HAL_stepper_timer_rate(STEP_TIMER_NUM)
 #define STEPPER_TIMER_TICKS_PER_US ((STEPPER_TIMER_RATE) / 1000000) // stepper timer ticks per µs
 
@@ -98,11 +99,6 @@ FORCE_INLINE static hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
 
 FORCE_INLINE static uint32_t HAL_stepper_timer_rate(const uint8_t timer_num) {
   return TimerRates[timer_num];
-}
-
-FORCE_INLINE static uint32_t HAL_stepper_timer_prescaler(
-  const uint8_t timer_num, const uint32_t desired_freq) {
-  return (TimerHandle[timer_num]->getTimerClkFreq() + desired_freq / 2) / desired_freq;
 }
 
 #define HAL_timer_isr_prologue(TIMER_NUM)
