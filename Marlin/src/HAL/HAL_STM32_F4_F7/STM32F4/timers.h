@@ -86,6 +86,10 @@ FORCE_INLINE static uint32_t HAL_timer_get_count(const uint8_t timer_num) {
 
 FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
   TimerHandle[timer_num]->setOverflow(compare + 1, TICK_FORMAT);
+  uint32_t cnt = TimerHandle[timer_num]->getCount(TICK_FORMAT);
+  if (cnt >= compare) {
+    TimerHandle[timer_num]->refresh();
+  }
 }
 
 FORCE_INLINE static hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
