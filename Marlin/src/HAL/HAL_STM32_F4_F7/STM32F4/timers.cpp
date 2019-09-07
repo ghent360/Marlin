@@ -34,11 +34,14 @@
 #define STEP_TIMER_IRQ_ID TIM5_IRQn
 #define TEMP_TIMER_IRQ_ID TIM7_IRQn
 
+#define TEMP_TIMER_PRESCALE     HAL_stepper_timer_prescaler(TEMP_TIMER_NUM, 72000)
+
 // ------------------------
 // Private Variables
 // ------------------------
 
 stm32_timer_t TimerHandle[NUM_HARDWARE_TIMERS] = {0};
+uint32_t TimerRates[NUM_HARDWARE_TIMERS] = {0};
 
 void TC5_Handler(stm32_timer_t htim);
 void TC7_Handler(stm32_timer_t htim);
@@ -54,9 +57,6 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
         TimerHandle[timer_num] = new HardwareTimer(TIM5);
         TimerHandle[timer_num]->attachInterrupt(TC5_Handler);
         TimerHandle[timer_num]->setPrescaleFactor(STEPPER_TIMER_PRESCALE);
-        TimerHandle[timer_num]->setOverflow(
-          HAL_stepper_timer_rate(timer_num) / frequency - 1, TICK_FORMAT);
-        TimerHandle[timer_num]->resume();
         HAL_NVIC_SetPriority(STEP_TIMER_IRQ_ID, 1, 0);
         break;
 
@@ -65,12 +65,14 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
         TimerHandle[timer_num] = new HardwareTimer(TIM7);
         TimerHandle[timer_num]->attachInterrupt(TC7_Handler);
         TimerHandle[timer_num]->setPrescaleFactor(TEMP_TIMER_PRESCALE);
-        TimerHandle[timer_num]->setOverflow(
-          HAL_stepper_timer_rate(timer_num) / frequency - 1, TICK_FORMAT);
-        TimerHandle[timer_num]->resume();
         HAL_NVIC_SetPriority(TEMP_TIMER_IRQ_ID, 2, 0);
         break;
     }
+    TimerRates[timer_num] = TimerHandle[timer_num]->getTimerClkFreq()
+      / TimerHandle[timer_num]->getPrescaleFactor();
+    TimerHandle[timer_num]->setOverflow(
+      TimerRates[timer_num] / frequency - 1, TICK_FORMAT);
+    TimerHandle[timer_num]->resume();
   }
 }
 
