@@ -19,53 +19,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-#include "../gcode.h"
-#include "../../module/printcounter.h"
-#include "../../lcd/ultralcd.h"
+#pragma once
 
 /**
- * M75: Start print timer
+ * joystick.h - joystick input / jogging
  */
-void GcodeSuite::M75() {
-  print_job_timer.start();
-}
 
-/**
- * M76: Pause print timer
- */
-void GcodeSuite::M76() {
-  print_job_timer.pause();
-}
+#include "../core/macros.h"
+#include "../module/temperature.h"
 
-/**
- * M77: Stop print timer
- */
-void GcodeSuite::M77() {
- print_job_timer.stop();
-}
+//#define JOYSTICK_DEBUG
 
-#if ENABLED(PRINTCOUNTER)
+class Joystick {
+  friend class Temperature;
+  private:
+    #if HAS_JOY_ADC_X
+      static temp_info_t x;
+    #endif
+    #if HAS_JOY_ADC_Y
+      static temp_info_t y;
+    #endif
+    #if HAS_JOY_ADC_Z
+      static temp_info_t z;
+    #endif
+  public:
+    #if ENABLED(JOYSTICK_DEBUG)
+      static void report();
+    #endif
+    static void calculate(float norm_jog[XYZ]);
+    static void inject_jog_moves();
+};
 
-/**
- * M78: Show print statistics
- */
-void GcodeSuite::M78() {
-  if (parser.intval('S') == 78) {  // "M78 S78" will reset the statistics
-    print_job_timer.initStats();
-    ui.reset_status();
-    return;
-  }
-
-  #if HAS_SERVICE_INTERVALS
-    if (parser.seenval('R')) {
-      print_job_timer.resetServiceInterval(parser.value_int());
-      ui.reset_status();
-      return;
-    }
-  #endif
-
-  print_job_timer.showStats();
-}
-
-#endif // PRINTCOUNTER
+extern Joystick joystick;
