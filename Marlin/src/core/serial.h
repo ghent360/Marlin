@@ -75,7 +75,9 @@ extern uint8_t marlin_debug_flags;
 #define SERIAL_PRINTF(V...)     SERIAL_OUT(printf, V)
 #define SERIAL_FLUSH()          SERIAL_OUT(flush)
 
-#if TX_BUFFER_SIZE > 0
+#ifdef __STM32F1__
+  #define SERIAL_FLUSHTX()      SERIAL_OUT(flush)
+#elif TX_BUFFER_SIZE > 0
   #define SERIAL_FLUSHTX()      SERIAL_OUT(flushTX)
 #else
   #define SERIAL_FLUSHTX()
@@ -144,8 +146,8 @@ extern uint8_t marlin_debug_flags;
 #define SERIAL_ECHOPGM(S)           (serialprintPGM(PSTR(S)))
 #define SERIAL_ECHOLNPGM(S)         (serialprintPGM(PSTR(S "\n")))
 
-#define SERIAL_ECHOPAIR_F(pre, V...) do{ SERIAL_ECHO(pre); SERIAL_ECHO_F(V); }while(0)
-#define SERIAL_ECHOLNPAIR_F(V...)    do{ SERIAL_ECHOPAIR_F(V); SERIAL_EOL(); }while(0)
+#define SERIAL_ECHOPAIR_F(S, V...)  do{ SERIAL_ECHOPGM(S); SERIAL_ECHO_F(V); }while(0)
+#define SERIAL_ECHOLNPAIR_F(V...)   do{ SERIAL_ECHOPAIR_F(V); SERIAL_EOL(); }while(0)
 
 #define SERIAL_ECHO_START()         serial_echo_start()
 #define SERIAL_ERROR_START()        serial_error_start()
