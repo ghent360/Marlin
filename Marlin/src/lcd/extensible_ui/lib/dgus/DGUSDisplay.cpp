@@ -289,11 +289,11 @@ void DGUSScreenVariableHandler::DGUSLCD_SendStringToDisplayPGM(DGUS_VP_Variable 
 
     // Don't let the user in the dark why there is no reaction.
     if (!ExtUI::isMediaInserted()) {
-       setstatusmessagePGM(PSTR("No SD Card"));
+       setstatusmessagePGM(PSTR(MSG_NO_MEDIA));
        return;
     }
     if (card.flag.abort_sd_printing) {
-       setstatusmessagePGM(PSTR("Aborting..."));
+       setstatusmessagePGM(PSTR(MSG_MEDIA_ABORTING));
        return;
     }
   }
@@ -497,21 +497,25 @@ void DGUSScreenVariableHandler::HandleTemperatureChanged(DGUS_VP_Variable &var, 
 }
 
 void DGUSScreenVariableHandler::HandleFlowRateChanged(DGUS_VP_Variable &var, void *val_ptr) {
-  uint16_t newvalue = swap16(*(uint16_t*)val_ptr);
-  uint8_t target_extruder;
-  switch (var.VP) {
-    default: return;
-    #if (HOTENDS >= 1)
-      case VP_Flowrate_E1: target_extruder = 0; break;
-    #endif
-    #if (HOTENDS >= 2)
-      case VP_Flowrate_E2: target_extruder = 1; break;
-    #endif
-  }
+  #if EXTRUDERS
+    uint16_t newvalue = swap16(*(uint16_t*)val_ptr);
+    uint8_t target_extruder;
+    switch (var.VP) {
+      default: return;
+      #if (HOTENDS >= 1)
+        case VP_Flowrate_E1: target_extruder = 0; break;
+      #endif
+      #if (HOTENDS >= 2)
+        case VP_Flowrate_E2: target_extruder = 1; break;
+      #endif
+    }
 
-  planner.flow_percentage[target_extruder] = newvalue;
-  planner.refresh_e_factor(target_extruder);
-  ScreenHandler.skipVP = var.VP; // don't overwrite value the next update time as the display might autoincrement in parallel
+    planner.flow_percentage[target_extruder] = newvalue;
+    planner.refresh_e_factor(target_extruder);
+    ScreenHandler.skipVP = var.VP; // don't overwrite value the next update time as the display might autoincrement in parallel
+  #else
+    UNUSED(var); UNUSED(val_ptr);
+  #endif
 }
 
 void DGUSScreenVariableHandler::HandleManualExtrude(DGUS_VP_Variable &var, void *val_ptr) {
