@@ -117,23 +117,20 @@ struct FastIOPin {
         HAL_GPIO_Init(portAddr(), &GPIO_InitStructure);
     }
 
-    GPIO_TypeDef* portAddr() const {
+    volatile GPIO_TypeDef* portAddr() const {
       return reinterpret_cast<GPIO_TypeDef*>(AHB1PERIPH_BASE + port_num_ * 0x400);
     }
 
     void set() const {
-        volatile GPIO_TypeDef* gpio_port = portAddr();
-        gpio_port->BSRR = pin_;
+        portAddr()->BSRR = pin_;
     }
 
     void reset() const {
-        volatile GPIO_TypeDef* const gpio_port = portAddr();
-        gpio_port->BSRR = pin_ << 16;
+        portAddr()->BSRR = pin_ << 16;
     }
 
     void toggle() const {
-        volatile GPIO_TypeDef* const gpio_port = portAddr();
-        gpio_port->ODR ^= pin_;
+        portAddr()->ODR ^= pin_;
     }
 
     void write(uint8_t val) const {
@@ -145,12 +142,11 @@ struct FastIOPin {
     }
 
     uint8_t read() const {
-        volatile  GPIO_TypeDef* gpio_port = portAddr();
-        return (gpio_port->IDR & pin_) ? 1 : 0;
+        return (portAddr()->IDR & pin_) ? 1 : 0;
     }
 
     bool isValid() const {
-        return pin_ != (uint8_t)-1;
+        return pin_ != 0;
     }
 
     uint16_t toArduinoPin() const {
@@ -687,7 +683,7 @@ struct FastIOPin {
 #ifdef PK15
         if (pin == PK15) return FastIOPin(PORTK, 15);
 #endif
-        return FastIOPin(PORTA, (uint8_t)(uint16_t)-1);
+        return FastIOPin(PORTA, (uint8_t)-1);
     }
 private:
     static constexpr uint16_t to_arduino_pin_[MAX_PORT_NUM][16] = {
