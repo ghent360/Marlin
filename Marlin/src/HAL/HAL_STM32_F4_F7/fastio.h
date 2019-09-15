@@ -117,7 +117,7 @@ struct FastIOPin {
         HAL_GPIO_Init(portAddr(), &GPIO_InitStructure);
     }
 
-    volatile GPIO_TypeDef* portAddr() const {
+    GPIO_TypeDef* portAddr() const {
       return reinterpret_cast<GPIO_TypeDef*>(AHB1PERIPH_BASE + port_num_ * 0x400);
     }
 
