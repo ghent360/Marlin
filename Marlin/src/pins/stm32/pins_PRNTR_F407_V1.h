@@ -172,7 +172,7 @@
  *           NC | · · | GND                                   5V | · · | GND
  * (RESET)  PE6 | · · | PE3  (SD_DETECT)           (LCD_D7)  PA8 | · · | PA7  (LCD_D6)
  *  (MOSI)  PC3 | · · | PE1  (BTN_EN2)             (LCD_D5)  PA6 | · · | PA3  (LCD_D4)
- * (SD_SS)  PE7 | · · | PE2  (BTN_EN1)             (LCD_RS)  PE4 | · · | PE14 (LCD_EN)
+ * (SD_SS)  PE7 | · · | PE2  (BTN_EN1)             (LCD_RS)  PE4 | · · | PA15 (LCD_EN)
  *   (SCK) PB10 | · · | PC2  (MISO)               (BTN_ENC)  PE0 | · · | PE5  (BEEPER)
  *               -----                                            -----
  *               EXP2                                             EXP1
@@ -190,7 +190,11 @@
  */
 
 #define EXP1_BEEPER  IO_PIN(E, 5)
+#if NUCLEO_BOARD_REV <=3
+#define EXP1_LCD_EN  SLOW_PIN(A, 15)
+#else
 #define EXP1_LCD_EN  SLOW_PIN(E, 14)
+#endif
 #define EXP1_LCD_D4  SLOW_PIN(A, 3)
 #define EXP1_LCD_D5  SLOW_PIN(A, 6)
 #define EXP1_LCD_D6  SLOW_PIN(A, 7)
