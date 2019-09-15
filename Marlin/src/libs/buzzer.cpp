@@ -68,7 +68,7 @@ void Buzzer::tick() {
         CRITICAL_SECTION_END;
       #elif ENABLED(SPEAKER)
         CRITICAL_SECTION_START;
-        ::tone(BEEPER_PIN, state.tone.frequency, state.tone.duration);
+        ::tone(ARDUINO_PIN(BEEPER_PIN), state.tone.frequency, state.tone.duration);
         CRITICAL_SECTION_END;
       #else
         on();
