@@ -74,6 +74,10 @@ void spiBegin(void) {
     SET_OUTPUT(SS_PIN);
     OUT_WRITE(SS_PIN, HIGH);
   #endif
+  #if PIN_EXISTS(SPI_FLASH_CS)
+    SET_OUTPUT(SPI_FLASH_CS_PIN);
+    OUT_WRITE(SPI_FLASH_CS_PIN, HIGH);
+  #endif
 }
 
 /** Configure SPI for specified SPI speed */
@@ -157,6 +161,31 @@ void spiSendBlock(uint8_t token, const uint8_t* buf) {
   #endif
   SPI.endTransaction();
 }
+
+#if ENABLED(SPI_EEPROM)
+
+// Read single byte from specified SPI channel
+uint8_t spiRec(uint32_t chan) {
+  return SPI.transfer(0xff);
+}
+
+// Write single byte to specified SPI channel
+void spiSend(uint32_t chan, byte b) { 
+  spiSend(b);
+}
+
+// Write buffer to specified SPI channel
+void spiSend(uint32_t chan, const uint8_t* buf, size_t n) {
+  SPI.beginTransaction(spiConfig);
+  #ifdef STM32GENERIC
+    SPI.dmaSend(const_cast<uint8_t*>(buf), n);
+  #else
+    SPI.transfer((uint8_t*)buf, nullptr, n);
+  #endif
+  SPI.endTransaction();
+}
+
+#endif // SPI_EEPROM
 
 #endif // SOFTWARE_SPI
 #endif // STM32GENERIC && (STM32F4 || STM32F7)
