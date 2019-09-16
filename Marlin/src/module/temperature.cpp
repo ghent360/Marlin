@@ -1553,6 +1553,9 @@ void Temperature::updateTemperaturesFromRawValues() {
     #define INIT_E_AUTO_FAN_PIN(P) do{ if (P == FAN1_PIN || P == FAN2_PIN) { SET_PWM(P); SET_FAST_PWM_FREQ(FAST_PWM_FAN_FREQUENCY); } else SET_OUTPUT(P); }while(0)
   #endif
 #else
+    #define INIT_E_AUTO_FAN_PIN(P) do{ if (P == FAN1_PIN || P == FAN2_PIN) { SET_PWM(P); SET_FAST_PWM_FREQ(FAST_PWM_FAN_FREQUENCY); } else SET_OUTPUT(P); }while(0)
+  #endif
+#else
   #define INIT_E_AUTO_FAN_PIN(P) SET_OUTPUT(P)
 #endif
 #if CHAMBER_AUTO_FAN_SPEED != 255
