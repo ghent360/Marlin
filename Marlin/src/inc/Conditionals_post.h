@@ -1296,15 +1296,6 @@
 #if FAN_COUNT > 0
   #define WRITE_FAN(n, v) WRITE(FAN##n##_PIN, (v) ^ FAN_INVERTING)
 #endif
-#if HAS_FAN1
-  #define WRITE_FAN1(v) WRITE(FAN1_PIN, (v) ^ FAN_INVERTING)
-#endif
-#if HAS_FAN2
-  #define WRITE_FAN2(v) WRITE(FAN2_PIN, (v) ^ FAN_INVERTING)
-#endif
-#if HAS_FAN3
-  #define WRITE_FAN3(v) WRITE(FAN3_PIN, (v) ^ FAN_INVERTING)
-#endif
 
 /**
  * Part Cooling fan multipliexer
@@ -1830,13 +1821,13 @@
   #endif
 #endif
 
-//
-// The external SD card is not used. Hardware SPI is used to access the card.
-// When sharing the SD card with a PC we want the menu options to
-// mount/unmount the card and refresh it. So we disable card detect.
-//
 #if ENABLED(SDSUPPORT)
   #if SD_CONNECTION_IS(ONBOARD) && DISABLED(NO_SD_HOST_DRIVE)
+    //
+    // The external SD card is not used. Hardware SPI is used to access the card.
+    // When sharing the SD card with a PC we want the menu options to
+    // mount/unmount the card and refresh it. So we disable card detect.
+    //
     #undef SD_DETECT_PIN
     #define SHARED_SD_CARD
   #endif
