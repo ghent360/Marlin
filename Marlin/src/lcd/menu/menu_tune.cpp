@@ -144,7 +144,7 @@ void menu_tune() {
   //
   #if HOTENDS == 1
     MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(int3, MSG_NOZZLE, &thermalManager.temp_hotend[0].target, 0, HEATER_0_MAXTEMP - 15, thermalManager.start_watching_E0);
-  #else // HOTENDS > 1
+  #elif HOTENDS > 1
     #define EDIT_NOZZLE(N) MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(int3, MSG_NOZZLE MSG_LCD_N##N, &thermalManager.temp_hotend[N].target, 0, HEATER_##N##_MAXTEMP - 15, thermalManager.start_watching_E##N)
     EDIT_NOZZLE(0);
     EDIT_NOZZLE(1);
@@ -195,7 +195,7 @@ void menu_tune() {
         MENU_MULTIPLIER_ITEM_EDIT(uint8, MSG_EXTRA_FAN_SPEED " 3", &thermalManager.new_fan_speed[2], 3, 255);
       #endif
     #endif
-    #if HAS_FAN3 || (ENABLED(SINGLENOZZLE) && EXTRUDERS > 2)
+    #if HAS_FAN3 || (ENABLED(SINGLENOZZLE) && EXTRUDERS > 3)
       MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(uint8, MSG_FAN_SPEED " 4", &thermalManager.lcd_tmpfan_speed[3], 0, 255, thermalManager.lcd_setFanSpeed3);
       #if ENABLED(EXTRA_FAN_SPEED)
         MENU_MULTIPLIER_ITEM_EDIT(uint8, MSG_EXTRA_FAN_SPEED " 4", &thermalManager.new_fan_speed[3], 3, 255);

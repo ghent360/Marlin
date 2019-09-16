@@ -58,7 +58,7 @@
 #define SPI_2XCLOCK_MASK 0x01  // SPI2X = bit 0 on SPSR
 
 // define SPI_AVR_EIMSK for AVR boards with external interrupt pins
-#if defined(EIMSK)
+#ifdef EIMSK
   #define SPI_AVR_EIMSK EIMSK
 #elif defined(GICR)
   #define SPI_AVR_EIMSK GICR
@@ -405,5 +405,13 @@ private:
   BitOrder bitOrder;
   */
 };
+
+/**
+ * @brief Wait until TXE (tx empty) flag is set and BSY (busy) flag unset.
+ */
+static inline void waitSpiTxEnd(spi_dev *spi_d) {
+  while (spi_is_tx_empty(spi_d) == 0) { /* nada */ } // wait until TXE=1
+  while (spi_is_busy(spi_d) != 0) { /* nada */ }     // wait until BSY=0
+}
 
 extern SPIClass SPI;
