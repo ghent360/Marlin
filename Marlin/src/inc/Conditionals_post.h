@@ -1296,15 +1296,6 @@
 #if FAN_COUNT > 0
   #define WRITE_FAN(n, v) WRITE(FAN##n##_PIN, (v) ^ FAN_INVERTING)
 #endif
-#if HAS_FAN1
-  #define WRITE_FAN1(v) WRITE(FAN1_PIN, (v) ^ FAN_INVERTING)
-#endif
-#if HAS_FAN2
-  #define WRITE_FAN2(v) WRITE(FAN2_PIN, (v) ^ FAN_INVERTING)
-#endif
-#if HAS_FAN3
-  #define WRITE_FAN3(v) WRITE(FAN3_PIN, (v) ^ FAN_INVERTING)
-#endif
 
 /**
  * Part Cooling fan multipliexer
