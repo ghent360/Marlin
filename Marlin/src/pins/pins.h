@@ -508,6 +508,10 @@
   #include "stm32/pins_BIGTREE_SKR_PRO_V1.1.h"  // STM32F4                                env:BIGTREE_SKR_PRO
 #elif MB(BIGTREE_BTT002_V1_0)
   #include "stm32/pins_BIGTREE_BTT002_V1.0.h"   // STM32F4                                env:BIGTREE_BTT002
+#elif MB(LERDGE_K)
+  #include "stm32/pins_LERDGE_K.h"              // STM32F4                                env:STM32F4
+#elif MB(LERDGE_X)
+  #include "stm32/pins_LERDGE_X.h"              // STM32F4                                env:STM32F4
 #elif MB(PRNTR_V1)
   #include "stm32/pins_PRNTR_V1.h"              // STM32F4                                env:STM32F4
 
@@ -526,13 +530,6 @@
 
 #elif MB(ESP32)
   #include "esp32/pins_ESP32.h"                 // ESP32                                  env:esp32
-
-//
-// Adafruit Grand Central M4 (SAMD51 ARM Cortex-M4)
-//
-
-#elif MB(AGCM4_RURAMPS4D_13)
-  #include "samd/pins_AGCM4_RURAMPS4D_13.h"     // SAMD51                                 env:SAMD51_grandcentral_m4
 
 //
 // Linux Native Debug board
@@ -720,6 +717,9 @@
 #endif
 #ifndef FAN2_PIN
   #define FAN2_PIN -1
+#endif
+#ifndef FAN3_PIN
+  #define FAN3_PIN -1
 #endif
 #ifndef CONTROLLER_FAN_PIN
   #define CONTROLLER_FAN_PIN  -1

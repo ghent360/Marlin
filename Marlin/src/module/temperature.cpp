@@ -1320,13 +1320,14 @@ void Temperature::manage_heater() {
 
     if (!WITHIN(t_index, 0, COUNT(user_thermistor) - 1)) return 25;
 
-    if (user_thermistor[t_index].pre_calc) {
-      // pre-calculate some variables
-      user_thermistor[t_index].pre_calc = false;
-      user_thermistor[t_index].res_25_recip = 1.0f / user_thermistor[t_index].res_25;
-      user_thermistor[t_index].res_25_log = logf(user_thermistor[t_index].res_25);
-      user_thermistor[t_index].beta_recip = 1.0f / user_thermistor[t_index].beta;
-      user_thermistor[t_index].sh_alpha = (1.0f / (THERMISTOR_RESISTANCE_NOMINAL_C - THERMISTOR_ABS_ZERO_C)) - (user_thermistor[t_index].beta_recip * user_thermistor[t_index].res_25_log) - (user_thermistor[t_index].sh_c_coeff * user_thermistor[t_index].res_25_log * user_thermistor[t_index].res_25_log * user_thermistor[t_index].res_25_log);
+    user_thermistor_t &t = user_thermistor[t_index];
+    if (t.pre_calc) { // pre-calculate some variables
+      t.pre_calc     = false;
+      t.res_25_recip = 1.0f / t.res_25;
+      t.res_25_log   = logf(t.res_25);
+      t.beta_recip   = 1.0f / t.beta;
+      t.sh_alpha     = RECIPROCAL(THERMISTOR_RESISTANCE_NOMINAL_C - (THERMISTOR_ABS_ZERO_C))
+                        - (t.beta_recip * t.res_25_log) - (t.sh_c_coeff * cu(t.res_25_log));
     }
 
     // maximum adc value .. take into account the over sampling
@@ -1334,13 +1335,13 @@ void Temperature::manage_heater() {
               adc_raw = constrain(raw, 1, adc_max - 1); // constrain to prevent divide-by-zero
 
     const float adc_inverse = (adc_max - adc_raw) - 0.5f,
-                resistance = user_thermistor[t_index].series_res * (adc_raw + 0.5f) / adc_inverse,
+                resistance = t.series_res * (adc_raw + 0.5f) / adc_inverse,
                 log_resistance = logf(resistance);
 
-    float value = user_thermistor[t_index].sh_alpha;
-    value += log_resistance * user_thermistor[t_index].beta_recip;
-    if (user_thermistor[t_index].sh_c_coeff != 0)
-      value += user_thermistor[t_index].sh_c_coeff * log_resistance * log_resistance * log_resistance;
+    float value = t.sh_alpha;
+    value += log_resistance * t.beta_recip;
+    if (t.sh_c_coeff != 0)
+      value += t.sh_c_coeff * cu(log_resistance);
     value = 1.0f / value;
 
     //#if (MOTHERBOARD == BOARD_RAMPS_14_EFB)
@@ -1546,12 +1547,12 @@ void Temperature::updateTemperaturesFromRawValues() {
 #endif
 #define INIT_FAN_PIN(P) do{ _INIT_FAN_PIN(P); SET_FAST_PWM_FREQ(P); }while(0)
 #if EXTRUDER_AUTO_FAN_SPEED != 255
-  #define INIT_E_AUTO_FAN_PIN(P) do{ if (P == FAN1_PIN || P == FAN2_PIN) { SET_PWM(P); SET_FAST_PWM_FREQ(FAST_PWM_FAN_FREQUENCY); } else SET_OUTPUT(P); }while(0)
+  #define INIT_E_AUTO_FAN_PIN(P) do{ if (P == FAN1_PIN || P == FAN2_PIN || P == FAN3_PIN) { SET_PWM(P); SET_FAST_PWM_FREQ(FAST_PWM_FAN_FREQUENCY); } else SET_OUTPUT(P); }while(0)
 #else
   #define INIT_E_AUTO_FAN_PIN(P) SET_OUTPUT(P)
 #endif
 #if CHAMBER_AUTO_FAN_SPEED != 255
-  #define INIT_CHAMBER_AUTO_FAN_PIN(P) do{ if (P == FAN1_PIN || P == FAN2_PIN) { SET_PWM(P); SET_FAST_PWM_FREQ(FAST_PWM_FAN_FREQUENCY); } else SET_OUTPUT(P); }while(0)
+  #define INIT_CHAMBER_AUTO_FAN_PIN(P) do{ if (P == FAN1_PIN || P == FAN2_PIN || P == FAN3_PIN) { SET_PWM(P); SET_FAST_PWM_FREQ(FAST_PWM_FAN_FREQUENCY); } else SET_OUTPUT(P); }while(0)
 #else
   #define INIT_CHAMBER_AUTO_FAN_PIN(P) SET_OUTPUT(P)
 #endif
@@ -2513,7 +2514,7 @@ void Temperature::isr() {
           if (soft_pwm_count_fan[2] <= pwm_count_tmp) WRITE_FAN(2, LOW);
         #endif
         #if HAS_FAN3
-          if (soft_pwm_count_fan[3] <= pwm_count_tmp) WRITE_FAN3(LOW);
+          if (soft_pwm_count_fan[3] <= pwm_count_tmp) WRITE_FAN(3, LOW);
         #endif
       #endif
     }
@@ -2610,7 +2611,7 @@ void Temperature::isr() {
           _PWM_FAN(2);
         #endif
         #if HAS_FAN3
-          _PWM_FAN(3,3);
+          _PWM_FAN(3);
         #endif
       }
       #if HAS_FAN0
@@ -2623,7 +2624,7 @@ void Temperature::isr() {
         if (soft_pwm_count_fan[2] <= pwm_count_tmp) WRITE_FAN(2, LOW);
       #endif
       #if HAS_FAN3
-        if (soft_pwm_count_fan[3] <= pwm_count_tmp) WRITE_FAN3(LOW);
+        if (soft_pwm_count_fan[3] <= pwm_count_tmp) WRITE_FAN(3, LOW);
       #endif
     #endif // FAN_SOFT_PWM
 
