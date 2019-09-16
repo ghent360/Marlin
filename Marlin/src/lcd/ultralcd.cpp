@@ -685,7 +685,7 @@ void MarlinUI::quick_feedback(const bool clear_buttons/*=true*/) {
         // previous invocation is being blocked. Modifications to manual_move_offset shouldn't be made while
         // processing_manual_move is true or the planner will get out of sync.
         processing_manual_move = true;
-        prepare_move_to_destination(); // will call set_current_from_destination()
+        prepare_move_to_destination(); // will set current_position from destination
         processing_manual_move = false;
 
         feedrate_mm_s = old_feedrate;
@@ -842,7 +842,7 @@ void MarlinUI::update() {
 
       if (sd_status) {
         safe_delay(500); // Some boards need a delay to get settled
-        card.initsd();
+        card.mount();
         if (old_sd_status == 2)
           card.beginautostart();  // Initial boot
         else
