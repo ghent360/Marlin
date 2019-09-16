@@ -24,19 +24,20 @@
   #error "Oops!  Make sure you have an STM32F4 board selected from the 'Tools -> Boards' menu."
 #endif
 
-#define PRNTR_BOARD_REV_3
+#define PRNTR_BOARD_REV 3
+#define NUCLEO_BOARD_REV 3
 
 /**
  * 21017 Venelin Efremov Marlin for stm32f4 test
  */
 
 #define DEFAULT_MACHINE_NAME "STM32F4"
-#ifndef PRNTR_BOARD_REV_3
+#if PRNTR_BOARD_REV < 3
 #define BOARD_NAME "Marlin for PrntrBoard V1(F407)"
 #else
 #define BOARD_NAME "Marlin for PrntrBoard V1.3(F407)"
 #endif
-#define DEFAULT_WEBSITE_URL "http://blog.pcbxprt.com/index.php/category/prntrboard/"
+#define DEFAULT_WEBSITE_URL "https://blog.pcbxprt.com/index.php/category/prntrboard/"
 
 #if HOTENDS > 2 || E_STEPPERS > 2
   #error "PRNTR Board supports up to 2 hotends / E-steppers."
@@ -94,8 +95,7 @@
 #define X_CS_PIN           SLOW_PIN(D, 9)
 #define Y_CS_PIN           SLOW_PIN(D, 10)
 #define Z_CS_PIN           SLOW_PIN(D, 11)
-#ifndef PRNTR_BOARD_REV_3
-#error "Fix ME!!!"
+#if PRNTR_BOARD_REV < 3
 #define E0_CS_PIN          SLOW_PIN(B, 8)
 #define E1_CS_PIN          SLOW_PIN(B, 9)
 #else
@@ -110,14 +110,12 @@
 #define HEATER_1_PIN       IO_PIN(B, 7)   // EXTRUDER 1
 //#define HEATER_2_PIN       -1
 
-//#define HEATER_BED_PIN     IO_PIN(B, 11) // BED
-#define HEATER_BED_PIN      -1
+#define HEATER_BED_PIN       -1    // IO_PIN(B, 11) // BED
 //#define HEATER_BED2_PIN    -1    // BED2
 //#define HEATER_BED3_PIN    -1    // BED3
 
-#define FAN_COUNT 3
 #ifndef FAN_PIN
-#define FAN_PIN            SLOW_PIN(B, 14)   // E0 Part
+#define FAN_PIN            SLOW_PIN(B, 14)  // E0 Part
 #endif
 #define FAN1_PIN           SLOW_PIN(B, 15)  // E1 Part
 #define FAN2_PIN           SLOW_PIN(C, 6)   // E0 Cool / TC1
@@ -135,171 +133,8 @@
 
 // Laser control
 #if ENABLED(SPINDLE_LASER_ENABLE)
-//#define SPINDLE_LASER_PWM_PIN       PB8
-//#define SPINDLE_LASER_ENABLE_PIN    PD5
+#error PRNTRboard does not support SPINDLE_LASER
 #endif
-
-//
-// LCD Pins
-//
-#if ENABLED(ULTRA_LCD)
-
-  #if ENABLED(REPRAPWORLD_GRAPHICAL_LCD)
-    //#define LCD_PINS_RS         SLOW_PIN(C, 3)   // CS chip select /SS chip slave select
-    //#define LCD_PINS_ENABLE     SLOW_PIN(C, 1)   // SID (MOSI)
-    //#define LCD_PINS_D4         SLOW_PIN(B, 10)  // SCK (CLK) clock
-  #elif ENABLED(NEWPANEL) && ENABLED(PANEL_ONE)
-    //#define LCD_PINS_RS         PB8
-    //#define LCD_PINS_ENABLE     PD2
-    //#define LCD_PINS_D4         PB12
-    //#define LCD_PINS_D5         PB13
-    //#define LCD_PINS_D6         PB14
-    //#define LCD_PINS_D7         PB15
-  #else
-    #define LCD_PINS_RS         SLOW_PIN(C, 3)   // CS chip select /SS chip slave select
-    #define LCD_PINS_ENABLE     SLOW_PIN(C, 1)   // SID (MOSI)
-    #define LCD_PINS_D4         SLOW_PIN(B, 10)  // SCK (CLK) clock
-    //#define LCD_PINS_D5         PB13
-    //#define LCD_PINS_D6         PB14
-    //#define LCD_PINS_D7         PB15
-    #if DISABLED(NEWPANEL)
-      //#define BEEPER_PIN        SLOW_PIN(B, 9)   // LCD_A0
-      // Buttons are attached to a shift register
-      // Not wired yet
-      //#define SHIFT_CLK 38
-      //#define SHIFT_LD 42
-      //#define SHIFT_OUT 40
-      //#define SHIFT_EN 17
-    #endif
-  #endif
-
-  #if ENABLED(NEWPANEL)
-    #if ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER)
-      #define BEEPER_PIN          IO_PIN(B, 9)
-
-      #define BTN_EN1             IO_PIN(A, 13)
-      #define BTN_EN2             IO_PIN(A, 14)
-      #define BTN_ENC             IO_PIN(B, 8) //IO_PIN(C, 14)
-
-      #define SD_DETECT_PIN       -1
-      //#define KILL_PIN            IO_PIN(B, 8)   // LCD_RESET
-      #define KILL_PIN          -1
-
-      #if ENABLED(BQ_LCD_SMART_CONTROLLER)
-        //#define LCD_BACKLIGHT_PIN 39
-      #endif
-
-    #elif ENABLED(REPRAPWORLD_GRAPHICAL_LCD)
-
-      //#define BTN_EN1           64
-      //#define BTN_EN2           59
-      //#define BTN_ENC           63
-      //#define SD_DETECT_PIN     42
-
-    #elif ENABLED(LCD_I2C_PANELOLU2)
-
-      //#define BTN_EN1           47
-      //#define BTN_EN2           43
-      //#define BTN_ENC           32
-      //#define LCD_SDSS          53
-      //#define SD_DETECT_PIN     -1
-      //#define KILL_PIN          41
-
-    #elif ENABLED(LCD_I2C_VIKI)
-      //#define BTN_EN1           22   // http://files.panucatt.com/datasheets/viki_wiring_diagram.pdf explains 40/42.
-      //#define BTN_EN2            7   // 22/7 are unused on RAMPS_14. 22 is unused and 7 the SERVO0_PIN on RAMPS_13.
-
-      //#define BTN_ENC           -1
-      //#define LCD_SDSS          53
-      //#define SD_DETECT_PIN     49
-
-    #elif ENABLED(VIKI2) || ENABLED(miniVIKI)
-      //#define BEEPER_PIN        33
-
-      // Pins for DOGM SPI LCD Support
-      //#define DOGLCD_A0         44
-      //#define DOGLCD_CS         45
-      //#define LCD_SCREEN_ROT_180
-
-      //#define BTN_EN1           22
-      //#define BTN_EN2            7
-      //#define BTN_ENC           39
-
-      //#define SDSS              53
-      //#define SD_DETECT_PIN     -1   // Pin 49 for display sd interface, 72 for easy adapter board
-
-      //#define KILL_PIN          31
-
-      //#define STAT_LED_RED_PIN  32
-      //#define STAT_LED_BLUE_PIN 35
-
-    #elif ENABLED(ELB_FULL_GRAPHIC_CONTROLLER)
-      //#define BTN_EN1           35
-      //#define BTN_EN2           37
-      //#define BTN_ENC           31
-      //#define SD_DETECT_PIN     49
-      //#define LCD_SDSS          53
-      //#define KILL_PIN          41
-      //#define BEEPER_PIN        23
-      //#define DOGLCD_CS         29
-      //#define DOGLCD_A0         27
-      //#define LCD_BACKLIGHT_PIN 33
-
-    #elif ENABLED(MINIPANEL)
-      //#define BEEPER_PIN        42
-      // Pins for DOGM SPI LCD Support
-      //#define DOGLCD_A0         44
-      //#define DOGLCD_CS         66
-      //#define LCD_BACKLIGHT_PIN 65   // backlight LED on A11/D65
-      //#define SDSS              53
-
-      //#define KILL_PIN          64
-      // GLCD features
-      //#define LCD_CONTRAST   190
-      // Uncomment screen orientation
-      //#define LCD_SCREEN_ROT_90
-      //#define LCD_SCREEN_ROT_180
-      //#define LCD_SCREEN_ROT_270
-      // The encoder and click button
-      //#define BTN_EN1           40
-      //#define BTN_EN2           63
-      //#define BTN_ENC           59
-      // not connected to a pin
-      //#define SD_DETECT_PIN     49
-
-    #else
-      // Beeper on AUX-4
-      //#define BEEPER_PIN        33
-
-      // buttons are directly attached using AUX-2
-      #if ENABLED(REPRAPWORLD_KEYPAD)
-        //#define BTN_EN1         64
-        //#define BTN_EN2         59
-        //#define BTN_ENC         63
-        //#define SHIFT_OUT       40
-        //#define SHIFT_CLK       44
-        //#define SHIFT_LD        42
-      #elif ENABLED(PANEL_ONE)
-        //#define BTN_EN1         59   // AUX2 PIN 3
-        //#define BTN_EN2         63   // AUX2 PIN 4
-        //#define BTN_ENC         49   // AUX3 PIN 7
-      #else
-        //#define BTN_EN1         37
-        //#define BTN_EN2         35
-        //#define BTN_ENC         31
-      #endif
-
-      #if ENABLED(G3D_PANEL)
-        //#define SD_DETECT_PIN   49
-        //#define KILL_PIN        41
-      #else
-        //#define SD_DETECT_PIN -1   // Ramps doesn't use this
-      #endif
-
-    #endif
-  #endif // NEWPANEL
-
-#endif // ULTRA_LCD
 
 // Extruder filament end detectors
 #define U_MIN_PIN          IO_PIN(C, 0)
@@ -329,3 +164,129 @@
 #if ENABLED(SD_DETECT_INVERTED)
   #error "SD_DETECT_INVERTED must be disabled for the PRNTR_F407 board."
 #endif
+
+
+/**
+ * For NUCLEO-F407 rev 1-3
+ *               _____                                            _____
+ *           NC | · · | GND                                   5V | · · | GND
+ * (RESET)  PE6 | · · | PE3  (SD_DETECT)           (LCD_D7)  PA8 | · · | PA7  (LCD_D6)
+ *  (MOSI)  PC3 | · · | PE1  (BTN_EN2)             (LCD_D5)  PA6 | · · | PA3  (LCD_D4)
+ * (SD_SS)  PE7 | · · | PE2  (BTN_EN1)             (LCD_RS)  PE4 | · · | PA15 (LCD_EN)
+ *   (SCK) PB10 | · · | PC2  (MISO)               (BTN_ENC)  PE0 | · · | PE5  (BEEPER)
+ *               -----                                            -----
+ *               EXP2                                             EXP1
+ *
+ *
+ * For NUCLEO-F407 rev 4+
+ *               _____                                            _____
+ *           NC | · · | GND                                   5V | · · | GND
+ * (RESET)  PE6 | · · | PE3  (SD_DETECT)           (LCD_D7)  PA8 | · · | PA7  (LCD_D6)
+ *  (MOSI)  PC3 | · · | PE10 (BTN_EN2)             (LCD_D5)  PA6 | · · | PA3  (LCD_D4)
+ * (SD_SS)  PE7 | · · | PE9  (BTN_EN1)             (LCD_RS)  PE4 | · · | PE14 (LCD_EN)
+ *   (SCK) PB10 | · · | PC2  (MISO)               (BTN_ENC) PC14 | · · | PE5  (BEEPER)
+ *               -----                                            -----
+ *               EXP2                                             EXP1
+ */
+
+#define EXP1_BEEPER  IO_PIN(E, 5)
+#if NUCLEO_BOARD_REV <=3
+#define EXP1_LCD_EN  SLOW_PIN(A, 15)
+#else
+#define EXP1_LCD_EN  SLOW_PIN(E, 14)
+#endif
+#define EXP1_LCD_D4  SLOW_PIN(A, 3)
+#define EXP1_LCD_D5  SLOW_PIN(A, 6)
+#define EXP1_LCD_D6  SLOW_PIN(A, 7)
+#define EXP1_LCD_D7  SLOW_PIN(A, 8)
+#define EXP1_LCD_RS  SLOW_PIN(E, 4)
+#if NUCLEO_BOARD_REV <=3
+  #define EXP1_BTN_ENC IO_PIN(E, 0)
+#else
+  #define EXP1_BTN_ENC IO_PIN(C, 14)
+#endif
+
+#define EXP2_SD_RST    IO_PIN(E, 6)
+#define EXP2_MOSI      SLOW_PIN(C, 3)
+#define EXP2_SD_SS     SLOW_PIN(E, 7)
+#define EXP2_SCK       SLOW_PIN(B, 10)
+#define EXP2_SD_DETECT IO_PIN(E, 3)
+#if NUCLEO_BOARD_REV <=3
+  #define EXP2_BTN_B     IO_PIN(E, 1)
+  #define EXP2_BTN_A     IO_PIN(E, 2)
+#else
+  #define EXP2_BTN_B     IO_PIN(E, 10)
+  #define EXP2_BTN_A     IO_PIN(E, 9)
+#endif
+#define EXP2_MISO      SLOW_PIN(C, 2)
+
+#if HAS_SPI_LCD
+  #define BEEPER_PIN       EXP1_BEEPER   // (37) not 5V tolerant
+  #define BTN_ENC          EXP1_BTN_ENC   // (58) open-drain
+
+  #if ENABLED(CR10_STOCKDISPLAY)
+    #define LCD_PINS_RS    EXP1_LCD_D6
+
+    #define BTN_EN1        EXP1_LCD_EN
+    #define BTN_EN2        EXP1_LCD_D4
+
+    #define LCD_PINS_ENABLE EXP1_LCD_D7
+    #define LCD_PINS_D4    EXP1_LCD_D5
+
+  #else
+    #define LCD_PINS_RS    EXP1_LCD_RS
+
+    #define BTN_EN1        EXP2_BTN_A
+    #define BTN_EN2        EXP2_BTN_B
+
+    #define LCD_PINS_ENABLE EXP1_LCD_EN
+    #define LCD_PINS_D4    EXP1_LCD_D4
+
+    #define LCD_SDSS       EXP2_SD_SS
+    #define SD_DETECT_PIN  EXP2_SD_DETECT
+
+    #if ENABLED(FYSETC_MINI_12864)
+      #define DOGLCD_CS    EXP1_LCD_EN
+      #define DOGLCD_A0    EXP1_LCD_RS
+      #define DOGLCD_SCK   EXP2_SCK
+      #define DOGLCD_MOSI  EXP2_MOSI
+
+      #define LCD_BACKLIGHT_PIN -1
+
+      #define FORCE_SOFT_SPI      // Use this if default of hardware SPI causes display problems
+                                  //   results in LCD soft SPI mode 3, SD soft SPI mode 0
+
+      #define LCD_RESET_PIN EXP1_LCD_D4 // Must be high or open for LCD to operate normally.
+
+      #if EITHER(FYSETC_MINI_12864_1_2, FYSETC_MINI_12864_2_0)
+        #ifndef RGB_LED_R_PIN
+          #define RGB_LED_R_PIN EXP1_LCD_D5
+        #endif
+        #ifndef RGB_LED_G_PIN
+          #define RGB_LED_G_PIN EXP1_LCD_D6
+        #endif
+        #ifndef RGB_LED_B_PIN
+          #define RGB_LED_B_PIN EXP1_LCD_D7
+        #endif
+      #elif ENABLED(FYSETC_MINI_12864_2_1)
+        #define NEOPIXEL_PIN    EXP1_LCD_D5
+      #endif
+
+    #else // !FYSETC_MINI_12864
+
+      #if ENABLED(MKS_MINI_12864)
+        #define DOGLCD_CS  EXP1_LCD_D5
+        #define DOGLCD_A0  EXP1_LCD_D6
+      #endif
+
+      #if ENABLED(ULTIPANEL)
+        #define LCD_PINS_D5 EXP1_LCD_D5
+        #define LCD_PINS_D6 EXP1_LCD_D6
+        #define LCD_PINS_D7 EXP1_LCD_D7
+      #endif
+
+    #endif // !FYSETC_MINI_12864
+
+  #endif
+
+#endif // HAS_SPI_LCD
