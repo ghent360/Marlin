@@ -27,7 +27,6 @@
 #include "unwinder.h"
 #include "unwmemaccess.h"
 
-#include "../../../inc/MarlinConfig.h"
 #include "../../../core/serial.h"
 #include <stdarg.h>
 

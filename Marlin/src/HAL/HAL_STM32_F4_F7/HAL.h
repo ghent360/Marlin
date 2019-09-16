@@ -80,6 +80,7 @@
   #elif SERIAL_PORT_2 == SERIAL_PORT
     #error "SERIAL_PORT_2 must be different than SERIAL_PORT"
   #endif
+  #define NUM_SERIAL 2
   #if SERIAL_PORT_2 == -1
     #define MYSERIAL1 SerialUSB
   #elif SERIAL_PORT_2 == 1
@@ -95,6 +96,8 @@
   #elif SERIAL_PORT_2 == 6
     #define MYSERIAL1 Serial6
   #endif
+#else
+  #define NUM_SERIAL 1
 #endif
 
 /**

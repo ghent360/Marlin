@@ -20,7 +20,6 @@
  *
  */
 
-#include "../inc/MarlinConfig.h"
 #include "serial.h"
 #include "language.h"
 #include "enum.h"
