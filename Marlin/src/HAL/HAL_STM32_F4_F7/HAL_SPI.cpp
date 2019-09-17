@@ -66,7 +66,7 @@ static SPISettings spiConfig;
  *
  * @return Nothing
  */
-void spiBegin(void) {
+void spiBegin() {
   SPI.setMOSI(MOSI_PIN);
   SPI.setMISO(MISO_PIN);
   SPI.setSCLK(SCK_PIN);  
@@ -104,7 +104,7 @@ void spiInit(uint8_t spiRate) {
  *
  * @details
  */
-uint8_t spiRec(void) {
+uint8_t spiRec() {
   SPI.beginTransaction(spiConfig);
   uint8_t returnByte = SPI.transfer(0xFF);
   SPI.endTransaction();
