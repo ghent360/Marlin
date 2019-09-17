@@ -170,6 +170,8 @@ namespace ExtUI {
   void enableHeater(const extruder_t extruder) {
     #if HOTENDS && HEATER_IDLE_HANDLER
       thermalManager.reset_heater_idle_timer(extruder - E0);
+    #else
+      UNUSED(extruder);
     #endif
   }
 
@@ -190,6 +192,8 @@ namespace ExtUI {
           #endif
           break;
       }
+    #else
+      UNUSED(heater);
     #endif
   }
 
@@ -197,6 +201,8 @@ namespace ExtUI {
     return false
       #if HOTENDS && HEATER_IDLE_HANDLER
         || thermalManager.hotend_idle[extruder - E0].timed_out
+      #else
+        ; UNUSED(extruder)
       #endif
     ;
   }
@@ -218,6 +224,7 @@ namespace ExtUI {
           #endif
       }
     #else
+      UNUSED(heater);
       return false;
     #endif
   }
@@ -522,12 +529,18 @@ namespace ExtUI {
       switch (axis) {
         #if X_SENSORLESS && AXIS_HAS_STALLGUARD(X)
           case X: stepperX.homing_threshold(value); break;
+        #else
+          UNUSED(value);
         #endif
         #if Y_SENSORLESS && AXIS_HAS_STALLGUARD(Y)
           case Y: stepperY.homing_threshold(value); break;
+        #else
+          UNUSED(value);
         #endif
         #if Z_SENSORLESS && AXIS_HAS_STALLGUARD(Z)
           case Z: stepperZ.homing_threshold(value); break;
+        #else
+          UNUSED(value);
         #endif
         default: break;
       }
@@ -888,7 +901,7 @@ namespace ExtUI {
     feedrate_percentage = clamp(value, 10, 500);
   }
 
-  void setUserConfirmed(void) {
+  void setUserConfirmed() {
     #if HAS_RESUME_CONTINUE
       wait_for_user = false;
     #endif
@@ -968,8 +981,7 @@ namespace ExtUI {
 
   bool FileList::isAtRootDir() {
     #if ENABLED(SDSUPPORT)
-      card.getWorkDirName();
-      return card.filename[0] == '/';
+      card.flag.workDirIsRoot;
     #else
       return true;
     #endif

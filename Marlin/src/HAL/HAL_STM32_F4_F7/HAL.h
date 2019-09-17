@@ -80,6 +80,7 @@
   #elif SERIAL_PORT_2 == SERIAL_PORT
     #error "SERIAL_PORT_2 must be different than SERIAL_PORT"
   #endif
+  #define NUM_SERIAL 2
   #if SERIAL_PORT_2 == -1
     #define MYSERIAL1 SerialUSB
   #elif SERIAL_PORT_2 == 1
@@ -95,6 +96,8 @@
   #elif SERIAL_PORT_2 == 6
     #define MYSERIAL1 Serial6
   #endif
+#else
+  #define NUM_SERIAL 1
 #endif
 
 /**
@@ -147,19 +150,19 @@ extern uint16_t HAL_adc_result;
 // Memory related
 #define __bss_end __bss_end__
 
-inline void HAL_init(void) { }
+inline void HAL_init() { }
 
 // Clear reset reason
-void HAL_clear_reset_source (void);
+void HAL_clear_reset_source();
 
 // Reset reason
-uint8_t HAL_get_reset_source(void);
+uint8_t HAL_get_reset_source();
 
 void _delay_ms(const int delay);
 
 /*
 extern "C" {
-  int freeMemory(void);
+  int freeMemory();
 }
 */
 
@@ -176,7 +179,7 @@ int freeMemory() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 
-static inline int freeMemory(void) {
+static inline int freeMemory() {
   volatile char top;
   return &top - reinterpret_cast<char*>(_sbrk(0));
 }
@@ -202,14 +205,14 @@ void eeprom_update_block (const void *__src, void *__dst, size_t __n);
 
 #define HAL_ANALOG_SELECT(pin) 
 
-inline void HAL_adc_init(void) {}
+inline void HAL_adc_init() {}
 
 #define HAL_START_ADC(pin)  HAL_adc_start_conversion(pin)
 #define HAL_READ_ADC()      HAL_adc_result
 #define HAL_ADC_READY()     true
 
 void HAL_adc_start_conversion(const uint8_t adc_pin);
-uint16_t HAL_adc_get_result(void);
+uint16_t HAL_adc_get_result();
 
 #ifndef GET_PIN_MAP_PIN
 #define GET_PIN_MAP_PIN(index) index

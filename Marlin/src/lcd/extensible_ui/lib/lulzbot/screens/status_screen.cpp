@@ -29,10 +29,6 @@
 
 #include "../archim2-flash/flash_storage.h"
 
-#if BOTH(SDSUPPORT, LULZBOT_MANUAL_USB_STARTUP)
-  #include "../../../../../sd/cardreader.h"
-#endif
-
 using namespace FTDI;
 using namespace Theme;
 
@@ -181,6 +177,10 @@ void StatusScreen::draw_temperature(draw_mode_t what) {
        .cmd(BITMAP_LAYOUT(Fan_Icon_Info))
        .cmd(BITMAP_SIZE  (Fan_Icon_Info))
        .icon  (BTN_POS(5,2), BTN_SIZE(1,1), Fan_Icon_Info, icon_scale);
+
+    #ifdef TOUCH_UI_USE_UTF8
+      load_utf8_bitmaps(cmd); // Restore font bitmap handles
+    #endif
   }
 
   if (what & FOREGROUND) {
@@ -279,24 +279,16 @@ void StatusScreen::draw_interaction_buttons(draw_mode_t what) {
     CommandProcessor cmd;
     cmd.colors(normal_btn)
        .font(Theme::font_medium)
-    #if BOTH(SDSUPPORT, LULZBOT_MANUAL_USB_STARTUP)
-      .enabled(!Sd2Card::ready() || has_media)
-    #else
-      .enabled(has_media)
-    #endif
+       .enabled(has_media)
        .colors(has_media ? action_btn : normal_btn)
-      #ifdef TOUCH_UI_PORTRAIT
-         .tag(3).button( BTN_POS(1,8), BTN_SIZE(2,1),
-      #else
-         .tag(3).button( BTN_POS(1,7), BTN_SIZE(2,2),
-      #endif
-      isPrintingFromMedia() ? GET_TEXTF(PRINTING) :
-      #if BOTH(SDSUPPORT, LULZBOT_MANUAL_USB_STARTUP)
-      (!Sd2Card::ready() ? GET_TEXTF(ENABLE_MEDIA) :
-      #else
-      GET_TEXTF(MEDIA))
-      #endif
-      .colors(!has_media ? action_btn : normal_btn)
+       .tag(3).button(
+          #ifdef TOUCH_UI_PORTRAIT
+            BTN_POS(1,8), BTN_SIZE(2,1),
+          #else
+            BTN_POS(1,7), BTN_SIZE(2,2),
+          #endif
+          isPrintingFromMedia() ? GET_TEXTF(PRINTING) : GET_TEXTF(MEDIA)
+        ).colors(!has_media ? action_btn : normal_btn)
       #ifdef TOUCH_UI_PORTRAIT
        .tag(4).button( BTN_POS(3,8), BTN_SIZE(2,1), GET_TEXTF(MENU));
       #else
@@ -342,9 +334,6 @@ void StatusScreen::setStatusMessage(const char* message) {
      .cmd(CLEAR(true,true,true));
 
   draw_temperature(BACKGROUND);
-  #ifdef TOUCH_UI_USE_UTF8
-    load_utf8_bitmaps(cmd);
-  #endif
   draw_progress(BACKGROUND);
   draw_axis_position(BACKGROUND);
   draw_status_message(BACKGROUND, message);
@@ -406,18 +395,7 @@ bool StatusScreen::onTouchEnd(uint8_t tag) {
   using namespace ExtUI;
 
   switch (tag) {
-    case 3:
-      #if BOTH(SDSUPPORT, LULZBOT_MANUAL_USB_STARTUP)
-      if (!Sd2Card::ready()) {
-        StatusScreen::setStatusMessage(GET_TEXTF(INSERT_MEDIA));
-        Sd2Card::usbStartup();
-      } else {
-        GOTO_SCREEN(FilesScreen);
-      }
-      #else
-        GOTO_SCREEN(FilesScreen);
-      #endif
-      break;
+    case 3: GOTO_SCREEN(FilesScreen); break;
     case 4:
       if (isPrinting()) {
         GOTO_SCREEN(TuneMenu);
