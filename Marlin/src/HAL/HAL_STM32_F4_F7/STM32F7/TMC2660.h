@@ -152,7 +152,7 @@ class TMC26XStepper {
      * \brief Report the currently selected speed in RPM.
      * \sa setSpeed()
      */
-    uint16_t getSpeed(void);
+    uint16_t getSpeed();
 
     /*!
      * \brief Set the number of microsteps in 2^i values (rounded) up to 256
@@ -172,7 +172,7 @@ class TMC26XStepper {
      *
      * \sa setMicrosteps()
      */
-    int16_t getMicrosteps(void);
+    int16_t getMicrosteps();
 
     /*!
      * \brief Initiate a movement with the given number of steps. Positive values move in one direction, negative in the other.
@@ -206,7 +206,7 @@ class TMC26XStepper {
      * It is recommended to call this using a hardware timer to ensure regular invocation.
      * \sa step()
      */
-    char move(void);
+    char move();
 
     /*!
      * \brief Check whether the last movement command is done.
@@ -215,13 +215,13 @@ class TMC26XStepper {
      * Used to determine if the motor is ready for new movements.
      *\sa step(), move()
      */
-    char isMoving(void);
+    char isMoving();
 
     /*!
      * \brief Get the number of steps left in the current movement.
      * \return The number of steps left in the movement. Always positive.
      */
-    uint16_t getStepsLeft(void);
+    uint16_t getStepsLeft();
 
     /*!
      * \brief Stop the motor immediately.
@@ -229,7 +229,7 @@ class TMC26XStepper {
      *
      * This method directly and abruptly stops the motor and may be used as an emergency stop.
      */
-    char stop(void);
+    char stop();
 
     /*!
      * \brief Set and configure the classical Constant Off Timer Chopper
@@ -311,7 +311,7 @@ class TMC26XStepper {
      * \return the maximum motor current in milli amps
      * \sa getCurrentCurrent()
      */
-    uint16_t getCurrent(void);
+    uint16_t getCurrent();
 
     /*!
      * \brief set the StallGuard threshold in order to get sensible StallGuard readings.
@@ -334,13 +334,13 @@ class TMC26XStepper {
      * \brief reads out the StallGuard threshold
      * \return a number between -64 and 63.
      */
-    char getStallGuardThreshold(void);
+    char getStallGuardThreshold();
 
     /*!
      * \brief returns the current setting of the StallGuard filter
      * \return 0 if not set, -1 if set
      */
-    char getStallGuardFilter(void);
+    char getStallGuardFilter();
 
     /*!
      * \brief This method configures the CoolStep smart energy operation. You must have a proper StallGuard configuration for the motor situation (current, voltage, speed) in rder to use this feature.
@@ -413,7 +413,7 @@ class TMC26XStepper {
      *
      * Keep in mind that this routine reads and writes a value via SPI - so this may take a bit time.
      */
-    int16_t getMotorPosition(void);
+    int16_t getMotorPosition();
 
     /*!
      * \brief Reads the current StallGuard value.
@@ -421,14 +421,14 @@ class TMC26XStepper {
      * Keep in mind that this routine reads and writes a value via SPI - so this may take a bit time.
      * \sa setStallGuardThreshold() for tuning the readout to sensible ranges.
      */
-    int16_t getCurrentStallGuardReading(void);
+    int16_t getCurrentStallGuardReading();
 
     /*!
      * \brief Reads the current current setting value as fraction of the maximum current
      * Returns values between 0 and 31, representing 1/32 to 32/32 (=1)
      * \sa setCoolStepConfiguration()
      */
-    uint8_t getCurrentCSReading(void);
+    uint8_t getCurrentCSReading();
 
 
     /*!
@@ -444,7 +444,7 @@ class TMC26XStepper {
      * may not be the fastest.
      * \sa getCurrentCSReading(), getResistor(), isCurrentScalingHalfed(), getCurrent()
      */
-    uint16_t getCurrentCurrent(void);
+    uint16_t getCurrentCurrent();
 
     /*!
      * \brief checks if there is a StallGuard warning in the last status
@@ -454,7 +454,7 @@ class TMC26XStepper {
      *
      * \sa setStallGuardThreshold() for tuning the readout to sensible ranges.
      */
-    boolean isStallGuardOverThreshold(void);
+    boolean isStallGuardOverThreshold();
 
     /*!
      * \brief Return over temperature status of the last status readout
@@ -462,7 +462,7 @@ class TMC26XStepper {
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-    char getOverTemperature(void);
+    char getOverTemperature();
 
     /*!
      * \brief Is motor channel A shorted to ground detected in the last status readout.
@@ -471,7 +471,7 @@ class TMC26XStepper {
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
 
-    boolean isShortToGroundA(void);
+    boolean isShortToGroundA();
 
     /*!
      * \brief Is motor channel B shorted to ground detected in the last status readout.
@@ -479,14 +479,14 @@ class TMC26XStepper {
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-    boolean isShortToGroundB(void);
+    boolean isShortToGroundB();
     /*!
      * \brief iIs motor channel A connected according to the last statu readout.
      * \return true is yes, false if not.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-    boolean isOpenLoadA(void);
+    boolean isOpenLoadA();
 
     /*!
      * \brief iIs motor channel A connected according to the last statu readout.
@@ -494,7 +494,7 @@ class TMC26XStepper {
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-    boolean isOpenLoadB(void);
+    boolean isOpenLoadB();
 
     /*!
      * \brief Is chopper inactive since 2^20 clock cycles - defaults to ~0,08s
@@ -502,7 +502,7 @@ class TMC26XStepper {
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-    boolean isStandStill(void);
+    boolean isStandStill();
 
     /*!
      * \brief checks if there is a StallGuard warning in the last status
@@ -515,7 +515,7 @@ class TMC26XStepper {
      *
      * \sa setStallGuardThreshold() for tuning the readout to sensible ranges.
      */
-    boolean isStallGuardReached(void);
+    boolean isStallGuardReached();
 
     /*!
      *\brief enables or disables the motor driver bridges. If disabled the motor can run freely. If enabled not.
@@ -551,13 +551,13 @@ class TMC26XStepper {
      * \brief Prints out all the information that can be found in the last status read out - it does not force a status readout.
      * The result is printed via Serial
      */
-    void debugLastStatus(void);
+    void debugLastStatus();
 
     /*!
      * \brief library version
      * \return the version number as int.
      */
-    int16_t version(void);
+    int16_t version();
 
   private:
     uint16_t steps_left;      // The steps the motor has to do to complete the movement
