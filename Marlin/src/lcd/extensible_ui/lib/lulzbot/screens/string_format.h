@@ -1,9 +1,8 @@
-/****************************
- * bio_confirm_home_xyz.cpp *
- ****************************/
+/*******************
+ * string_format.h *
+ *******************/
 
 /****************************************************************************
- *   Written By Mark Pelletier  2017 - Aleph Objects, Inc.                  *
  *   Written By Marcio Teixeira 2018 - Aleph Objects, Inc.                  *
  *                                                                          *
  *   This program is free software: you can redistribute it and/or modify   *
@@ -20,31 +19,11 @@
  *   location: <http://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
-#include "../config.h"
+#pragma once
 
-#if ENABLED(LULZBOT_TOUCH_UI) && defined(LULZBOT_USE_BIOPRINTER_UI)
-
-#include "screens.h"
-
-using namespace FTDI;
-
-void BioConfirmHomeXYZ::onRedraw(draw_mode_t) {
-  drawMessage(GET_TEXTF(LOADING_WARNING));
-  drawYesNoButtons(1);
-}
-
-bool BioConfirmHomeXYZ::onTouchEnd(uint8_t tag) {
-  switch (tag) {
-    case 1:
-      SpinnerDialogBox::enqueueAndWait_P(F(LULZBOT_HOME_XYZ_COMMANDS));
-      current_screen.forget();
-      break;
-    case 2:
-      GOTO_SCREEN(StatusScreen);
-      break;
-    default:
-      return DialogBoxBaseClass::onTouchEnd(tag);
-  }
-  return true;
-}
-#endif // LULZBOT_TOUCH_UI
+void format_temp(char *str, float t1);
+void format_temp_and_idle(char *str, float t1);
+void format_temp_and_temp(char *str, float t1, float t2);
+void format_temp_and_material(char *str, float t1, const char *material);
+void format_position(char *str, float p);
+void format_position(char *str, float x, float y, float z);
