@@ -155,6 +155,8 @@ Temperature thermalManager;
 
   #if ENABLED(ADAPTIVE_FAN_SLOWING)
     uint8_t Temperature::fan_speed_scaler[FAN_COUNT] = ARRAY_N(FAN_COUNT, 128, 128, 128, 128, 128, 128);
+  #else
+    constexpr uint8_t Temperature::fan_speed_scaler[];
   #endif
 
   #if HAS_LCD_MENU
