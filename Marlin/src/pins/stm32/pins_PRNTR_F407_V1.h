@@ -156,7 +156,7 @@
 
 // 16Mbit SPI FLASH
 #define SPI_FLASH
-#define SPI_FLASH_CS_PIN    PE8
+#define SPI_FLASH_CS_PIN    SLOW_PIN(E, 8)
 // Emulate 4k EEPROM emulation
 #define E2END (0xfff - 8)
 
