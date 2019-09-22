@@ -154,6 +154,9 @@
 
 #define Z_MIN_PROBE_PIN  IO_PIN(C, 13)
 
+// Prevent the default SS_PIN definition
+#define SS_PIN -1
+
 // 16Mbit SPI FLASH
 #define SPI_FLASH
 #define SPI_FLASH_CS_PIN    SLOW_PIN(E, 8)
