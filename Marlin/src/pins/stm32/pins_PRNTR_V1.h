@@ -316,3 +316,6 @@
 #define SCK_PIN  STEPPER_SPI_SCK
 
 #define Z_MIN_PROBE_PIN  IO_PIN(C, 13)
+
+// Prevent the default SS_PIN definition
+#define SS_PIN -1
