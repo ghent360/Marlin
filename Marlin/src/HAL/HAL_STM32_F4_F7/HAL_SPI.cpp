@@ -36,7 +36,6 @@
 #include "../../inc/MarlinConfig.h"
 
 #include <SPI.h>
-#include <pins_arduino.h>
 #include "../shared/HAL_SPI.h"
 #include "spi_pins.h"
 
@@ -69,11 +68,7 @@ static SPISettings spiConfig;
 void spiBegin() {
   SPI.setMOSI(MOSI_PIN);
   SPI.setMISO(MISO_PIN);
-  SPI.setSCLK(SCK_PIN);  
-  #if PIN_EXISTS(SS)
-    SET_OUTPUT(SS_PIN);
-    OUT_WRITE(SS_PIN, HIGH);
-  #endif
+  SPI.setSCLK(SCK_PIN);
 }
 
 /** Configure SPI for specified SPI speed */
