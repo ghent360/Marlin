@@ -1535,7 +1535,7 @@ void Temperature::updateTemperaturesFromRawValues() {
 #ifdef ALFAWISE_UX0
   #define _INIT_SOFT_FAN(P) OUT_WRITE_OD(P, FAN_INVERTING ? LOW : HIGH)
 #else
-  #define _INIT_SOFT_FAN(P) OUT_WRITE(P, FAN_INVERTING ? LOW : HIGH)
+  #define _INIT_SOFT_FAN(P) extDigitalWrite(P, FAN_INVERTING ? LOW : HIGH)
 #endif
 #if ENABLED(FAN_SOFT_PWM)
   #define _INIT_FAN_PIN(P) _INIT_SOFT_FAN(P)
