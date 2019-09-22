@@ -41,6 +41,7 @@
  */
 
 #include "../../../inc/MarlinConfig.h"
+#ifdef ARDUINO_ARCH_SAM
 
 #if MB(PRINTRBOARD_G2)
 
@@ -143,3 +144,4 @@ void PWM_Handler() {
 }
 
 #endif // PRINTRBOARD_G2
+#endif // ARDUINO_ARCH_SAM

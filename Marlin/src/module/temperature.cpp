@@ -155,6 +155,8 @@ Temperature thermalManager;
 
   #if ENABLED(ADAPTIVE_FAN_SLOWING)
     uint8_t Temperature::fan_speed_scaler[FAN_COUNT] = ARRAY_N(FAN_COUNT, 128, 128, 128, 128, 128, 128);
+  #else
+    constexpr uint8_t Temperature::fan_speed_scaler[];
   #endif
 
   #if HAS_LCD_MENU
@@ -245,7 +247,7 @@ Temperature thermalManager;
       int16_t Temperature::maxtemp_raw_CHAMBER = HEATER_CHAMBER_RAW_HI_TEMP;
     #endif
     #if WATCH_CHAMBER
-      heater_watch_t Temperature::watch_chamber = { 0 };
+      heater_watch_t Temperature::watch_chamber{0};
     #endif
     millis_t Temperature::next_chamber_check_ms;
   #endif // HAS_HEATED_CHAMBER
@@ -930,7 +932,7 @@ void Temperature::min_temp_error(const heater_ind_t heater) {
 
     #if DISABLED(PID_OPENLOOP)
 
-      static PID_t work_pid = { 0 };
+      static PID_t work_pid{0};
       static float temp_iState = 0, temp_dState = 0;
       static bool pid_reset = true;
       float pid_output = 0;
@@ -1533,7 +1535,7 @@ void Temperature::updateTemperaturesFromRawValues() {
 #ifdef ALFAWISE_UX0
   #define _INIT_SOFT_FAN(P) OUT_WRITE_OD(P, FAN_INVERTING ? LOW : HIGH)
 #else
-  #define _INIT_SOFT_FAN(P) OUT_WRITE(P, FAN_INVERTING ? LOW : HIGH)
+  #define _INIT_SOFT_FAN(P) extDigitalWrite(P, FAN_INVERTING ? LOW : HIGH)
 #endif
 #if ENABLED(FAN_SOFT_PWM)
   #define _INIT_FAN_PIN(P) _INIT_SOFT_FAN(P)

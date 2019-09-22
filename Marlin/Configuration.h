@@ -132,7 +132,7 @@
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
-#define CUSTOM_MACHINE_NAME "PruSolderbot/STM"
+#define CUSTOM_MACHINE_NAME "PruSldrbot/STM"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like http://www.uuidgenerator.net/version4
@@ -1751,7 +1751,7 @@
 //
 // Note: Usually sold with a white PCB.
 //
-//#define REPRAP_DISCOUNT_SMART_CONTROLLER
+#define REPRAP_DISCOUNT_SMART_CONTROLLER
 
 //
 // Original RADDS LCD Display+Encoder+SDCardReader
@@ -2079,6 +2079,9 @@
 //
 //#define TOUCH_BUTTONS
 #if ENABLED(TOUCH_BUTTONS)
+  #define BUTTON_DELAY_EDIT  50 // (ms) Button repeat delay for edit screens
+  #define BUTTON_DELAY_MENU 250 // (ms) Button repeat delay for menus
+
   #define XPT2046_X_CALIBRATION   12316
   #define XPT2046_Y_CALIBRATION  -8981
   #define XPT2046_X_OFFSET       -43
@@ -2218,7 +2221,7 @@
  */
 //#define NUM_SERVOS 3 // Servo index starts with 0 for M280 command
 
-// Delay (in milliseconds) before the next move will start, to give the servo time to reach its target angle.
+// (ms) Delay  before the next move will start, to give the servo time to reach its target angle.
 // 300ms is a good value but you can try less delay.
 // If the servo can't reach the requested position, increase it.
 #define SERVO_DELAY { 300 }

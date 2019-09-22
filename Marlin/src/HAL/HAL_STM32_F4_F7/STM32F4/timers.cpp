@@ -39,20 +39,24 @@
 // ------------------------
 
 stm32_timer_t TimerHandle[NUM_HARDWARE_TIMERS] = {0};
-uint32_t TimerRates[NUM_HARDWARE_TIMERS] = {0};
+HAL_STEP_TIMER_ISR();
+HAL_TEMP_TIMER_ISR();
 
-void TC5_Handler(stm32_timer_t htim);
-void TC7_Handler(stm32_timer_t htim);
+#ifdef NEW_TIMER_HAL
+uint32_t TimerRates[NUM_HARDWARE_TIMERS] = {0};
 
 static uint32_t HAL_stepper_timer_prescaler(
   const uint8_t timer_num, const uint32_t desired_freq) {
   return (TimerHandle[timer_num]->getTimerClkFreq() + desired_freq / 2) / desired_freq;
 }
-
+#else
+static bool timers_initialized[NUM_HARDWARE_TIMERS] = {false};
+#endif
 // ------------------------
 // Public functions
 // ------------------------
 void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
+#ifdef NEW_TIMER_HAL
   if (!TimerHandle[timer_num]) {
     switch (timer_num) {
       case STEP_TIMER_NUM:
@@ -79,6 +83,30 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       TimerRates[timer_num] / frequency - 1, TICK_FORMAT);
     TimerHandle[timer_num]->resume();
   }
+#else
+  if (!timers_initialized[timer_num]) {
+    constexpr uint32_t step_prescaler = STEPPER_TIMER_PRESCALE - 1,
+                       temp_prescaler = TEMP_TIMER_PRESCALE - 1;
+    switch (timer_num) {
+      case STEP_TIMER_NUM:
+        // STEPPER TIMER TIM5 - use a 32bit timer
+	      TimerHandle[timer_num].timer = TIM5;
+	      TimerHandle[timer_num].irqHandle = TC5_Handler;
+        TimerHandleInit(&TimerHandle[timer_num], (((HAL_TIMER_RATE) / step_prescaler) / frequency) - 1, step_prescaler);
+        HAL_NVIC_SetPriority(STEP_TIMER_IRQ_ID, 1, 0);
+        break;
+
+      case TEMP_TIMER_NUM:
+        // TEMP TIMER TIM7 - any available 16bit Timer (1 already used for PWM)
+        TimerHandle[timer_num].timer = TIM7;
+        TimerHandle[timer_num].irqHandle = TC7_Handler;
+        TimerHandleInit(&TimerHandle[timer_num], (((HAL_TIMER_RATE) / temp_prescaler) / frequency) - 1, temp_prescaler);
+        HAL_NVIC_SetPriority(TEMP_TIMER_IRQ_ID, 2, 0);
+        break;
+    }
+    timers_initialized[timer_num] = true;
+  }
+#endif
 }
 
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
