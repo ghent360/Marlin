@@ -23,6 +23,10 @@
 
 #include <stdint.h>
 
+#if STM32_CORE_VERSION_MAJOR > 1 || (STM32_CORE_VERSION_MAJOR == 1 && STM32_CORE_VERSION_MINOR > 6) || (STM32_CORE_VERSION_MAJOR == 1 && STM32_CORE_VERSION_MINOR == 6 && STM32_CORE_VERSION_PATCH > 1)
+#define NEW_TIMER_HAL
+#endif
+
 #ifdef NEW_TIMER_HAL
 #include <HardwareTimer.h>
 #endif
