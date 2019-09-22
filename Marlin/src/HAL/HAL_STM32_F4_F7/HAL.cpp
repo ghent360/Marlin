@@ -98,4 +98,7 @@ uint16_t HAL_adc_get_result() {
   return HAL_adc_result;
 }
 
+#ifdef USE_FAST_IO
+constexpr uint16_t FastIOPin::to_arduino_pin_[PortZ][16];
+#endif
 #endif // STM32GENERIC && (STM32F4 || STM32F7)

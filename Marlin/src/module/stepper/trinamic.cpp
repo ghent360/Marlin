@@ -817,7 +817,7 @@ void reset_trinamic_drivers() {
     TMC_ADV()
   #endif
 
-  stepper.set_directions();
+  //stepper.set_directions();
 }
 
 #endif // HAS_TRINAMIC

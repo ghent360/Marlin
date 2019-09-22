@@ -74,10 +74,6 @@ void spiBegin() {
     SET_OUTPUT(SS_PIN);
     OUT_WRITE(SS_PIN, HIGH);
   #endif
-  #if PIN_EXISTS(SPI_FLASH_CS)
-    SET_OUTPUT(SPI_FLASH_CS_PIN);
-    OUT_WRITE(SPI_FLASH_CS_PIN, HIGH);
-  #endif
 }
 
 /** Configure SPI for specified SPI speed */
