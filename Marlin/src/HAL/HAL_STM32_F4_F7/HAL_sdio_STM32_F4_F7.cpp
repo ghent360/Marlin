@@ -24,7 +24,7 @@
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
-#ifdef __HAL_SD_ENABLE
+#if defined(__HAL_SD_ENABLE) && ENABLED(SDIO_SUPPORT)
 
 #include "../../inc/MarlinConfig.h" // Allow pins/pins.h to set density
 #include "bsp_sd.h"
