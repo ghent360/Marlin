@@ -14,4 +14,4 @@ done
 #arduino-cli compile --fqbn STM32:stm32:Nucleo_64:pnum=NUCLEO_F446RE Marlin
 #arduino-cli compile --fqbn STM32:stm32:3dprinter:pnum=PRNTR_F407_V1,xserial=generic,usb=CDCgen,xusb=FS,opt=ogstd,rtlib=nano Marlin
 echo arduino-cli compile --fqbn ${PLATFORM}${DBG},rtlib=nano Marlin
-arduino-cli compile --fqbn ${PLATFORM}${DBG},rtlib=nano Marlin
+exec arduino-cli compile --fqbn ${PLATFORM}${DBG},rtlib=nano Marlin
