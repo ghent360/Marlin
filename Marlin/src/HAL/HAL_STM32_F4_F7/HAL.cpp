@@ -25,6 +25,8 @@
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
 #include "HAL.h"
+#include <HardwareSerial.h>
+#include "../../inc/MarlinConfig.h" // Allow pins/pins.h to set density
 
 //#include <Wire.h>
 
@@ -62,7 +64,12 @@ extern "C" {
   extern unsigned int _ebss; // end of bss section
 }
 
-// return free memory between end of heap (or end bss) and whatever is current
+#ifdef UART_XYZ
+HardwareSerial Serial_xyz(-1, UART_XYZ);
+#endif
+#ifdef UART_Ex
+HardwareSerial Serial_ex(-1, UART_Ex);
+#endif
 
 /*
 #include "wirish/syscalls.c"

@@ -35,6 +35,46 @@
 #include <HardwareSerial.h>
 #include <SPI.h>
 
+#ifdef X_HARDWARE_SERIAL
+extern HardwareSerial X_HARDWARE_SERIAL;
+#endif
+#ifdef X2_HARDWARE_SERIAL
+extern HardwareSerial X2_HARDWARE_SERIAL;
+#endif
+#ifdef Y_HARDWARE_SERIAL
+extern HardwareSerial Y_HARDWARE_SERIAL;
+#endif
+#ifdef Y2_HARDWARE_SERIAL
+extern HardwareSerial Y2_HARDWARE_SERIAL;
+#endif
+#ifdef Z_HARDWARE_SERIAL
+extern HardwareSerial Z_HARDWARE_SERIAL;
+#endif
+#ifdef Z2_HARDWARE_SERIAL
+extern HardwareSerial Z2_HARDWARE_SERIAL;
+#endif
+#ifdef Z3_HARDWARE_SERIAL
+extern HardwareSerial Z3_HARDWARE_SERIAL;
+#endif
+#ifdef E0_HARDWARE_SERIAL
+extern HardwareSerial E0_HARDWARE_SERIAL;
+#endif
+#ifdef E1_HARDWARE_SERIAL
+extern HardwareSerial E1_HARDWARE_SERIAL;
+#endif
+#ifdef E2_HARDWARE_SERIAL
+extern HardwareSerial E2_HARDWARE_SERIAL;
+#endif
+#ifdef E3_HARDWARE_SERIAL
+extern HardwareSerial E3_HARDWARE_SERIAL;
+#endif
+#ifdef E4_HARDWARE_SERIAL
+extern HardwareSerial E4_HARDWARE_SERIAL;
+#endif
+#ifdef E5_HARDWARE_SERIAL
+extern HardwareSerial E5_HARDWARE_SERIAL;
+#endif
+
 enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
 #define _TMC_INIT(ST, STEALTH_INDEX) tmc_init(stepper##ST, ST##_CURRENT, ST##_MICROSTEPS, ST##_HYBRID_THRESHOLD, stealthchop_by_axis[STEALTH_INDEX])
 
