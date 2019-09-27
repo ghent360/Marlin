@@ -373,12 +373,11 @@ bool set_probe_deployed(const bool deploy) {
     do_probe_raise(_MAX(Z_CLEARANCE_BETWEEN_PROBES, Z_CLEARANCE_DEPLOY_PROBE));
 
   #if EITHER(Z_PROBE_SLED, Z_PROBE_ALLEN_KEY)
-    #if ENABLED(Z_PROBE_SLED)
-      #define _AUE_ARGS true, false, false
-    #else
-      #define _AUE_ARGS
-    #endif
-    if (axis_unhomed_error(_AUE_ARGS)) {
+    if (axis_unhomed_error(
+      #if ENABLED(Z_PROBE_SLED)
+        _BV(X_AXIS)
+      #endif
+    )) {
       SERIAL_ERROR_MSG(MSG_STOP_UNHOMED);
       stop();
       return true;
@@ -447,7 +446,7 @@ bool set_probe_deployed(const bool deploy) {
   const char msg_wait_for_bed_heating[25] PROGMEM = "Wait for bed heating...\n";
 #endif
 
-static bool do_probe_move(const float z, const float fr_mm_s) {
+static bool do_probe_move(const float z, const feedRate_t fr_mm_s) {
   if (DEBUGGING(LEVELING)) DEBUG_POS(">>> do_probe_move", current_position);
 
   #if HAS_HEATED_BED && ENABLED(WAIT_FOR_BED_HEATER)
@@ -532,7 +531,7 @@ static bool do_probe_move(const float z, const float fr_mm_s) {
 /**
  * @brief Probe at the current XY (possibly more than once) to find the bed Z.
  *
- * @details Used by probe_pt to get the bed Z height at the current XY.
+ * @details Used by probe_at_point to get the bed Z height at the current XY.
  *          Leaves current_position[Z_AXIS] at the height where the probe triggered.
  *
  * @return The Z position of the bed at the current XY or NAN on error.
@@ -686,7 +685,7 @@ static float run_z_probe() {
 float probe_at_point(const float &rx, const float &ry, const ProbePtRaise raise_after/*=PROBE_PT_NONE*/, const uint8_t verbose_level/*=0*/, const bool probe_relative/*=true*/) {
   if (DEBUGGING(LEVELING)) {
     DEBUG_ECHOLNPAIR(
-      ">>> probe_pt(", LOGICAL_X_POSITION(rx), ", ", LOGICAL_Y_POSITION(ry),
+      ">>> probe_at_point(", LOGICAL_X_POSITION(rx), ", ", LOGICAL_Y_POSITION(ry),
       ", ", raise_after == PROBE_PT_RAISE ? "raise" : raise_after == PROBE_PT_STOW ? "stow" : "none",
       ", ", int(verbose_level),
       ", ", probe_relative ? "probe" : "nozzle", "_relative)"
@@ -743,7 +742,7 @@ float probe_at_point(const float &rx, const float &ry, const ProbePtRaise raise_
     SERIAL_ERROR_MSG(MSG_ERR_PROBING_FAILED);
   }
 
-  if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< probe_pt");
+  if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< probe_at_point");
 
   return measured_z;
 }
