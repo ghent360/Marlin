@@ -391,7 +391,7 @@ volatile bool Temperature::temp_meas_ready = false;
       next_auto_fan_check_ms = next_temp_ms + 2500UL;
     #endif
 
-    if (target > GHV(BED_MAXTEMP, temp_range[heater].maxtemp) - 15) {
+    if (target > GHV(BED_MAXTEMP - 10, temp_range[heater].maxtemp - 15)) {
       SERIAL_ECHOLNPGM(MSG_PID_TEMP_TOO_HIGH);
       return;
     }
@@ -859,7 +859,7 @@ void Temperature::min_temp_error(const heater_ind_t heater) {
             #if HOTENDS == 1
               constexpr bool this_hotend = true;
             #else
-              const bool this_hotend = (e == active_extruder);
+              const bool this_hotend = (ee == active_extruder);
             #endif
             work_pid[ee].Kc = 0;
             if (this_hotend) {
@@ -888,7 +888,7 @@ void Temperature::min_temp_error(const heater_ind_t heater) {
       #endif // PID_OPENLOOP
 
       #if ENABLED(PID_DEBUG)
-        if (e == active_extruder) {
+        if (ee == active_extruder) {
           SERIAL_ECHO_START();
           SERIAL_ECHOPAIR(
             MSG_PID_DEBUG, ee,
