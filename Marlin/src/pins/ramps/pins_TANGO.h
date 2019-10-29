@@ -19,55 +19,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-#include "../gcode.h"
-#include "../../module/printcounter.h"
-#include "../../lcd/ultralcd.h"
-
-#include "../../Marlin.h" // for startOrResumeJob
+#pragma once
 
 /**
- * M75: Start print timer
+ * BIQU Tango pin assignments
  */
-void GcodeSuite::M75() {
-  startOrResumeJob();
-}
 
-/**
- * M76: Pause print timer
- */
-void GcodeSuite::M76() {
-  print_job_timer.pause();
-}
+#define BOARD_INFO_NAME "Tango"
 
-/**
- * M77: Stop print timer
- */
-void GcodeSuite::M77() {
-  print_job_timer.stop();
-}
+#define FAN_PIN             8
+#define FAN1_PIN           -1
 
-#if ENABLED(PRINTCOUNTER)
+#define ORIG_E0_AUTO_FAN_PIN 7
 
-/**
- * M78: Show print statistics
- */
-void GcodeSuite::M78() {
-  if (parser.intval('S') == 78) {  // "M78 S78" will reset the statistics
-    print_job_timer.initStats();
-    ui.reset_status();
-    return;
-  }
-
-  #if HAS_SERVICE_INTERVALS
-    if (parser.seenval('R')) {
-      print_job_timer.resetServiceInterval(parser.value_int());
-      ui.reset_status();
-      return;
-    }
+#ifndef TEMP_0_PIN
+  #if TEMP_SENSOR_0 == -1
+    #define TEMP_0_PIN     10   // Analog Input (connector *K1* on Tango thermocouple ADD ON is used)
+  #else
+    #define TEMP_0_PIN     15   // Analog Input (default connector for thermistor *T0* on rumba board is used)
   #endif
+#endif
 
-  print_job_timer.showStats();
-}
+#ifndef TEMP_1_PIN
+  #if TEMP_SENSOR_1 == -1
+    #define TEMP_1_PIN      9   // Analog Input (connector *K2* on Tango thermocouple ADD ON is used)
+  #else
+    #define TEMP_1_PIN     14   // Analog Input (default connector for thermistor *T1* on rumba board is used)
+  #endif
+#endif
 
-#endif // PRINTCOUNTER
+#include "pins_RUMBA.h"
