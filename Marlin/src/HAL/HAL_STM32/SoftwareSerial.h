@@ -32,6 +32,8 @@
 
 #ifndef SOFTWARESERIAL_H
 #define SOFTWARESERIAL_H
+#include "../HAL.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 #include <Arduino.h>
 
@@ -116,4 +118,5 @@ class SoftwareSerial : public Stream {
     using Print::write;
 };
 
+#endif // PLATFORM_ID
 #endif // SOFTWARESERIAL_H

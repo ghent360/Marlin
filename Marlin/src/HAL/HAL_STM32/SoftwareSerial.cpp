@@ -34,6 +34,9 @@
 //
 // Includes
 //
+#include "../HAL.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32)
+
 #include "SoftwareSerial.h"
 #include <timer.h>
 
@@ -389,3 +392,5 @@ int SoftwareSerial::peek() {
   // Read from "head"
   return _receive_buffer[_receive_buffer_head];
 }
+
+#endif // PLATFORM_ID
