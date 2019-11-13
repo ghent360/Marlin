@@ -72,7 +72,7 @@ HardwareSerial Serial_ex(-1, UART_Ex);
 #endif
 
 /*
-#include "wirish/syscalls.c"
+#include <wirish/syscalls.c>
 //extern caddr_t _sbrk(int incr);
 #ifndef CONFIG_HEAP_END
 extern char _lm_heap_end;
