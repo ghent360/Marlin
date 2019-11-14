@@ -996,9 +996,6 @@
       #error "No E stepper plug left for X2!"
     #endif
   #endif
-  #ifndef X2_CS_PIN
-    #define X2_CS_PIN     _EPIN(E_STEPPERS, CS)
-  #endif
   #ifndef X2_MS1_PIN
     #define X2_MS1_PIN    _EPIN(E_STEPPERS, MS1)
   #endif
@@ -1008,7 +1005,10 @@
   #ifndef X2_MS3_PIN
     #define X2_MS3_PIN    _EPIN(E_STEPPERS, MS3)
   #endif
-  #if AXIS_DRIVER_TYPE_X2(TMC2208) || AXIS_DRIVER_TYPE_X2(TMC2209)
+  #if AXIS_HAS_SPI(X2) && !defined(X2_CS_PIN)
+    #define X2_CS_PIN     _EPIN(E_STEPPERS, CS)
+  #endif
+  #if AXIS_HAS_UART(X2)
     #ifndef X2_SERIAL_TX_PIN
       #define X2_SERIAL_TX_PIN _EPIN(E_STEPPERS, SERIAL_TX)
     #endif
@@ -1044,9 +1044,6 @@
       #error "No E stepper plug left for Y2!"
     #endif
   #endif
-  #ifndef Y2_CS_PIN
-    #define Y2_CS_PIN     _EPIN(Y2_E_INDEX, CS)
-  #endif
   #ifndef Y2_MS1_PIN
     #define Y2_MS1_PIN    _EPIN(Y2_E_INDEX, MS1)
   #endif
@@ -1056,7 +1053,10 @@
   #ifndef Y2_MS3_PIN
     #define Y2_MS3_PIN    _EPIN(Y2_E_INDEX, MS3)
   #endif
-  #if AXIS_DRIVER_TYPE_Y2(TMC2208) || AXIS_DRIVER_TYPE_Y2(TMC2209)
+  #if AXIS_HAS_SPI(Y2) && !defined(Y2_CS_PIN)
+    #define Y2_CS_PIN     _EPIN(Y2_E_INDEX, CS)
+  #endif
+  #if AXIS_HAS_UART(Y2)
     #ifndef Y2_SERIAL_TX_PIN
       #define Y2_SERIAL_TX_PIN _EPIN(Y2_E_INDEX, SERIAL_TX)
     #endif
@@ -1092,9 +1092,6 @@
       #error "No E stepper plug left for Z2!"
     #endif
   #endif
-  #ifndef Z2_CS_PIN
-    #define Z2_CS_PIN     _EPIN(Z2_E_INDEX, CS)
-  #endif
   #ifndef Z2_MS1_PIN
     #define Z2_MS1_PIN    _EPIN(Z2_E_INDEX, MS1)
   #endif
@@ -1104,7 +1101,10 @@
   #ifndef Z2_MS3_PIN
     #define Z2_MS3_PIN    _EPIN(Z2_E_INDEX, MS3)
   #endif
-  #if AXIS_DRIVER_TYPE_Z2(TMC2208) || AXIS_DRIVER_TYPE_Z2(TMC2209)
+  #if AXIS_HAS_SPI(Z2) && !defined(Z2_CS_PIN)
+    #define Z2_CS_PIN     _EPIN(Z2_E_INDEX, CS)
+  #endif
+  #if AXIS_HAS_UART(Z2)
     #ifndef Z2_SERIAL_TX_PIN
       #define Z2_SERIAL_TX_PIN _EPIN(Z2_E_INDEX, SERIAL_TX)
     #endif
@@ -1139,8 +1139,10 @@
       #error "No E stepper plug left for Z3!"
     #endif
   #endif
-  #ifndef Z3_CS_PIN
-    #define Z3_CS_PIN     _EPIN(Z3_E_INDEX, CS)
+  #if AXIS_HAS_SPI(Z3)
+    #ifndef Z3_CS_PIN
+      #define Z3_CS_PIN     _EPIN(Z3_E_INDEX, CS)
+    #endif
   #endif
   #ifndef Z3_MS1_PIN
     #define Z3_MS1_PIN    _EPIN(Z3_E_INDEX, MS1)
@@ -1151,7 +1153,7 @@
   #ifndef Z3_MS3_PIN
     #define Z3_MS3_PIN    _EPIN(Z3_E_INDEX, MS3)
   #endif
-  #if AXIS_DRIVER_TYPE_Z3(TMC2208) || AXIS_DRIVER_TYPE_Z3(TMC2209)
+  #if AXIS_HAS_UART(Z3)
     #ifndef Z3_SERIAL_TX_PIN
       #define Z3_SERIAL_TX_PIN _EPIN(Z3_E_INDEX, SERIAL_TX)
     #endif
