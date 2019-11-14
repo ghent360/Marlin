@@ -70,6 +70,12 @@ HardwareSerial Serial_xyz(-1, UART_XYZ);
 #ifdef UART_Ex
 HardwareSerial Serial_ex(-1, UART_Ex);
 #endif
+#ifdef UART_ST14
+HardwareSerial Serial_ST14(-1, UART_ST14);
+#endif
+#ifdef UART_ST56
+HardwareSerial Serial_ST56(-1, UART_ST56);
+#endif
 
 /*
 #include <wirish/syscalls.c>
