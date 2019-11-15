@@ -38,7 +38,7 @@
 #if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 #include "SoftwareSerial.h"
-#include <timer.h>
+#include "timers.h"
 
 #define OVERSAMPLE 3 // in RX, Timer will generate interruption OVERSAMPLE time during a bit. Thus OVERSAMPLE ticks in a bit. (interrupt not synchonized with edge).
 
