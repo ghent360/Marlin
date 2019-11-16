@@ -4,6 +4,9 @@ PLATFORM="STM32:stm32:Nucleo_64:pnum=NUCLEO_F446RE"
 DBG=
 while [ ! -z "$1" ]; do
   if [ "$1" = "-4" ]; then
+    PLATFORM="STM32:stm32:3dprinter:pnum=PRNTR_V2,xserial=generic,usb=CDCgen,xusb=FS"
+  fi
+  if [ "$1" = "-4o" ]; then
     PLATFORM="STM32:stm32:3dprinter:pnum=PRNTR_F407_V1,xserial=generic,usb=CDCgen,xusb=FS"
   fi
   if [ "$1" = "-d" ]; then
