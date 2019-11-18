@@ -246,7 +246,8 @@ bool MarlinUI::detected() { return true; }
 void MarlinUI::init_lcd() {
 
   #if PIN_EXISTS(LCD_BACKLIGHT)
-    OUT_WRITE(LCD_BACKLIGHT_PIN, (
+    pinMode(LCD_BACKLIGHT_PIN, OUTPUT);
+    digitalWrite(LCD_BACKLIGHT_PIN, (
       #if ENABLED(DELAYED_BACKLIGHT_INIT)
         LOW  // Illuminate after reset
       #else
@@ -256,7 +257,7 @@ void MarlinUI::init_lcd() {
   #endif
 
   #if EITHER(MKS_12864OLED, MKS_12864OLED_SSD1306)
-    SET_OUTPUT(LCD_PINS_DC);
+    pinMode(LCD_PINS_DC, OUTPUT);
     #ifndef LCD_RESET_PIN
       #define LCD_RESET_PIN LCD_PINS_RS
     #endif
@@ -264,15 +265,16 @@ void MarlinUI::init_lcd() {
 
   #if PIN_EXISTS(LCD_RESET)
     // Perform a clean hardware reset with needed delays
-    OUT_WRITE(LCD_RESET_PIN, LOW);
+    pinMode(LCD_RESET_PIN, OUTPUT);
+    digitalWrite(LCD_RESET_PIN, LOW);
     _delay_ms(5);
-    WRITE(LCD_RESET_PIN, HIGH);
+    digitalWrite(LCD_RESET_PIN, HIGH);
     _delay_ms(5);
     u8g.begin();
   #endif
 
   #if PIN_EXISTS(LCD_BACKLIGHT) && ENABLED(DELAYED_BACKLIGHT_INIT)
-    WRITE(LCD_BACKLIGHT_PIN, HIGH);
+    digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
   #endif
 
   #if HAS_LCD_CONTRAST

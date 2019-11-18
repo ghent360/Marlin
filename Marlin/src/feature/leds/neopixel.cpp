@@ -71,7 +71,7 @@ void Marlin_NeoPixel::set_color_startup(const uint32_t color) {
 }
 
 void Marlin_NeoPixel::init() {
-  SET_OUTPUT(NEOPIXEL_PIN);
+  pinMode(NEOPIXEL_PIN, OUTPUT);
   set_brightness(NEOPIXEL_BRIGHTNESS); // 0 - 255 range
   begin();
   show();  // initialize to all off
