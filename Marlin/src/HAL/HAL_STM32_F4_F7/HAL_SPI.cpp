@@ -59,20 +59,34 @@ static SPISettings spiConfig;
 // ------------------------
 // Hardware SPI
 // ------------------------
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+SPIClass SPI_2;
+static SPISettings spiConfig2;
+#endif
 
 /**
  * @brief  Begin SPI port setup
  *
  * @return Nothing
  */
-void spiBegin() {
-  SPI.setMOSI(MOSI_PIN);
-  SPI.setMISO(MISO_PIN);
-  SPI.setSCLK(SCK_PIN);
+void spiBegin(SPIClass& spiInstance) {
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  if (&spiInstance == &SPI) {
+#endif    
+    spiInstance.setMOSI(MOSI_PIN);
+    spiInstance.setMISO(MISO_PIN);
+    spiInstance.setSCLK(SCK_PIN);
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  } else {
+    spiInstance.setMOSI(SPI2_MOSI_PIN);
+    spiInstance.setMISO(SPI2_MISO_PIN);
+    spiInstance.setSCLK(SPI2_SCK_PIN);
+  }
+#endif
 }
 
 /** Configure SPI for specified SPI speed */
-void spiInit(uint8_t spiRate) {
+void spiInit(uint8_t spiRate, SPIClass& spiInstance) {
   // Use datarates Marlin uses
   uint32_t clock;
   switch (spiRate) {
@@ -84,8 +98,16 @@ void spiInit(uint8_t spiRate) {
     case SPI_SPEED_6:       clock =   300000; break;
     default:                clock =  4000000; // Default from the SPI libarary
   }
-  spiConfig = SPISettings(clock, MSBFIRST, SPI_MODE0);
-  SPI.begin();
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  if (&spiInstance == &SPI) {
+#endif    
+    spiConfig = SPISettings(clock, MSBFIRST, SPI_MODE0);
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  } else {
+    spiConfig2 = SPISettings(clock, MSBFIRST, SPI_MODE0);
+  }
+#endif
+  spiInstance.begin();
 }
 
 /**
@@ -95,10 +117,18 @@ void spiInit(uint8_t spiRate) {
  *
  * @details
  */
-uint8_t spiRec() {
-  SPI.beginTransaction(spiConfig);
+uint8_t spiRec(SPIClass& spiInstance) {
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  if (&spiInstance == &SPI) {
+#endif    
+    spiInstance.beginTransaction(spiConfig);
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  } else {
+    spiInstance.beginTransaction(spiConfig2);
+  }
+#endif    
   uint8_t returnByte = SPI.transfer(0xFF);
-  SPI.endTransaction();
+  spiInstance.endTransaction();
   return returnByte;
 }
 
@@ -111,14 +141,22 @@ uint8_t spiRec() {
  *
  * @details Uses DMA
  */
-void spiRead(uint8_t* buf, uint16_t nbyte) {
-  SPI.beginTransaction(spiConfig);
+void spiRead(uint8_t* buf, uint16_t nbyte, SPIClass& spiInstance) {
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  if (&spiInstance == &SPI) {
+#endif    
+    spiInstance.beginTransaction(spiConfig);
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  } else {
+    spiInstance.beginTransaction(spiConfig2);
+  }
+#endif    
   #ifdef STM32GENERIC
-    SPI.dmaTransfer(0, const_cast<uint8_t*>(buf), nbyte);
+    spiInstance.dmaTransfer(0, const_cast<uint8_t*>(buf), nbyte);
   #else
-    SPI.transfer(buf, nbyte);
+    spiInstance.transfer(buf, nbyte);
   #endif
-  SPI.endTransaction();
+  spiInstance.endTransaction();
 }
 
 /**
@@ -128,10 +166,18 @@ void spiRead(uint8_t* buf, uint16_t nbyte) {
  *
  * @details
  */
-void spiSend(uint8_t b) {
-  SPI.beginTransaction(spiConfig);
-  SPI.transfer(b);
-  SPI.endTransaction();
+void spiSend(uint8_t b, SPIClass& spiInstance) {
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  if (&spiInstance == &SPI) {
+#endif    
+    spiInstance.beginTransaction(spiConfig);
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  } else {
+    spiInstance.beginTransaction(spiConfig2);
+  }
+#endif    
+  spiInstance.transfer(b);
+  spiInstance.endTransaction();
 }
 
 /**
@@ -142,38 +188,44 @@ void spiSend(uint8_t b) {
  *
  * @details Use DMA
  */
-void spiSendBlock(uint8_t token, const uint8_t* buf) {
-  SPI.beginTransaction(spiConfig);
-  SPI.transfer(token);
+void spiSendBlock(uint8_t token, const uint8_t* buf, SPIClass& spiInstance) {
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  if (&spiInstance == &SPI) {
+#endif    
+    spiInstance.beginTransaction(spiConfig);
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  } else {
+    spiInstance.beginTransaction(spiConfig2);
+  }
+#endif    
+  spiInstance.transfer(token);
   #ifdef STM32GENERIC
-    SPI.dmaSend(const_cast<uint8_t*>(buf), 512);
+    spiInstance.dmaSend(const_cast<uint8_t*>(buf), 512);
   #else
-    SPI.transfer((uint8_t*)buf, nullptr, 512);
+    spiInstance.transfer((uint8_t*)buf, nullptr, 512);
   #endif
-  SPI.endTransaction();
+  spiInstance.endTransaction();
 }
 
 #if ENABLED(SPI_EEPROM)
 
-// Read single byte from specified SPI channel
-uint8_t spiRec(uint32_t chan) {
-  return SPI.transfer(0xff);
-}
-
-// Write single byte to specified SPI channel
-void spiSend(uint32_t chan, byte b) { 
-  spiSend(b);
-}
-
 // Write buffer to specified SPI channel
-void spiSend(uint32_t chan, const uint8_t* buf, size_t n) {
-  SPI.beginTransaction(spiConfig);
+void spiSend(const uint8_t* buf, size_t n, SPIClass& spiInstance) {
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  if (&spiInstance == &SPI) {
+#endif    
+    spiInstance.beginTransaction(spiConfig);
+#if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
+  } else {
+    spiInstance.beginTransaction(spiConfig2);
+  }
+#endif    
   #ifdef STM32GENERIC
-    SPI.dmaSend(const_cast<uint8_t*>(buf), n);
+    spiInstance.dmaSend(const_cast<uint8_t*>(buf), n);
   #else
-    SPI.transfer((uint8_t*)buf, nullptr, n);
+    spiInstance.transfer((uint8_t*)buf, nullptr, n);
   #endif
-  SPI.endTransaction();
+  spiInstance.endTransaction();
 }
 
 #endif // SPI_EEPROM

@@ -52,7 +52,7 @@
 */
 
 #include "../HAL.h"
-#if (HAL_PLATFORM_ID == HAL_ID_STM32F4)
+#if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
 #include <U8glib.h>
 #include <Arduino.h>
@@ -71,7 +71,7 @@ static void init_i2c_hw()
 {
   i2c_.sda = digitalPinToPinName(PIN_WIRE_SDA);
   i2c_.scl = digitalPinToPinName(PIN_WIRE_SCL);
-  i2c_custom_init(&i2c_, I2C_400KHz, I2C_ADDRESSINGMODE_7BIT, 0);
+  i2c_custom_init(&i2c_, 400000, I2C_ADDRESSINGMODE_7BIT, 0);
 }
 
 static void wait_i2c_ready()

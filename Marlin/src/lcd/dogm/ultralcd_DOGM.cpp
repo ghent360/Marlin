@@ -277,6 +277,8 @@ void MarlinUI::init_lcd() {
     digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
   #endif
 
+  // FYSETC HACK!!!
+  u8g.setContrast(255);
   #if HAS_LCD_CONTRAST
     refresh_contrast();
   #endif

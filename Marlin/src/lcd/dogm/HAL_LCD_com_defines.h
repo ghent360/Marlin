@@ -99,12 +99,17 @@
   #define U8G_COM_ST7920_HAL_HW_SPI   u8g_com_HAL_LPC1768_ST7920_hw_spi_fn
   #define U8G_COM_SSD_I2C_HAL         u8g_com_HAL_LPC1768_ssd_hw_i2c_fn
 
-#elif HAL_PLATFORM_ID == HAL_ID_STM32F4
+#elif HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7
 
   uint8_t u8g_com_HAL_stm32f4_ST7920_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);
   uint8_t u8g_com_HAL_stm32f4_ssd_hw_i2c_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);
+  uint8_t u8g_com_HAL_stm32f4_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);
+  uint8_t u8g_com_HAL_stm32f4_sw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr);
+
   #define U8G_COM_ST7920_HAL_HW_SPI u8g_com_HAL_stm32f4_ST7920_hw_spi_fn
   #define U8G_COM_SSD_I2C_HAL u8g_com_HAL_stm32f4_ssd_hw_i2c_fn
+  #define U8G_COM_HAL_HW_SPI_FN u8g_com_HAL_stm32f4_hw_spi_fn
+  #define U8G_COM_HAL_SW_SPI_FN u8g_com_HAL_stm32f4_sw_spi_fn
 
 #endif
 

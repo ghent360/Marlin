@@ -36,7 +36,7 @@
 */
 
 #include "../HAL.h"
-#if (HAL_PLATFORM_ID == HAL_ID_STM32F4)
+#if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
 #include <U8glib.h>
 #include <Arduino.h>
@@ -48,6 +48,12 @@
 #define SPI_MODE1 0x01
 #define SPI_MODE2 0x02
 #define SPI_MODE3 0x03
+
+#ifndef LCD_SPI_INSTANCE
+#define LCD_SPI_INSTANCE SPI
+#endif
+
+extern SPIClass LCD_SPI_INSTANCE;
 
 static uint8_t _buf[256*2 + 1];
 
@@ -69,7 +75,7 @@ static void u8g_com_arduino_st7920_write_byte_hw_spi_seq(u8g_t *u8g, uint8_t rs,
       ptr++;
       len--;
   }
-  SPI.transfer(_buf, idx);
+  LCD_SPI_INSTANCE.transfer(_buf, idx);
 }
 
 static void u8g_com_arduino_st7920_write_byte_hw_spi(u8g_t *u8g, uint8_t rs, uint8_t val)
@@ -86,7 +92,7 @@ static void u8g_com_arduino_st7920_write_byte_hw_spi(u8g_t *u8g, uint8_t rs, uin
   }
   _buf[idx++] = val & 0x0f0;
   _buf[idx++] = val << 4;
-  SPI.transfer(_buf, idx);
+  LCD_SPI_INSTANCE.transfer(_buf, idx);
 }
 
 uint8_t u8g_com_HAL_stm32f4_ST7920_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
@@ -117,12 +123,12 @@ uint8_t u8g_com_HAL_stm32f4_ST7920_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t ar
       {
         /* disable, note: the st7920 has an active high chip select */
         u8g_com_arduino_digital_write(u8g, U8G_PI_CS, LOW);
-        SPI.endTransaction();
+        LCD_SPI_INSTANCE.endTransaction();
       }
       else
       {
         /* enable */
-        SPI.beginTransaction(SPISettings(400000, MSBFIRST, SPI_MODE0));
+        LCD_SPI_INSTANCE.beginTransaction(SPISettings(400000, MSBFIRST, SPI_MODE0));
         u8g_com_arduino_digital_write(u8g, U8G_PI_CS, HIGH);
       }
       break;

@@ -186,9 +186,19 @@
 #define STEPPER_SPI_MISO   SLOW_PIN(A, 6)
 #define STEPPER_SPI_SCK    SLOW_PIN(B, 3)
 
+#define EXT_SPI_MOSI   SLOW_PIN(C, 3)
+#define EXT_SPI_MISO   SLOW_PIN(C, 2)
+#define EXT_SPI_SCK    SLOW_PIN(B, 13)
+
 #define MOSI_PIN STEPPER_SPI_MOSI
 #define MISO_PIN STEPPER_SPI_MISO
 #define SCK_PIN  STEPPER_SPI_SCK
+
+#define SPI2_MOSI_PIN EXT_SPI_MOSI
+#define SPI2_MISO_PIN EXT_SPI_MISO
+#define SPI2_SCK_PIN  EXT_SPI_SCK
+
+#define LCD_SPI_INSTANCE SPI_2
 
 // Prevent the default SS_PIN definition
 #define SS_PIN -1

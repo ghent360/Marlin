@@ -42,6 +42,7 @@
 #define HEATER_BED_INVERTING true
 #define HEATER_0_INVERTING true
 #define HEATER_1_INVERTING true
+#define HEATER_2_INVERTING true
 
 //
 // Custom Thermistor 1000 parameters
@@ -882,7 +883,7 @@
    * LED Control Menu
    * Add LED Control to the LCD menu
    */
-  //#define LED_CONTROL_MENU
+  #define LED_CONTROL_MENU
   #if ENABLED(LED_CONTROL_MENU)
     #define LED_COLOR_PRESETS                 // Enable the Preset Color menu option
     #if ENABLED(LED_COLOR_PRESETS)
