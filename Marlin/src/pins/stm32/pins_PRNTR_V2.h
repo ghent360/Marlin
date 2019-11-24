@@ -206,7 +206,7 @@
 
 #define I2C_EEPROM
 
-#define SD_DETECT_PIN       SLOW_PIN(D, 3)
+#define SD_DETECT_PIN       IO_PIN(D, 3)
 //if ENABLED(SD_DETECT_INVERTED)
 //  #error "SD_DETECT_INVERTED must be disabled for the PRNTR_V2 board."
 //#endif
@@ -264,7 +264,7 @@
     #define LCD_PINS_D4    EXP1_LCD_D4
 
     #define LCD_SDSS       EXP2_SD_SS
-    #define SD_DETECT_PIN  EXP2_SD_DETECT
+    //#define SD_DETECT_PIN  EXP2_SD_DETECT
 
     #if ENABLED(FYSETC_MINI_12864)
       #define DOGLCD_CS    EXP1_LCD_E
