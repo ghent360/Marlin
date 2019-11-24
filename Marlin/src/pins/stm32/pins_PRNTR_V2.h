@@ -199,6 +199,7 @@
 #define SPI2_SCK_PIN  EXT_SPI_SCK
 
 #define LCD_SPI_INSTANCE SPI_2
+#define LCD_SPI_INSTANCE_SETTINGS spiConfig2
 
 // Prevent the default SS_PIN definition
 #define SS_PIN -1
@@ -273,7 +274,7 @@
 
       #define LCD_BACKLIGHT_PIN -1
 
-      #define FORCE_SOFT_SPI      // Use this if default of hardware SPI causes display problems
+      //#define FORCE_SOFT_SPI      // Use this if default of hardware SPI causes display problems
                                   //   results in LCD soft SPI mode 3, SD soft SPI mode 0
 
       #define LCD_RESET_PIN EXP1_LCD_D4 // Must be high or open for LCD to operate normally.

@@ -66,8 +66,12 @@
 #ifndef LCD_SPI_INSTANCE
 #define LCD_SPI_INSTANCE SPI
 #endif
+#ifndef LCD_SPI_INSTANCE_SETTINGS
+#define LCD_SPI_INSTANCE_SETTINGS spiConfig
+#endif
 
 extern SPIClass LCD_SPI_INSTANCE;
+extern SPISettings LCD_SPI_INSTANCE_SETTINGS;
 
 uint8_t u8g_com_HAL_stm32f4_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr) {
   switch (msg) {
@@ -75,12 +79,7 @@ uint8_t u8g_com_HAL_stm32f4_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, 
       break;
 
     case U8G_COM_MSG_INIT:
-      u8g_SetPILevel(u8g, U8G_PI_CS, 1);
-      u8g_SetPILevel(u8g, U8G_PI_A0, 1);
-      u8g_SetPILevel(u8g, U8G_PI_RESET, 1);
-      u8g_SetPIOutput(u8g, U8G_PI_CS);
-      u8g_SetPIOutput(u8g, U8G_PI_A0);
-      u8g_SetPIOutput(u8g, U8G_PI_RESET);
+      u8g_com_arduino_assign_pin_output_high(u8g);
       u8g_Delay(5);
       spiBegin(LCD_SPI_INSTANCE);
       #ifndef SPI_SPEED
@@ -90,29 +89,31 @@ uint8_t u8g_com_HAL_stm32f4_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, 
       break;
 
     case U8G_COM_MSG_ADDRESS:                     /* define cmd (arg_val = 0) or data mode (arg_val = 1) */
-      u8g_SetPILevel(u8g, U8G_PI_A0, arg_val);
+      u8g_com_arduino_digital_write(u8g, U8G_PI_A0, arg_val);
       break;
 
     case U8G_COM_MSG_CHIP_SELECT:
-      u8g_SetPILevel(u8g, U8G_PI_CS, (arg_val ? 0 : 1));
+      if (arg_val) {
+        LCD_SPI_INSTANCE.beginTransaction(LCD_SPI_INSTANCE_SETTINGS);
+      }
+      u8g_com_arduino_digital_write(u8g, U8G_PI_CS, !arg_val);
+      if (!arg_val) {
+        LCD_SPI_INSTANCE.endTransaction();
+      }
       break;
 
     case U8G_COM_MSG_RESET:
-      u8g_SetPILevel(u8g, U8G_PI_RESET, arg_val);
+      if ( u8g->pin_list[U8G_PI_RESET] != U8G_PIN_NONE )
+        u8g_com_arduino_digital_write(u8g, U8G_PI_RESET, arg_val);
       break;
 
     case U8G_COM_MSG_WRITE_BYTE:
-      spiSend((uint8_t)arg_val, LCD_SPI_INSTANCE);
+      LCD_SPI_INSTANCE.transfer((uint8_t)arg_val);
       break;
 
     case U8G_COM_MSG_WRITE_SEQ:
-    case U8G_COM_MSG_WRITE_SEQ_P: {
-        uint8_t *ptr = (uint8_t*) arg_ptr;
-        while (arg_val > 0) {
-          spiSend(*ptr++, LCD_SPI_INSTANCE);
-          arg_val--;
-        }
-      }
+    case U8G_COM_MSG_WRITE_SEQ_P:
+      LCD_SPI_INSTANCE.transfer((uint8_t*)arg_ptr, arg_val);
       break;
   }
   return 1;

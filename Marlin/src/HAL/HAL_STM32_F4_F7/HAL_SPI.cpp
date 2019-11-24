@@ -43,7 +43,7 @@
 // Public Variables
 // ------------------------
 
-static SPISettings spiConfig;
+SPISettings spiConfig;
 
 // ------------------------
 // Public functions
@@ -61,7 +61,7 @@ static SPISettings spiConfig;
 // ------------------------
 #if PIN_EXISTS(SPI2_MOSI) && PIN_EXISTS(SPI2_MISO) && PIN_EXISTS(SPI2_SCK)
 SPIClass SPI_2;
-static SPISettings spiConfig2;
+SPISettings spiConfig2;
 #endif
 
 /**
