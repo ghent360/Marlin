@@ -43,32 +43,19 @@
 #include "../../../inc/MarlinConfig.h"
 #include <SPI.h>
 
-#define SPI_TRANSFER_TIMEOUT    1000
-#define SPI_MODE0 0x00
-#define SPI_MODE1 0x01
-#define SPI_MODE2 0x02
-#define SPI_MODE3 0x03
-
 #ifndef LCD_SPI_INSTANCE
 #define LCD_SPI_INSTANCE SPI
 #endif
 
 extern SPIClass LCD_SPI_INSTANCE;
-
 static uint8_t _buf[256*2 + 1];
 
 static void u8g_com_arduino_st7920_write_byte_hw_spi_seq(u8g_t *u8g, uint8_t rs, uint8_t *ptr, uint8_t len)
 {
   uint8_t idx;
 
-  idx = 0;
-  if (rs == 0) {
-    _buf[0] = 0xf8;
-    idx = 1;
-  } else if (rs == 1) {
-    _buf[0] = 0xfa;
-    idx = 1;
-  }
+  _buf[0] = (rs == 0) ? 0xf8 : 0xfa;
+  idx = 1;
   while (len > 0) {
       _buf[idx++] = *ptr & 0x0f0;
       _buf[idx++] = *ptr << 4;
@@ -80,19 +67,10 @@ static void u8g_com_arduino_st7920_write_byte_hw_spi_seq(u8g_t *u8g, uint8_t rs,
 
 static void u8g_com_arduino_st7920_write_byte_hw_spi(u8g_t *u8g, uint8_t rs, uint8_t val)
 {
-  uint8_t idx;
-
-  idx = 0;
-  if (rs == 0) {
-    _buf[0] = 0xf8;
-    idx = 1;
-  } else if (rs == 1) {
-    _buf[0] = 0xfa;
-    idx = 1;
-  }
-  _buf[idx++] = val & 0x0f0;
-  _buf[idx++] = val << 4;
-  LCD_SPI_INSTANCE.transfer(_buf, idx);
+  _buf[0] = (rs == 0) ? 0xf8 : 0xfa;
+  _buf[1] = val & 0x0f0;
+  _buf[2] = val << 4;
+  LCD_SPI_INSTANCE.transfer(_buf, 3);
 }
 
 uint8_t u8g_com_HAL_stm32f4_ST7920_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
@@ -100,12 +78,9 @@ uint8_t u8g_com_HAL_stm32f4_ST7920_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t ar
   switch(msg)
   {
     case U8G_COM_MSG_INIT:
-      pinMode(u8g->pin_list[U8G_PI_CS], OUTPUT);
-      digitalWrite(u8g->pin_list[U8G_PI_CS], HIGH);
-      if (u8g->pin_list[U8G_PI_RESET] != U8G_PIN_NONE) {
-        pinMode(u8g->pin_list[U8G_PI_RESET], OUTPUT);
-        digitalWrite(u8g->pin_list[U8G_PI_RESET], HIGH);
-      }
+      u8g_com_arduino_assign_pin_output_high(u8g);
+      u8g_com_arduino_digital_write(u8g, U8G_PI_CS, LOW);
+      spiBegin(LCD_SPI_INSTANCE);
       u8g->pin_list[U8G_PI_A0_STATE] = 0;       /* inital RS state: command mode */
       break;
     
@@ -113,20 +88,17 @@ uint8_t u8g_com_HAL_stm32f4_ST7920_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t ar
       break;
 
     case U8G_COM_MSG_RESET:
-      if ( u8g->pin_list[U8G_PI_RESET] != U8G_PIN_NONE ) {
+      if ( u8g->pin_list[U8G_PI_RESET] != U8G_PIN_NONE )
 	      u8g_com_arduino_digital_write(u8g, U8G_PI_RESET, arg_val);
-      }
       break;
       
     case U8G_COM_MSG_CHIP_SELECT:
-      if ( arg_val == 0 )
-      {
-        /* disable, note: the st7920 has an active high chip select */
+      if ( arg_val == 0 ) {
+        /* disable */
+        /* note: the st7920 has an active high chip select */
         u8g_com_arduino_digital_write(u8g, U8G_PI_CS, LOW);
         LCD_SPI_INSTANCE.endTransaction();
-      }
-      else
-      {
+      } else {
         /* enable */
         LCD_SPI_INSTANCE.beginTransaction(SPISettings(400000, MSBFIRST, SPI_MODE0));
         u8g_com_arduino_digital_write(u8g, U8G_PI_CS, HIGH);
