@@ -301,6 +301,8 @@
 #define BOARD_BIGTREE_BTT002_V1_0     4208  // BigTreeTech BTT002 v1.0 (STM32F407VE)
 #define BOARD_LERDGE_K                4209  // Lerdge K (STM32F407ZG)
 #define BOARD_LERDGE_X                4210  // Lerdge X (STM32F407VE)
+#define BOARD_VAKE403D                4211  // VAkE 403D (STM32F446VET6)
+#define BOARD_FYSETC_S6               4212  // FYSETC S6 board
 #define BOARD_PRNTR_V1                4225  // STM32F446RE NUCLEO-64 shield controller
 #define BOARD_PRNTR_F407_V1           4226  // STM32F407VE NUCLEO-64-like shield controller
 #define BOARD_PRNTR_F407_2209         4227  // STM32F407VE NUCLEO-64-like shield controller
