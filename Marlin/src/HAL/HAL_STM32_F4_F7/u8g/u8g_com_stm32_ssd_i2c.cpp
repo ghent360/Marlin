@@ -56,6 +56,7 @@
 
 #include <U8glib.h>
 #include <Arduino.h>
+#include <Wire.h>
 
 #if !defined(U8G_WITH_PINLIST)
 #error U8G_WITH_PINLIST should be defined for this driver to work.
