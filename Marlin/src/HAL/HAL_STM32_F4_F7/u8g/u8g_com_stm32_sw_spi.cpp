@@ -33,10 +33,20 @@ static inline void stm32_Delay(uint8_t cycles) {
     __NOP();
 }
 
-static inline void swSpiTransfer_mode_0(
-  GPIO_TypeDef *mosiPort, uint32_t mosiPin,
-  GPIO_TypeDef *sckPort, uint32_t sckPin,
-  uint8_t b) {
+static GPIO_TypeDef *mosiPort;
+static uint32_t mosiPin;
+static GPIO_TypeDef *sckPort;
+static uint32_t sckPin;
+
+static inline void u8g_com_stm32_init_shift_out(uint8_t dataPin, uint8_t clockPin)
+{
+  mosiPort = digitalPinToPort(dataPin);
+  mosiPin = STM_LL_GPIO_PIN(digitalPinToPinName(dataPin));
+  sckPort = digitalPinToPort(clockPin);
+  sckPin = STM_LL_GPIO_PIN(digitalPinToPinName(clockPin));
+}
+
+static inline void swSpiTransfer_mode_0(uint8_t b) {
   for (uint8_t i = 0; i < 8; i++) {
     if (b & 0x80) {
       LL_GPIO_SetOutputPin(mosiPort, mosiPin);
@@ -52,10 +62,7 @@ static inline void swSpiTransfer_mode_0(
   }
 }
 
-static inline void swSpiTransfer_mode_3(
-  GPIO_TypeDef *mosiPort, uint32_t mosiPin,
-  GPIO_TypeDef *sckPort, uint32_t sckPin,
-  uint8_t b) {
+static inline void swSpiTransfer_mode_3(uint8_t b) {
   for (uint8_t i = 0; i < 8; i++) {
     LL_GPIO_ResetOutputPin(sckPort, sckPin);
     stm32_Delay(5);
@@ -71,14 +78,11 @@ static inline void swSpiTransfer_mode_3(
   }
 }
 
-static void u8g_sw_spi_HAL_STM32F1_shift_out(
-  GPIO_TypeDef *mosiPort, uint32_t mosiPin,
-  GPIO_TypeDef *sckPort, uint32_t sckPin,
-  uint8_t val) {
-  #if ENABLED(FYSETC_MINI_12864)
-    swSpiTransfer_mode_3(mosiPort, mosiPin, sckPort, sckPin, val);
+static void u8g_sw_spi_HAL_STM32F1_shift_out(uint8_t val) {
+  #ifdef FYSETC_MINI_12864
+    swSpiTransfer_mode_3(val);
   #else
-    swSpiTransfer_mode_0(mosiPort, mosiPin, sckPort, sckPin, val);
+    swSpiTransfer_mode_0(val);
   #endif
 }
 
@@ -88,6 +92,7 @@ uint8_t u8g_com_HAL_stm32f4_sw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, 
       u8g_com_arduino_assign_pin_output_high(u8g);
       u8g_com_arduino_digital_write(u8g, U8G_PI_SCK, LOW);
       u8g_com_arduino_digital_write(u8g, U8G_PI_MOSI, LOW);
+      u8g_com_stm32_init_shift_out(u8g->pin_list[U8G_PI_MOSI], u8g->pin_list[U8G_PI_SCK]);
       break;
 
     case U8G_COM_MSG_STOP:
@@ -104,46 +109,35 @@ uint8_t u8g_com_HAL_stm32f4_sw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, 
                                      // the next chip select goes active
           u8g_com_arduino_digital_write(u8g, U8G_PI_SCK, HIGH);// Set SCK to mode 3 idle state before CS goes active
           u8g_com_arduino_digital_write(u8g, U8G_PI_CS, LOW);
+          u8g_com_stm32_init_shift_out(u8g->pin_list[U8G_PI_MOSI], u8g->pin_list[U8G_PI_SCK]);
         } else {
           u8g_com_arduino_digital_write(u8g, U8G_PI_CS, HIGH);
           u8g_com_arduino_digital_write(u8g, U8G_PI_SCK, LOW); // Set SCK to mode 0 idle state after CS goes inactive
         }
       #else
+        if (arg_val) {
+          u8g_com_stm32_init_shift_out(u8g->pin_list[U8G_PI_MOSI], u8g->pin_list[U8G_PI_SCK]);
+        }
         u8g_com_arduino_digital_write(u8g, U8G_PI_CS, !arg_val);
       #endif
       break;
 
-    case U8G_COM_MSG_WRITE_BYTE: {
-      GPIO_TypeDef *mosiPort = digitalPinToPort(u8g->pin_list[U8G_PI_MOSI]);
-      uint32_t mosiPin = STM_LL_GPIO_PIN(digitalPinToPinName(u8g->pin_list[U8G_PI_MOSI]));
-      GPIO_TypeDef *sckPort = digitalPinToPort(u8g->pin_list[U8G_PI_SCK]);
-      uint32_t sckPin = STM_LL_GPIO_PIN(digitalPinToPinName(u8g->pin_list[U8G_PI_SCK]));
-
-      u8g_sw_spi_HAL_STM32F1_shift_out(mosiPort, mosiPin, sckPort, sckPin, arg_val);
-      }
+    case U8G_COM_MSG_WRITE_BYTE:
+      u8g_sw_spi_HAL_STM32F1_shift_out(arg_val);
       break;
 
     case U8G_COM_MSG_WRITE_SEQ: {
       uint8_t *ptr = (uint8_t *)arg_ptr;
-      GPIO_TypeDef *mosiPort = digitalPinToPort(u8g->pin_list[U8G_PI_MOSI]);
-      uint32_t mosiPin = STM_LL_GPIO_PIN(digitalPinToPinName(u8g->pin_list[U8G_PI_MOSI]));
-      GPIO_TypeDef *sckPort = digitalPinToPort(u8g->pin_list[U8G_PI_SCK]);
-      uint32_t sckPin = STM_LL_GPIO_PIN(digitalPinToPinName(u8g->pin_list[U8G_PI_SCK]));
-
       while (arg_val > 0) {
-        u8g_sw_spi_HAL_STM32F1_shift_out(mosiPort, mosiPin, sckPort, sckPin, *ptr++);
+          u8g_sw_spi_HAL_STM32F1_shift_out(*ptr++);
         arg_val--;
       }
     } break;
 
     case U8G_COM_MSG_WRITE_SEQ_P: {
       uint8_t *ptr = (uint8_t *)arg_ptr;
-      GPIO_TypeDef *mosiPort = digitalPinToPort(u8g->pin_list[U8G_PI_MOSI]);
-      uint32_t mosiPin = STM_LL_GPIO_PIN(digitalPinToPinName(u8g->pin_list[U8G_PI_MOSI]));
-      GPIO_TypeDef *sckPort = digitalPinToPort(u8g->pin_list[U8G_PI_SCK]);
-      uint32_t sckPin = STM_LL_GPIO_PIN(digitalPinToPinName(u8g->pin_list[U8G_PI_SCK]));
       while (arg_val > 0) {
-        u8g_sw_spi_HAL_STM32F1_shift_out(mosiPort, mosiPin, sckPort, sckPin, u8g_pgm_read(ptr));
+        u8g_sw_spi_HAL_STM32F1_shift_out(u8g_pgm_read(ptr));
         ptr++;
         arg_val--;
       }
