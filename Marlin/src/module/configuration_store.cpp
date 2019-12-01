@@ -3132,8 +3132,9 @@ void MarlinSettings::reset() {
             SP_Y_STR, stepperY.getMilliamps(),
           #endif
           #if AXIS_IS_TMC(Z)
-            SP_Z_STR, stepperZ.getMilliamps()
+            SP_Z_STR, stepperZ.getMilliamps(),
           #endif
+          ""
         );
       #endif
 
@@ -3148,8 +3149,9 @@ void MarlinSettings::reset() {
             SP_Y_STR, stepperY2.getMilliamps(),
           #endif
           #if AXIS_IS_TMC(Z2)
-            SP_Z_STR, stepperZ2.getMilliamps()
+            SP_Z_STR, stepperZ2.getMilliamps(),
           #endif
+          ""
         );
       #endif
 
