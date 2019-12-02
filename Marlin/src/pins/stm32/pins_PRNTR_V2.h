@@ -56,11 +56,11 @@
 #define PWM2        IO_PIN(A, 15)
 #define PWM3        IO_PIN(B, 4)
 #define PWM4        IO_PIN(B, 8)
-#define PWM5        IO_PIN(B, 9)
-#define PWM6        IO_PIN(C, 7)
-#define PWM7        IO_PIN(E, 5)
-#define PWM8        IO_PIN(E, 6)
-#define PWM9        IO_PIN(D, 15)
+#define PWM5        SLOW_PIN(B, 9)
+#define PWM6        SLOW_PIN(C, 7)
+#define PWM7        SLOW_PIN(E, 5)
+#define PWM8        SLOW_PIN(E, 6)
+#define PWM9        SLOW_PIN(D, 15)
 
 //
 // Steppers
