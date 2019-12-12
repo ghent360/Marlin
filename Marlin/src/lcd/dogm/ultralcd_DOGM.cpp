@@ -244,52 +244,55 @@ bool MarlinUI::detected() { return true; }
 
 // Initialize or re-initialize the LCD
 void MarlinUI::init_lcd() {
+  #if DISABLED(MKS_LCD12864B)
 
-  #if PIN_EXISTS(LCD_BACKLIGHT)
-    pinMode(LCD_BACKLIGHT_PIN, OUTPUT);
-    digitalWrite(LCD_BACKLIGHT_PIN, (
-      #if ENABLED(DELAYED_BACKLIGHT_INIT)
-        LOW  // Illuminate after reset
-      #else
-        HIGH // Illuminate right away
-      #endif
-    ));
-  #endif
-
-  #if EITHER(MKS_12864OLED, MKS_12864OLED_SSD1306)
-    pinMode(LCD_PINS_DC, OUTPUT);
-    #ifndef LCD_RESET_PIN
-      #define LCD_RESET_PIN LCD_PINS_RS
+    #if PIN_EXISTS(LCD_BACKLIGHT)
+      pinMode(LCD_BACKLIGHT_PIN, OUTPUT);
+      digitalWrite(LCD_BACKLIGHT_PIN, (
+        #if ENABLED(DELAYED_BACKLIGHT_INIT)
+          LOW  // Illuminate after reset
+        #else
+          HIGH // Illuminate right away
+        #endif
+      ));
     #endif
-  #endif
 
-  #if PIN_EXISTS(LCD_RESET)
-    // Perform a clean hardware reset with needed delays
-    pinMode(LCD_RESET_PIN, OUTPUT);
-    digitalWrite(LCD_RESET_PIN, LOW);
-    _delay_ms(5);
-    digitalWrite(LCD_RESET_PIN, HIGH);
-    _delay_ms(5);
-    u8g.begin();
-  #endif
+    #if EITHER(MKS_12864OLED, MKS_12864OLED_SSD1306)
+      pinMode(LCD_PINS_DC, OUTPUT);
+      #ifndef LCD_RESET_PIN
+        #define LCD_RESET_PIN LCD_PINS_RS
+      #endif
+    #endif
 
-  #if PIN_EXISTS(LCD_BACKLIGHT) && ENABLED(DELAYED_BACKLIGHT_INIT)
-    digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
-  #endif
+    #if PIN_EXISTS(LCD_RESET)
+      // Perform a clean hardware reset with needed delays
+      pinMode(LCD_RESET_PIN, OUTPUT);
+      digitalWrite(LCD_RESET_PIN, LOW);
+      _delay_ms(5);
+      digitalWrite(LCD_RESET_PIN, HIGH);
+      _delay_ms(5);
+      u8g.begin();
+    #endif
 
-  // FYSETC HACK!!!
-  u8g.setContrast(255);
-  #if HAS_LCD_CONTRAST
-    refresh_contrast();
-  #endif
+    #if PIN_EXISTS(LCD_BACKLIGHT) && ENABLED(DELAYED_BACKLIGHT_INIT)
+      digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
+    #endif
 
-  #if ENABLED(LCD_SCREEN_ROT_90)
-    u8g.setRot90();
-  #elif ENABLED(LCD_SCREEN_ROT_180)
-    u8g.setRot180();
-  #elif ENABLED(LCD_SCREEN_ROT_270)
-    u8g.setRot270();
-  #endif
+    // FYSETC HACK!!!
+    u8g.setContrast(255);
+    #if HAS_LCD_CONTRAST
+      refresh_contrast();
+    #endif
+
+    #if ENABLED(LCD_SCREEN_ROT_90)
+      u8g.setRot90();
+    #elif ENABLED(LCD_SCREEN_ROT_180)
+      u8g.setRot180();
+    #elif ENABLED(LCD_SCREEN_ROT_270)
+      u8g.setRot270();
+    #endif
+
+  #endif // !MKS_LCD12864B
 
   uxg_SetUtf8Fonts(g_fontinfo, COUNT(g_fontinfo));
 }
