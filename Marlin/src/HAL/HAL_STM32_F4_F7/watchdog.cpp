@@ -32,6 +32,7 @@
   IWDG_HandleTypeDef hiwdg;
 
   void watchdog_init() {
+#if 1
     hiwdg.Instance = IWDG;
     hiwdg.Init.Prescaler = IWDG_PRESCALER_32; //32kHz LSI clock and 32x prescalar = 1024Hz IWDG clock
     hiwdg.Init.Reload = 4095;           //4095 counts = 4 seconds at 1024Hz
@@ -43,14 +44,17 @@
         TOGGLE(LED_PIN);  // heartbeat indicator
       #endif
     }
+#endif    
   }
 
   void HAL_watchdog_refresh() {
+#if 1    
     /* Refresh IWDG: reload counter */
     if (HAL_IWDG_Refresh(&hiwdg) != HAL_OK) {
       /* Refresh Error */
       //Error_Handler();
     }
+#endif    
   }
 
 #endif // USE_WATCHDOG

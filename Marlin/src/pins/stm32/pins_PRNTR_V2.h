@@ -147,7 +147,10 @@
 #endif
 #define FAN1_PIN           PWM6  // E1 Part
 #define FAN2_PIN           PWM7  // E0 Cool / TC1
-#define FAN3_PIN           PWM8  // E1 Cool / TC2
+//#define FAN3_PIN           PWM8  // E1 Cool / TC2
+
+#define SERVO0_PIN         PWM9
+#define SERVO1_PIN         PWM8
 
 #define UART_ST14          SLOW_PIN(B, 10)  // UART ST1-4
 #define UART_ST56          SLOW_PIN(C, 6)   // UART ST5-6
