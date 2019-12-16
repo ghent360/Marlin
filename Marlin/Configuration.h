@@ -2214,7 +2214,7 @@
  * Set this manually if there are extra servos needing manual control.
  * Leave undefined or set to 0 to entirely disable the servo subsystem.
  */
-#define NUM_SERVOS 0 // Servo index starts with 0 for M280 command
+#define NUM_SERVOS 2 // Servo index starts with 0 for M280 command
 
 // (ms) Delay  before the next move will start, to give the servo time to reach its target angle.
 // 300ms is a good value but you can try less delay.

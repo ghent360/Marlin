@@ -34,12 +34,12 @@
 
   void watchdog_init() {
     // 4 sec timeout
-    //IWatchdog.begin(4000000);
+    IWatchdog.begin(4000000);
   }
 
   void HAL_watchdog_refresh() {
-    //IWatchdog.reload();
-    SERIAL_ECHOLN('reloadin...');
+    IWatchdog.reload();
+    //SERIAL_ECHOLN('reloadin...');
     #if DISABLED(PINS_DEBUGGING) && PIN_EXISTS(LED)
       TOGGLE(LED_PIN);  // heartbeat indicator
     #endif
