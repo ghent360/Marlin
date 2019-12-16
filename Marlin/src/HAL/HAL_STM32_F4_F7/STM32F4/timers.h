@@ -77,10 +77,10 @@
 
 #ifdef NEW_TIMER_HAL
 #define HAL_STEP_TIMER_ISR() void TC5_Handler(stm32_timer_t htim)
-#define HAL_TEMP_TIMER_ISR() void TC7_Handler(stm32_timer_t htim)
+#define HAL_TEMP_TIMER_ISR() void TC8_Handler(stm32_timer_t htim)
 #else
 #define HAL_STEP_TIMER_ISR() void TC5_Handler(stimer_t *htim)
-#define HAL_TEMP_TIMER_ISR() void TC7_Handler(stimer_t *htim)
+#define HAL_TEMP_TIMER_ISR() void TC8_Handler(stimer_t *htim)
 #endif
 
 // ------------------------

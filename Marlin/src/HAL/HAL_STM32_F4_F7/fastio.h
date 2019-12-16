@@ -701,7 +701,7 @@ struct FastIOPin {
         return FastIOPin(PortA, (uint8_t)-1);
     }
 private:
-    static constexpr uint16_t to_arduino_pin_[PortEND][16] = {
+    static constexpr uint16_t to_arduino_pin_[LastPort+1][16] = {
     // PORTA
     {
 #ifdef PA0
