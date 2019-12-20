@@ -181,7 +181,7 @@
 // TODO: NS_TO_PULSE_TIMER_TICKS has some rounding issues:
 //   1. PULSE_TIMER_TICKS_PER_US rounds to an integer, which loses 20% of the count for a 2.5 MHz pulse tick (such as for LPC1768)
 //   2. The math currently rounds down to the closes tick. Perhaps should round up.
-constexpr uint32_t NS_TO_PULSE_TIMER_TICKS(uint32_t NS) { return PULSE_TIMER_TICKS_PER_US * (NS) / 1000UL; }
+uint32_t inline NS_TO_PULSE_TIMER_TICKS(uint32_t NS) { return PULSE_TIMER_TICKS_PER_US * (NS) / 1000UL; }
 #define CYCLES_TO_NS(CYC) (1000UL * (CYC) / ((F_CPU) / 1000000))
 
 // But the user could be enforcing a minimum time, so the loop time is
