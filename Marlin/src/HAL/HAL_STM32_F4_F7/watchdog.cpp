@@ -39,7 +39,7 @@
 
   void HAL_watchdog_refresh() {
     IWatchdog.reload();
-    //SERIAL_ECHOLN('reloadin...');
+    //SERIAL_ECHOLN("reloadin...\n");
     #if DISABLED(PINS_DEBUGGING) && PIN_EXISTS(LED)
       TOGGLE(LED_PIN);  // heartbeat indicator
     #endif
