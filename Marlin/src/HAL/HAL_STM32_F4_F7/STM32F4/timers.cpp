@@ -32,7 +32,7 @@
 
 #define NUM_HARDWARE_TIMERS 2
 #define STEP_TIMER_IRQ_ID TIM5_IRQn
-#define TEMP_TIMER_IRQ_ID TIM7_IRQn
+#define TEMP_TIMER_IRQ_ID TIM8_IRQn
 
 // ------------------------
 // Private Variables
@@ -62,18 +62,20 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       case STEP_TIMER_NUM:
         // STEPPER TIMER TIM5 - use a 32bit timer
         TimerHandle[timer_num] = new HardwareTimer(TIM5);
-        TimerHandle[timer_num]->attachInterrupt(TC5_Handler);
+        TimerHandle[timer_num]->setMode(1, TIMER_OUTPUT_COMPARE, NC);
         TimerHandle[timer_num]->setPrescaleFactor(
           HAL_stepper_timer_prescaler(STEP_TIMER_NUM, 2000000));
+        TimerHandle[timer_num]->attachInterrupt(TC5_Handler);
         HAL_NVIC_SetPriority(STEP_TIMER_IRQ_ID, 1, 0);
         break;
 
       case TEMP_TIMER_NUM:
-        // TEMP TIMER TIM7 - any available 16bit Timer (1 already used for PWM)
-        TimerHandle[timer_num] = new HardwareTimer(TIM7);
-        TimerHandle[timer_num]->attachInterrupt(TC7_Handler);
+        // TEMP TIMER TIM8 - any available 16bit Timer (1 already used for PWM)
+        TimerHandle[timer_num] = new HardwareTimer(TIM8);
+        TimerHandle[timer_num]->setMode(1, TIMER_OUTPUT_COMPARE, NC);
         TimerHandle[timer_num]->setPrescaleFactor(
           HAL_stepper_timer_prescaler(TEMP_TIMER_NUM, 72000));
+        TimerHandle[timer_num]->attachInterrupt(TC8_Handler);
         HAL_NVIC_SetPriority(TEMP_TIMER_IRQ_ID, 2, 0);
         break;
     }
@@ -97,9 +99,9 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
         break;
 
       case TEMP_TIMER_NUM:
-        // TEMP TIMER TIM7 - any available 16bit Timer (1 already used for PWM)
-        TimerHandle[timer_num].timer = TIM7;
-        TimerHandle[timer_num].irqHandle = TC7_Handler;
+        // TEMP TIMER TIM8 - any available 16bit Timer (1 already used for PWM)
+        TimerHandle[timer_num].timer = TIM8;
+        TimerHandle[timer_num].irqHandle = TC8_Handler;
         TimerHandleInit(&TimerHandle[timer_num], (((HAL_TIMER_RATE) / temp_prescaler) / frequency) - 1, temp_prescaler);
         HAL_NVIC_SetPriority(TEMP_TIMER_IRQ_ID, 2, 0);
         break;
@@ -110,6 +112,9 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
 }
 
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
+#ifdef NEW_TIMER_HAL
+  if (TimerHandle[timer_num]) TimerHandle[timer_num]->resume();
+#endif
   switch (timer_num) {
     case STEP_TIMER_NUM: HAL_NVIC_EnableIRQ(STEP_TIMER_IRQ_ID); break;
     case TEMP_TIMER_NUM: HAL_NVIC_EnableIRQ(TEMP_TIMER_IRQ_ID); break;
@@ -117,10 +122,18 @@ void HAL_timer_enable_interrupt(const uint8_t timer_num) {
 }
 
 void HAL_timer_disable_interrupt(const uint8_t timer_num) {
+#ifdef NEW_TIMER_HAL
+  if (TimerHandle[timer_num]) TimerHandle[timer_num]->pause();
+#endif  
   switch (timer_num) {
-    case STEP_TIMER_NUM: HAL_NVIC_DisableIRQ(STEP_TIMER_IRQ_ID); break;
-    case TEMP_TIMER_NUM: HAL_NVIC_DisableIRQ(TEMP_TIMER_IRQ_ID); break;
+    case STEP_TIMER_NUM: 
+      HAL_NVIC_DisableIRQ(STEP_TIMER_IRQ_ID);
+      break;
+    case TEMP_TIMER_NUM:
+      HAL_NVIC_DisableIRQ(TEMP_TIMER_IRQ_ID);
+      break;
   }
+
   // We NEED memory barriers to ensure Interrupts are actually disabled!
   // ( https://dzone.com/articles/nvic-disabling-interrupts-on-arm-cortex-m-and-the )
   __DSB();

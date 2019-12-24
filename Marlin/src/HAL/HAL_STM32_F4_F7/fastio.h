@@ -650,10 +650,58 @@ struct FastIOPin {
 #ifdef PK15
         if (pin == PK15) return FastIOPin(PortK, 15);
 #endif
+#ifdef PZ0
+        if (pin == PZ0) return FastIOPin(PortZ, 0);
+#endif
+#ifdef PZ1
+        if (pin == PZ1) return FastIOPin(PortZ, 1);
+#endif
+#ifdef PZ2
+        if (pin == PZ2) return FastIOPin(PortZ, 2);
+#endif
+#ifdef PZ3
+        if (pin == PZ3) return FastIOPin(PortZ, 3);
+#endif
+#ifdef PZ4
+        if (pin == PZ4) return FastIOPin(PortZ, 4);
+#endif
+#ifdef PZ5
+        if (pin == PZ5) return FastIOPin(PortZ, 5);
+#endif
+#ifdef PZ6
+        if (pin == PZ6) return FastIOPin(PortZ, 6);
+#endif
+#ifdef PZ7
+        if (pin == PZ7) return FastIOPin(PortZ, 7);
+#endif
+#ifdef PZ8
+        if (pin == PZ8) return FastIOPin(PortZ, 8);
+#endif
+#ifdef PZ9
+        if (pin == PZ9) return FastIOPin(PortZ, 9);
+#endif
+#ifdef PZ10
+        if (pin == PZ10) return FastIOPin(PortZ, 10);
+#endif
+#ifdef PZ11
+        if (pin == PZ11) return FastIOPin(PortZ, 11);
+#endif
+#ifdef PZ12
+        if (pin == PZ12) return FastIOPin(PortZ, 12);
+#endif
+#ifdef PZ13
+        if (pin == PZ13) return FastIOPin(PortZ, 13);
+#endif
+#ifdef PZ14
+        if (pin == PZ14) return FastIOPin(PortZ, 14);
+#endif
+#ifdef PZ15
+        if (pin == PZ15) return FastIOPin(PortZ, 15);
+#endif
         return FastIOPin(PortA, (uint8_t)-1);
     }
 private:
-    static constexpr uint16_t to_arduino_pin_[PortZ][16] = {
+    static constexpr uint16_t to_arduino_pin_[LastPort+1][16] = {
     // PORTA
     {
 #ifdef PA0
@@ -1598,6 +1646,92 @@ private:
 #endif
     },
 #endif // GPIOK_BASE
+
+#ifdef GPIOZ_BASE
+    // PORTZ
+    {
+#ifdef PZ0
+        PZ0,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ1
+        PZ1,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ2
+        PZ2,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ3
+        PZ3,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ4
+        PZ4,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ5
+        PZ5,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ6
+        PZ6,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ7
+        PZ7,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ8
+        PZ8,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ9
+        PZ9,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ10
+        PZ10,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ11
+        PZ11,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ12
+        PZ12,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ13
+        PZ13,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ14
+        PZ14,
+#else
+        (uint16_t)-1,
+#endif
+#ifdef PZ15
+        PZ15,
+#else
+        (uint16_t)-1,
+#endif
+    },
+#endif // GPIOZ_BASE
 
     };
 };

@@ -28,6 +28,7 @@
 
 #include "Marduino.h"
 #include <stdint.h>
+#include <SPI.h>
 
 /**
  * SPI speed where 0 <= index <= 6
@@ -59,35 +60,29 @@
 //
 
 // Initialize SPI bus
-void spiBegin();
+void spiBegin(SPIClass& spiInstance = SPI);
 
 // Configure SPI for specified SPI speed
-void spiInit(uint8_t spiRate);
+void spiInit(uint8_t spiRate, SPIClass& spiInstance = SPI);
 
 // Write single byte to SPI
-void spiSend(uint8_t b);
+void spiSend(uint8_t b, SPIClass& spiInstance = SPI);
 
 // Read single byte from SPI
-uint8_t spiRec();
+uint8_t spiRec(SPIClass& spiInstance = SPI);
 
 // Read from SPI into buffer
-void spiRead(uint8_t* buf, uint16_t nbyte);
+void spiRead(uint8_t* buf, uint16_t nbyte, SPIClass& spiInstance = SPI);
 
 // Write token and then write from 512 byte buffer to SPI (for SD card)
-void spiSendBlock(uint8_t token, const uint8_t* buf);
+void spiSendBlock(uint8_t token, const uint8_t* buf, SPIClass& spiInstance = SPI);
 
 // Begin SPI transaction, set clock, bit order, data mode
-void spiBeginTransaction(uint32_t spiClock, uint8_t bitOrder, uint8_t dataMode);
+void spiBeginTransaction(uint32_t spiClock, uint8_t bitOrder, uint8_t dataMode, SPIClass& spiInstance = SPI);
 
 //
 // Extended SPI functions taking a channel number (Hardware SPI only)
 //
 
-// Write single byte to specified SPI channel
-void spiSend(uint32_t chan, byte b);
-
 // Write buffer to specified SPI channel
-void spiSend(uint32_t chan, const uint8_t* buf, size_t n);
-
-// Read single byte from specified SPI channel
-uint8_t spiRec(uint32_t chan);
+void spiSend(const uint8_t* buf, size_t n, SPIClass& spiInstance = SPI);
