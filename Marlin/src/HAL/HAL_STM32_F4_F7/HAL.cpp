@@ -25,6 +25,8 @@
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
 #include "HAL.h"
+#include <HardwareSerial.h>
+#include "../../inc/MarlinConfig.h" // Allow pins/pins.h to set density
 
 //#include <Wire.h>
 
@@ -62,10 +64,21 @@ extern "C" {
   extern unsigned int _ebss; // end of bss section
 }
 
-// return free memory between end of heap (or end bss) and whatever is current
+#ifdef UART_XYZ
+HardwareSerial Serial_xyz(-1, UART_XYZ);
+#endif
+#ifdef UART_Ex
+HardwareSerial Serial_ex(-1, UART_Ex);
+#endif
+#ifdef UART_ST14
+HardwareSerial Serial_ST14(-1, UART_ST14);
+#endif
+#ifdef UART_ST56
+HardwareSerial Serial_ST56(-1, UART_ST56);
+#endif
 
 /*
-#include "wirish/syscalls.c"
+#include <wirish/syscalls.c>
 //extern caddr_t _sbrk(int incr);
 #ifndef CONFIG_HEAP_END
 extern char _lm_heap_end;
@@ -99,6 +112,6 @@ uint16_t HAL_adc_get_result() {
 }
 
 #ifdef USE_FAST_IO
-constexpr uint16_t FastIOPin::to_arduino_pin_[PortZ][16];
+constexpr uint16_t FastIOPin::to_arduino_pin_[LastPort+1][16];
 #endif
 #endif // STM32GENERIC && (STM32F4 || STM32F7)
