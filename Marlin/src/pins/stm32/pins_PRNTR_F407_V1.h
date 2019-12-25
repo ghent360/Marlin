@@ -57,7 +57,8 @@
 #define X_STEP_PIN         IO_PIN(E, 12)
 #define X_DIR_PIN          IO_PIN(C, 4)
 #define X_ENABLE_PIN       STEPPER_ENABLE_PIN
-#define X_MIN_PIN          IO_PIN(D, 0)
+//#define X_MIN_PIN          IO_PIN(D, 0)
+#define X_MIN_PIN          IO_PIN(E, 11)
 #define X_MAX_PIN          IO_PIN(D, 4)
 
 #define Y_STEP_PIN         IO_PIN(C, 5)
