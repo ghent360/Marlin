@@ -1,30 +1,28 @@
-﻿# Marlin 3D Printer Firmware
+# Marlin 3D Printer Firmware
 
-[![Build Status](https://travis-ci.org/MarlinFirmware/Marlin.svg?branch=bugfix-2.0.x)](https://travis-ci.org/MarlinFirmware/Marlin)
 ![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)
 ![GitHub contributors](https://img.shields.io/github/contributors/marlinfirmware/marlin.svg)
 ![GitHub Release Date](https://img.shields.io/github/release-date/marlinfirmware/marlin.svg)
+[![Build Status](https://github.com/MarlinFirmware/Marlin/workflows/CI/badge.svg?branch=bugfix-2.0.x)](https://github.com/MarlinFirmware/Marlin/actions)
 
-<img align="top" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
+<img align="right" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
 
 ## This is a fork of the official Marlin code.
 Original code location: https://github.com/MarlinFirmware/Marlin.git 
 
 This repo is a port of Marlin to STM32 F4 MCU. I'm using Nucleo-F446RE as a test platform. I have an addon board for the NUCLEO that converts it to a 3D printer controller in similar fashion how RAMPS addon works with an arduino board. Open source schematics for the addon board: https://github.com/ghent360/PrntrBoard.git. Both the board and this firmware are functional.
 
-I was able to print a few object with this code, it is not guaranteed bug free, but it is comparable to the official Marlin bugfix-2.0.x branch in terms of what works and what does not.
+I also have a [V2 controller design](https://github.com/ghent360/PrntrBoardV2.git) using STM32F407 with integrated CPU and replaceable stepper drivers.
 
-To compile I'm using Arduino 1.8.9 with the official STM32 support library from this link https://github.com/stm32duino/Arduino_Core_STM32
+To compile I'm using Arduino 1.8.10 with the official STM32 support library from this link https://github.com/stm32duino/Arduino_Core_STM32 (minimum version 1.8.0 of the core is required)
 
 You can compile the code with the Arduino IDE or Visual Studio Code with an Arduino extension installed.
 
 Branches:
-- bugfix-2.0.x - this branch tracks Marlin's bugfix-2.0.x. Designed to work on Nucleo-F446RE dev board from STMicro with PRNTRboard with TMC2130 drivers.
-- f407 - this branch is based on my bugfix-2.0.x with modifications so it works on my Nucleo-F407 board with PRNTRboard with TMC2130 driver.
-- f407-2660 - this is based on f407 with configuration changes for PRNTRboard with TMC2660 drivers
-- sldrbot - this branch is based on bugfix-2.0.x designed to work on Nucleo-F446RE with PRNTRboard with TMC2130 drivers. Changes to the configuration are made to support my soldering machine robot.
-- sldrbot-407 - this branch is based on sldrbot, but designed to work on Nucleo-F407 with PRNTRBoard with TMC2130 drivers.
-- sldrbot-407-2660 - this branch is based on sldrbot-407, but changes are made to support TMC2660 drivers.
+- bugfix-2.0.x - this branch tracks Marlin's bugfix-2.0.x. Designed to work on my V2 design.
+- f407 - this branch is based on my bugfix-2.0.x with modifications so it works on my V1 board with F407 CPU addon and TMC2130 driver.
+- f407-2660 - this is based on f407 with configuration changes for V1 with TMC2660 drivers
+- f407-2209 - this is based on f407 with configuration changes for V1 with TMC2209 drivers
 
 ## ~Happy hacking
 
@@ -54,28 +52,73 @@ Marlin 2.0 introduces a layer of abstraction so that all the existing high-level
 
 ### Current HALs
 
-  name|processor|speed|flash|sram|logic|fpu
+  #### AVR (8-bit)
+
+  board|processor|speed|flash|sram|logic|fpu
   ----|---------|-----|-----|----|-----|---
   [Arduino AVR](https://www.arduino.cc/)|ATmega, ATTiny, etc.|16-20MHz|64-256k|2-16k|5V|no
-  [Teensy++ 2.0](http://www.microchip.com/wwwproducts/en/AT90USB1286)|[AT90USB1286](http://www.microchip.com/wwwproducts/en/AT90USB1286)|16MHz|128k|8k|5V|no
-  [Arduino STM32](https://github.com/rogerclarkmelbourne/Arduino_STM32)|[STM32F1](https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html) ARM-Cortex M3|72MHz|256-512k|48-64k|3.3V|no
-  [Due](https://www.arduino.cc/en/Guide/ArduinoDue), [RAMPS-FD](http://www.reprap.org/wiki/RAMPS-FD), etc.|[SAM3X8E ARM-Cortex M3](http://www.microchip.com/wwwproducts/en/ATsam3x8e)|84MHz|512k|64+32k|3.3V|no
+
+  #### DUE
+
+  boards|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
+  [Arduino Due](https://www.arduino.cc/en/Guide/ArduinoDue), [RAMPS-FD](http://www.reprap.org/wiki/RAMPS-FD), etc.|[SAM3X8E ARM-Cortex M3](http://www.microchip.com/wwwproducts/en/ATsam3x8e)|84MHz|512k|64+32k|3.3V|no
+
+  #### ESP32
+
+  board|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
+  [ESP32](https://www.espressif.com/en/products/hardware/esp32/overview)|Tensilica Xtensa LX6|320MHz|---|---|3.3V|---
+
+  #### LPC1768 / LPC1769
+
+  boards|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
   [Re-ARM](https://www.kickstarter.com/projects/1245051645/re-arm-for-ramps-simple-32-bit-upgrade)|[LPC1768 ARM-Cortex M3](http://www.nxp.com/products/microcontrollers-and-processors/arm-based-processors-and-mcus/lpc-cortex-m-mcus/lpc1700-cortex-m3/512kb-flash-64kb-sram-ethernet-usb-lqfp100-package:LPC1768FBD100)|100MHz|512k|32+16+16k|3.3-5V|no
   [MKS SBASE](http://forums.reprap.org/read.php?13,499322)|LPC1768 ARM-Cortex M3|100MHz|512k|32+16+16k|3.3-5V|no
-  [Azteeg X5 GT](https://www.panucatt.com/azteeg_X5_GT_reprap_3d_printer_controller_p/ax5gt.htm)|LPC1769 ARM-Cortex M3|120MHz|512k|32+16+16k|3.3-5V|no
   [Selena Compact](https://github.com/Ales2-k/Selena)|LPC1768 ARM-Cortex M3|100MHz|512k|32+16+16k|3.3-5V|no
-  [Teensy 3.5](https://www.pjrc.com/store/teensy35.html)|ARM-Cortex M4|120MHz|512k|192k|3.3-5V|yes
-  [Teensy 3.6](https://www.pjrc.com/store/teensy36.html)|ARM-Cortex M4|180MHz|1M|256k|3.3V|yes
-  [PRNTRboard/NUCLEO-F446](https://github.com/ghent360/PrntrBoard.git)|[STM32F446RE ARM-Cortex M4](https://www.st.com/en/microcontrollers/stm32f446.html)|180MHz|512k|112+16k|3.3V|yes
-  [PRNTRboard/NUCLEO-F407](https://github.com/ghent360/PrntrBoard.git)|[STM32F407VE ARM-Cortex M4](https://www.st.com/content/st_com/en/products/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus/stm32-high-performance-mcus/stm32f4-series/stm32f407-417/stm32f407ve.html)|168MHz|512k|192+4k|3.3V|yes
-
-### HALs in Development
-
-  name|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [STEVAL-3DP001V1](http://www.st.com/en/evaluation-tools/steval-3dp001v1.html)|[STM32F401VE Arm-Cortex M4](http://www.st.com/en/microcontrollers/stm32f401ve.html)|84MHz|512k|64+32k|3.3-5V|yes
+  [Azteeg X5 GT](https://www.panucatt.com/azteeg_X5_GT_reprap_3d_printer_controller_p/ax5gt.htm)|LPC1769 ARM-Cortex M3|120MHz|512k|32+16+16k|3.3-5V|no
   [Smoothieboard](http://reprap.org/wiki/Smoothieboard)|LPC1769 ARM-Cortex M3|120MHz|512k|64k|3.3-5V|no
+
+  #### SAMD51
+
+  boards|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
   [Adafruit Grand Central M4](https://www.adafruit.com/product/4064)|[SAMD51P20A ARM-Cortex M4](https://www.microchip.com/wwwproducts/en/ATSAMD51P20A)|120MHz|1M|256k|3.3V|yes
+
+  #### STM32F1
+
+  boards|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
+  [Arduino STM32](https://github.com/rogerclarkmelbourne/Arduino_STM32)|[STM32F1](https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html) ARM-Cortex M3|72MHz|256-512k|48-64k|3.3V|no
+  [STEVAL-3DP001V1](http://www.st.com/en/evaluation-tools/steval-3dp001v1.html)|[STM32F401VE Arm-Cortex M4](http://www.st.com/en/microcontrollers/stm32f401ve.html)|84MHz|512k|64+32k|3.3-5V|yes
+
+  #### STM32F4
+
+  boards|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
+  [PRNTRboard/NUCLEO-F446](https://github.com/ghent360/PrntrBoard.git)|[STM32F446RE ARM-Cortex M4](https://www.st.com/en/microcontrollers/stm32f446.html)|180MHz|512k|112+16k|3.3V|yes
+  [PRNTRboard/F407](https://github.com/ghent360/PrntrBoard.git)|[STM32F407VE ARM-Cortex M4](https://www.st.com/content/st_com/en/products/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus/stm32-high-performance-mcus/stm32f4-series/stm32f407-417/stm32f407ve.html)|168MHz|512k|192+4k|3.3V|yes
+  [PRNTRboard V2](https://github.com/ghent360/PrntrBoardV2.git)|[STM32F407VE ARM-Cortex M4](https://www.st.com/content/st_com/en/products/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus/stm32-high-performance-mcus/stm32f4-series/stm32f407-417/stm32f407ve.html)|168MHz|512k|192+4k|3.3V|yes
+
+  #### Teensy++ 2.0
+
+  boards|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
+  [Teensy++ 2.0](http://www.microchip.com/wwwproducts/en/AT90USB1286)|[AT90USB1286](http://www.microchip.com/wwwproducts/en/AT90USB1286)|16MHz|128k|8k|5V|no
+
+  #### Teensy 3.1 / 3.2
+
+  boards|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
+  [Teensy 3.2](https://www.pjrc.com/store/teensy32.html)|[MK20DX256VLH7](https://www.mouser.com/ProductDetail/NXP-Freescale/MK20DX256VLH7) ARM-Cortex M4|72MHz|256k|32k|3.3V-5V|yes
+
+  #### Teensy 3.5 / 3.6
+
+  boards|processor|speed|flash|sram|logic|fpu
+  ----|---------|-----|-----|----|-----|---
+  [Teensy 3.5](https://www.pjrc.com/store/teensy35.html)|[MK64FX512VMD12](https://www.mouser.com/ProductDetail/NXP-Freescale/MK64FX512VMD12) ARM-Cortex M4|120MHz|512k|192k|3.3-5V|yes
+  [Teensy 3.6](https://www.pjrc.com/store/teensy36.html)|[MK66FX1M0VMD18](https://www.mouser.com/ProductDetail/NXP-Freescale/MK66FX1M0VMD18) ARM-Cortex M4|180MHz|1M|256k|3.3V|yes
 
 ## Submitting Patches
 
@@ -91,10 +134,10 @@ Proposed patches should be submitted as a Pull Request against the ([bugfix-2.0.
 
 The current Marlin dev team consists of:
 
- - Scott Lahteine [[@thinkyhead](https://github.com/thinkyhead)] - USA &nbsp; [![Flattr Scott](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=thinkyhead&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
+ - Scott Lahteine [[@thinkyhead](https://github.com/thinkyhead)] - USA &nbsp; [Donate](http://www.thinkyhead.com/donate-to-marlin) / Flattr: [![Flattr Scott](http://api.flattr.com/button/flattr-badge-small.png)](https://flattr.com/submit/auto?user_id=thinkyhead&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
  - Roxanne Neufeld [[@Roxy-3D](https://github.com/Roxy-3D)] - USA
- - Bob Kuhn [[@Bob-the-Kuhn](https://github.com/Bob-the-Kuhn)] - USA
  - Chris Pepper [[@p3p](https://github.com/p3p)] - UK
+ - Bob Kuhn [[@Bob-the-Kuhn](https://github.com/Bob-the-Kuhn)] - USA
  - João Brazio [[@jbrazio](https://github.com/jbrazio)] - Portugal
  - Erik van der Zalm [[@ErikZalm](https://github.com/ErikZalm)] - Netherlands &nbsp; [![Flattr Erik](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ErikZalm&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
 
