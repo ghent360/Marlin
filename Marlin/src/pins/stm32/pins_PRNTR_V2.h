@@ -89,6 +89,7 @@
 #define ST6_STEP    IO_PIN(D, 0)
 
 // Swapped E0 and X motor pins for a moment.
+#define TMC2209_INVERT_DIAG
 #define X_STEP_PIN         ST1_STEP
 #define X_DIR_PIN          ST1_DIR
 #define X_ENABLE_PIN       STEPPER_ENABLE_PIN
