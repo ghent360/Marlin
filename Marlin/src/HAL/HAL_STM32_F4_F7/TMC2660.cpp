@@ -37,7 +37,7 @@
 #include "HAL.h"
 #include "../../core/serial.h"
 #include "../../inc/MarlinConfig.h"
-#include "../../Marlin.h"
+#include "../../MarlinCore.h"
 #include "../../module/stepper/indirection.h"
 #include "../../module/printcounter.h"
 #include "../../libs/duration_t.h"
