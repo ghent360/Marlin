@@ -1908,6 +1908,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   + ENABLED(FYSETC_MINI_12864_1_2) \
   + ENABLED(FYSETC_MINI_12864_2_0) \
   + ENABLED(FYSETC_MINI_12864_2_1) \
+  + ENABLED(FYSETC_GENERIC_12864_1_1) \
   + ENABLED(CR10_STOCKDISPLAY) \
   + ENABLED(ANET_FULL_GRAPHICS_LCD) \
   + ENABLED(AZSMZ_12864) \
@@ -2524,4 +2525,12 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
 
 #if HAS_ADC_BUTTONS && defined(ADC_BUTTON_DEBOUNCE_DELAY) && !WITHIN(ADC_BUTTON_DEBOUNCE_DELAY, 16, 255)
   #error "ADC_BUTTON_DEBOUNCE_DELAY must be an integer from 16 to 255."
+#endif
+
+/**
+ * Check to make sure MONITOR_DRIVER_STATUS isn't enabled
+ * on boards where TMC drivers share the SPI bus with SD.
+ */
+#if TMC_HAS_SPI && ALL(MONITOR_DRIVER_STATUS, SDSUPPORT, USES_SHARED_SPI)
+  #error "MONITOR_DRIVER_STATUS and SDSUPPORT cannot be used together on boards with shared SPI."
 #endif
