@@ -1311,7 +1311,18 @@ void Planner::check_axes_activity() {
     #if HAS_FAN3
       FAN_SET(3);
     #endif
-
+    #if HAS_FAN4
+      FAN_SET(4);
+    #endif
+    #if HAS_FAN5
+      FAN_SET(5);
+    #endif
+    #if HAS_FAN6
+      FAN_SET(6);
+    #endif
+    #if HAS_FAN7
+      FAN_SET(7);
+    #endif
   #endif // FAN_COUNT > 0
 
   #if ENABLED(AUTOTEMP)
