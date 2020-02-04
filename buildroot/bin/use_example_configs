@@ -2,9 +2,7 @@
 
 restore_configs
 
-if [ -f "config/examples/$@/Configuration.h" ]; then
-  cp "config/examples/$@/Configuration.h" Marlin/
-fi
+EXAMPLES="https://raw.githubusercontent.com/MarlinFirmware/Configurations/bugfix-2.0.x/config/examples"
 
 if [ -f "config/examples/$@/Configuration_adv.h" ]; then
   cp "config/examples/$@/Configuration_adv.h" Marlin/
