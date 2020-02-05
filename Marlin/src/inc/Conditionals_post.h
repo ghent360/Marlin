@@ -1444,7 +1444,6 @@
 #define HAS_Z4_MIN (PIN_EXISTS(Z4_MIN))
 #define HAS_Z4_MAX (PIN_EXISTS(Z4_MAX))
 #define HAS_Z_MIN_PROBE_PIN (HAS_CUSTOM_PROBE_PIN && PIN_EXISTS(Z_MIN_PROBE))
-#define HAS_CALIBRATION_PIN (PIN_EXISTS(CALIBRATION))
 
 //
 // ADC Temp Sensors (Thermistor or Thermocouple with amplifier ADC interface)
