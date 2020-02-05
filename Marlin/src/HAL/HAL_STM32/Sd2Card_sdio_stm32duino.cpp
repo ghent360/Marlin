@@ -19,6 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "../HAL.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 #include "../../inc/MarlinConfig.h"
 
@@ -272,3 +274,5 @@ bool SDIO_WriteBlock(uint32_t block, const uint8_t *src) {
 }
 
 #endif // SDIO_SUPPORT
+
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32)
