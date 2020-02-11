@@ -21,7 +21,10 @@
  */
 #pragma once
 
-#include "../inc/MarlinConfigPre.h"
+//
+// Included by MarlinConfigPre.h ahead of Configuration_adv.h.
+// Don't use #if in this file for anything not defined early!
+//
 
 #define _A4988              0x4988
 #define _A5984              0x5984
@@ -58,11 +61,7 @@
 #define AXIS_DRIVER_TYPE_Y(T) _AXIS_DRIVER_TYPE(Y,T)
 #define AXIS_DRIVER_TYPE_Z(T) _AXIS_DRIVER_TYPE(Z,T)
 
-#if EITHER(X_DUAL_STEPPER_DRIVERS, DUAL_X_CARRIAGE)
-  #define AXIS_DRIVER_TYPE_X2(T) _AXIS_DRIVER_TYPE(X2,T)
-#else
-  #define AXIS_DRIVER_TYPE_X2(T) false
-#endif
+#define AXIS_DRIVER_TYPE_X2(T) (EITHER(X_DUAL_STEPPER_DRIVERS, DUAL_X_CARRIAGE) && _AXIS_DRIVER_TYPE(X2,T))
 #define AXIS_DRIVER_TYPE_Y2(T) (ENABLED(Y_DUAL_STEPPER_DRIVERS) && _AXIS_DRIVER_TYPE(Y2,T))
 #define AXIS_DRIVER_TYPE_Z2(T) (NUM_Z_STEPPER_DRIVERS >= 2 && _AXIS_DRIVER_TYPE(Z2,T))
 #define AXIS_DRIVER_TYPE_Z3(T) (NUM_Z_STEPPER_DRIVERS >= 3 && _AXIS_DRIVER_TYPE(Z3,T))

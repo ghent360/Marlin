@@ -76,19 +76,7 @@ extern HardwareSerial E5_HARDWARE_SERIAL;
 #endif
 
 enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
-#define _TMC_INIT_1(ST, STEALTH_INDEX) tmc_init(stepper##ST, ST##_CURRENT, ST##_MICROSTEPS)
-#define _TMC_INIT_2(ST, STEALTH_INDEX) tmc_init(stepper##ST, ST##_CURRENT, ST##_MICROSTEPS, stealthchop_by_axis[STEALTH_INDEX], ST##_HYBRID_THRESHOLD)
-#define _TMC_INIT_3(ST, STEALTH_INDEX) tmc_init(stepper##ST, ST##_CURRENT, ST##_MICROSTEPS, stealthchop_by_axis[STEALTH_INDEX], ST##_HYBRID_THRESHOLD, ST##_COOLSTEP_SPEED_THRESHOLD, ST##_COOLSTEP_LOWER_LOAD_THRESHOLD, ST##_COOLSTEP_UPPER_LOAD_THRESHOLD, ST##_COOLSTEP_SEUP, ST##_COOLSTEP_SEDN, ST##_COOLSTEP_SEIMIN)
-#define _TMC_INIT_TMC2660(ST, STEALTH_INDEX) _TMC_INIT_1(ST, STEALTH_INDEX)
-#define _TMC_INIT_TMC2160(ST, STEALTH_INDEX) _TMC_INIT_2(ST, STEALTH_INDEX)
-#define _TMC_INIT_TMC2208(ST, STEALTH_INDEX) _TMC_INIT_2(ST, STEALTH_INDEX)
-#define _TMC_INIT_TMC5130(ST, STEALTH_INDEX) _TMC_INIT_3(ST, STEALTH_INDEX)
-#define _TMC_INIT_TMC5160(ST, STEALTH_INDEX) _TMC_INIT_3(ST, STEALTH_INDEX)
-#define _TMC_INIT_TMC2130(ST, STEALTH_INDEX) _TMC_INIT_3(ST, STEALTH_INDEX)
-#define _TMC_INIT_TMC2209(ST, STEALTH_INDEX) _TMC_INIT_3(ST, STEALTH_INDEX)
-#define __TMC_INIT(DRV, ST, STEALTH_INDEX) _TMC_INIT_##DRV(ST, STEALTH_INDEX)
-#define _TMC_INIT(DRV, ST, STEALTH_INDEX) __TMC_INIT(DRV, ST, STEALTH_INDEX)
-#define TMC_INIT(ST, STEALTH_INDEX) _TMC_INIT(ST##_DRIVER_TYPE, ST, STEALTH_INDEX)
+#define TMC_INIT(ST, STEALTH_INDEX) tmc_init(stepper##ST, ST##_CURRENT, ST##_MICROSTEPS, ST##_HYBRID_THRESHOLD, stealthchop_by_axis[STEALTH_INDEX])
 
 //   IC = TMC model number
 //   ST = Stepper object letter
@@ -174,19 +162,7 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
 
 #if HAS_DRIVER(TMC2130)
   template<char AXIS_LETTER, char DRIVER_ID, AxisEnum AXIS_ID>
-  void tmc_init(
-    TMCMarlin<TMC2130Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st,
-    const uint16_t mA,
-    const uint16_t microsteps,
-    const bool stealth,
-    const uint32_t hyb_thrs,
-    const uint32_t cool_thrs,
-    const uint8_t cool_semin,
-    const uint8_t cool_semax,
-    const uint8_t cool_seup,
-    const uint8_t cool_sedn,
-    const bool cool_seimin
-  ) {
+  void tmc_init(TMCMarlin<TMC2130Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st, const uint16_t mA, const uint16_t microsteps, const uint32_t hyb_thrs, const bool stealth) {
     st.begin();
 
     CHOPCONF_t chopconf{0};
@@ -221,28 +197,13 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
       UNUSED(hyb_thrs);
     #endif
 
-    st.set_cool_thrs(cool_thrs);  // (mm/s)
-    COOLCONF_t coolconf{0};
-    coolconf.semin = cool_semin;
-    coolconf.semax = cool_semax;
-    coolconf.seup = cool_seup;
-    coolconf.sedn = cool_sedn;
-    coolconf.seimin = cool_seimin;
-    st.COOLCONF(coolconf.sr);
-
     st.GSTAT(); // Clear GSTAT
   }
 #endif // TMC2130
 
 #if HAS_DRIVER(TMC2160)
   template<char AXIS_LETTER, char DRIVER_ID, AxisEnum AXIS_ID>
-  void tmc_init(
-    TMCMarlin<TMC2160Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st,
-    const uint16_t mA,
-    const uint16_t microsteps,
-    const bool stealth,
-    const uint32_t hyb_thrs
-  ) {
+  void tmc_init(TMCMarlin<TMC2160Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st, const uint16_t mA, const uint16_t microsteps, const uint32_t hyb_thrs, const bool stealth) {
     st.begin();
 
     CHOPCONF_t chopconf{0};
@@ -519,13 +480,7 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
 
 #if HAS_DRIVER(TMC2208)
   template<char AXIS_LETTER, char DRIVER_ID, AxisEnum AXIS_ID>
-  void tmc_init(
-    TMCMarlin<TMC2208Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st,
-    const uint16_t mA,
-    const uint16_t microsteps,
-    const bool stealth,
-    const uint32_t hyb_thrs
-  ) {
+  void tmc_init(TMCMarlin<TMC2208Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st, const uint16_t mA, const uint16_t microsteps, const uint32_t hyb_thrs, const bool stealth) {
     TMC2208_n::GCONF_t gconf{0};
     gconf.pdn_disable = true; // Use UART
     gconf.mstep_reg_select = true; // Select microsteps with UART
@@ -573,19 +528,7 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
 
 #if HAS_DRIVER(TMC2209)
   template<char AXIS_LETTER, char DRIVER_ID, AxisEnum AXIS_ID>
-  void tmc_init(
-    TMCMarlin<TMC2209Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st,
-    const uint16_t mA,
-    const uint16_t microsteps,
-    const bool stealth,
-    const uint32_t hyb_thrs,
-    const uint32_t cool_thrs,
-    const uint8_t cool_semin,
-    const uint8_t cool_semax,
-    const uint8_t cool_seup,
-    const uint8_t cool_sedn,
-    const bool cool_seimin
-  ) {
+  void tmc_init(TMCMarlin<TMC2209Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st, const uint16_t mA, const uint16_t microsteps, const uint32_t hyb_thrs, const bool stealth) {
     TMC2208_n::GCONF_t gconf{0};
     gconf.pdn_disable = true; // Use UART
     gconf.mstep_reg_select = true; // Select microsteps with UART
@@ -626,15 +569,6 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
       UNUSED(hyb_thrs);
     #endif
 
-    st.set_cool_thrs(cool_thrs);  // (mm/s)
-    COOLCONF_t coolconf{0};
-    coolconf.semin = cool_semin;
-    coolconf.semax = cool_semax;
-    coolconf.seup = cool_seup;
-    coolconf.sedn = cool_sedn;
-    coolconf.seimin = cool_seimin;
-    st.COOLCONF(coolconf.sr);
-
     st.GSTAT(0b111); // Clear
     delay(200);
   }
@@ -642,11 +576,7 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
 
 #if HAS_DRIVER(TMC2660)
   template<char AXIS_LETTER, char DRIVER_ID, AxisEnum AXIS_ID>
-  void tmc_init(
-    TMCMarlin<TMC2660Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st,
-    const uint16_t mA,
-    const uint16_t microsteps
-  ) {
+  void tmc_init(TMCMarlin<TMC2660Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st, const uint16_t mA, const uint16_t microsteps, const uint32_t, const bool) {
     st.begin();
 
     TMC2660_n::CHOPCONF_t chopconf{0};
@@ -673,19 +603,7 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
 
 #if HAS_DRIVER(TMC5130)
   template<char AXIS_LETTER, char DRIVER_ID, AxisEnum AXIS_ID>
-  void tmc_init(
-    TMCMarlin<TMC5130Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st,
-    const uint16_t mA,
-    const uint16_t microsteps,
-    const bool stealth,
-    const uint32_t hyb_thrs,
-    const uint32_t cool_thrs,
-    const uint8_t cool_semin,
-    const uint8_t cool_semax,
-    const uint8_t cool_seup,
-    const uint8_t cool_sedn,
-    const bool cool_seimin
-  ) {
+  void tmc_init(TMCMarlin<TMC5130Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st, const uint16_t mA, const uint16_t microsteps, const uint32_t hyb_thrs, const bool stealth) {
     st.begin();
 
     CHOPCONF_t chopconf{0};
@@ -720,34 +638,13 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
       UNUSED(hyb_thrs);
     #endif
 
-    st.set_cool_thrs(cool_thrs);  // (mm/s)
-    COOLCONF_t coolconf{0};
-    coolconf.semin = cool_semin;
-    coolconf.semax = cool_semax;
-    coolconf.seup = cool_seup;
-    coolconf.sedn = cool_sedn;
-    coolconf.seimin = cool_seimin;
-    st.COOLCONF(coolconf.sr);
-
     st.GSTAT(); // Clear GSTAT
   }
 #endif // TMC5130
 
 #if HAS_DRIVER(TMC5160)
   template<char AXIS_LETTER, char DRIVER_ID, AxisEnum AXIS_ID>
-  void tmc_init(
-    TMCMarlin<TMC5160Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st,
-    const uint16_t mA,
-    const uint16_t microsteps,
-    const bool stealth,
-    const uint32_t hyb_thrs,
-    const uint32_t cool_thrs,
-    const uint8_t cool_semin,
-    const uint8_t cool_semax,
-    const uint8_t cool_seup,
-    const uint8_t cool_sedn,
-    const bool cool_seimin
-  ) {
+  void tmc_init(TMCMarlin<TMC5160Stepper, AXIS_LETTER, DRIVER_ID, AXIS_ID> &st, const uint16_t mA, const uint16_t microsteps, const uint32_t hyb_thrs, const bool stealth) {
     st.begin();
 
     CHOPCONF_t chopconf{0};
@@ -784,16 +681,6 @@ enum StealthIndex : uint8_t { STEALTH_AXIS_XY, STEALTH_AXIS_Z, STEALTH_AXIS_E };
     #else
       UNUSED(hyb_thrs);
     #endif
-
-    st.set_cool_thrs(cool_thrs);  // (mm/s)
-    COOLCONF_t coolconf{0};
-    coolconf.semin = cool_semin;
-    coolconf.semax = cool_semax;
-    coolconf.seup = cool_seup;
-    coolconf.sedn = cool_sedn;
-    coolconf.seimin = cool_seimin;
-    st.COOLCONF(coolconf.sr);
-
     st.GSTAT(); // Clear GSTAT
   }
 #endif // TMC5160
