@@ -278,7 +278,7 @@ bool pin_is_protected(const pin_t pin) {
 }
 
 void protected_pin_err() {
-  SERIAL_ERROR_MSG(MSG_ERR_PROTECTED_PIN);
+  SERIAL_ERROR_MSG(STR_ERR_PROTECTED_PIN);
 }
 
 void quickstop_stepper() {
@@ -412,23 +412,13 @@ void startOrResumeJob() {
     #endif
   }
 
-  #if ENABLED(PRINTER_EVENT_LEDS)
-    #include "feature/leds/printer_event_leds.h"
-  #endif
-
   inline void finishSDPrinting() {
     bool did_state = true;
     switch (card.sdprinting_done_state) {
 
-      #if ENABLED(PRINTER_EVENT_LEDS)
-        case 1:
-          printerEventLEDs.onPrintCompleted();  // Change LED color for Print Completed
-          break;
-      #endif
-
       #if HAS_RESUME_CONTINUE                   // Display "Click to Continue..."
-        case 2:
-          did_state = queue.enqueue_P(PSTR("M0 S"
+        case 1:
+          did_state = queue.enqueue_P(PSTR("M0Q1S"
             #if HAS_LCD_MENU
               "1800"                            // ...for 30 minutes with LCD
             #else
@@ -438,13 +428,13 @@ void startOrResumeJob() {
           break;
       #endif
 
-      case 3: print_job_timer.stop(); break;
+      case 2: print_job_timer.stop(); break;
 
-      case 4:
+      case 3:
         did_state = print_job_timer.duration() < 60 || queue.enqueue_P(PSTR("M31"));
         break;
 
-      case 5:
+      case 4:
         #if ENABLED(POWER_LOSS_RECOVERY)
           recovery.purge();
         #endif
@@ -461,7 +451,7 @@ void startOrResumeJob() {
           ui.reselect_last_file();
         #endif
 
-        SERIAL_ECHOLNPGM(MSG_FILE_PRINTED);
+        SERIAL_ECHOLNPGM(STR_FILE_PRINTED);
 
       default:
         did_state = false;
@@ -498,7 +488,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
 
   if (max_inactive_time && ELAPSED(ms, gcode.previous_move_ms + max_inactive_time)) {
     SERIAL_ERROR_START();
-    SERIAL_ECHOLNPAIR(MSG_KILL_INACTIVE_TIME, parser.command_ptr);
+    SERIAL_ECHOLNPAIR(STR_KILL_INACTIVE_TIME, parser.command_ptr);
     kill();
   }
 
@@ -563,7 +553,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
     // KILL the machine
     // ----------------------------------------------------------------
     if (killCount >= KILL_DELAY) {
-      SERIAL_ERROR_MSG(MSG_KILL_BUTTON);
+      SERIAL_ERROR_MSG(STR_KILL_BUTTON);
       kill();
     }
   #endif
@@ -781,7 +771,7 @@ void idle(
 void kill(PGM_P const lcd_error/*=nullptr*/, PGM_P const lcd_component/*=nullptr*/, const bool steppers_off/*=false*/) {
   thermalManager.disable_all_heaters();
 
-  SERIAL_ERROR_MSG(MSG_ERR_KILLED);
+  SERIAL_ERROR_MSG(STR_ERR_KILLED);
 
   #if HAS_DISPLAY
     ui.kill_screen(lcd_error ?: GET_TEXT(MSG_KILLED), lcd_component ?: NUL_STR);
@@ -852,7 +842,7 @@ void stop() {
   #endif
 
   if (IsRunning()) {
-    SERIAL_ERROR_MSG(MSG_ERR_STOPPED);
+    SERIAL_ERROR_MSG(STR_ERR_STOPPED);
     LCD_MESSAGEPGM(MSG_STOPPED);
     safe_delay(350);       // allow enough time for messages to get out before stopping
     Running = false;
@@ -958,11 +948,11 @@ void setup() {
 
   // Check startup - does nothing if bootloader sets MCUSR to 0
   byte mcu = HAL_get_reset_source();
-  if (mcu &  1) SERIAL_ECHOLNPGM(MSG_POWERUP);
-  if (mcu &  2) SERIAL_ECHOLNPGM(MSG_EXTERNAL_RESET);
-  if (mcu &  4) SERIAL_ECHOLNPGM(MSG_BROWNOUT_RESET);
-  if (mcu &  8) SERIAL_ECHOLNPGM(MSG_WATCHDOG_RESET);
-  if (mcu & 32) SERIAL_ECHOLNPGM(MSG_SOFTWARE_RESET);
+  if (mcu &  1) SERIAL_ECHOLNPGM(STR_POWERUP);
+  if (mcu &  2) SERIAL_ECHOLNPGM(STR_EXTERNAL_RESET);
+  if (mcu &  4) SERIAL_ECHOLNPGM(STR_BROWNOUT_RESET);
+  if (mcu &  8) SERIAL_ECHOLNPGM(STR_WATCHDOG_RESET);
+  if (mcu & 32) SERIAL_ECHOLNPGM(STR_SOFTWARE_RESET);
   HAL_clear_reset_source();
 
   serialprintPGM(GET_TEXT(MSG_MARLIN));
@@ -972,15 +962,15 @@ void setup() {
 
   #if defined(STRING_DISTRIBUTION_DATE) && defined(STRING_CONFIG_H_AUTHOR)
     SERIAL_ECHO_MSG(
-      MSG_CONFIGURATION_VER
+      STR_CONFIGURATION_VER
       STRING_DISTRIBUTION_DATE
-      MSG_AUTHOR STRING_CONFIG_H_AUTHOR
+      STR_AUTHOR STRING_CONFIG_H_AUTHOR
     );
     SERIAL_ECHO_MSG("Compiled: " __DATE__);
   #endif
 
   SERIAL_ECHO_START();
-  SERIAL_ECHOLNPAIR(MSG_FREE_MEMORY, freeMemory(), MSG_PLANNER_BUFFER_BYTES, (int)sizeof(block_t) * (BLOCK_BUFFER_SIZE));
+  SERIAL_ECHOLNPAIR(STR_FREE_MEMORY, freeMemory(), STR_PLANNER_BUFFER_BYTES, (int)sizeof(block_t) * (BLOCK_BUFFER_SIZE));
 
   // UI must be initialized before EEPROM
   // (because EEPROM code calls the UI).
@@ -995,31 +985,27 @@ void setup() {
     ui.show_bootscreen();
   #endif
 
-  #if ENABLED(SDSUPPORT)
-    card.mount(); // Mount the SD card before settings.first_load
-  #endif
+  ui.reset_status();        // Load welcome message early. (Retained if no errors exist.)
 
-  // Load data from EEPROM if available (or use defaults)
-  // This also updates variables in the planner, elsewhere
-  settings.first_load();
+  #if ENABLED(SDSUPPORT)
+    card.mount();           // Mount the SD card before settings.first_load
+  #endif
+                            // Load data from EEPROM if available (or use defaults)
+  settings.first_load();    // This also updates variables in the planner, elsewhere
 
   #if ENABLED(TOUCH_BUTTONS)
     touch.init();
   #endif
 
-  #if HAS_M206_COMMAND
-    // Initialize current position based on home_offset
+  #if HAS_M206_COMMAND      // Initialize current position based on home_offset
     current_position += home_offset;
   #endif
 
-  // Vital to init stepper/planner equivalent for current_position
-  sync_plan_position();
+  sync_plan_position();     // Vital to init stepper/planner equivalent for current_position
 
   thermalManager.init();    // Initialize temperature loop
 
   print_job_timer.init();   // Initial setup of print job timer
-
-  ui.reset_status();        // Print startup message after print statistics are loaded
 
   endstops.init();          // Init endstops and pullups
 
@@ -1174,6 +1160,10 @@ void setup() {
 
   #if ENABLED(PRUSA_MMU2)
     mmu2.init();
+  #endif
+
+  #if HAS_SERVICE_INTERVALS
+    ui.reset_status(true);  // Show service messages or keep current status
   #endif
 }
 
