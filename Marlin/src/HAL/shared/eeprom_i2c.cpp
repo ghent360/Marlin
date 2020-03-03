@@ -39,7 +39,7 @@
 // Private Variables
 // ------------------------
 
-static uint8_t eeprom_device_address = 0x50;
+static uint8_t eeprom_device_address = 0x57;
 
 // ------------------------
 // Public functions
