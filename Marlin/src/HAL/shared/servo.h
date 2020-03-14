@@ -70,19 +70,19 @@
 #include "../HAL.h"
 
 #if (HAL_PLATFORM_ID == HAL_ID_TEENSY31_32)
-  #include "../HAL_TEENSY31_32/Servo.h"
+  #include "../TEENSY31_32/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_TEENSY35_36)
-  #include "../HAL_TEENSY35_36/Servo.h"
+  #include "../TEENSY35_36/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_LPC1768)
-  #include "../HAL_LPC1768/Servo.h"
+  #include "../LPC1768/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_STM32F1)
-  #include "../HAL_STM32F1/Servo.h"
+  #include "../STM32F1/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) || (HAL_PLATFORM_ID == HAL_ID_STM32F4) || (HAL_PLATFORM_ID == HAL_ID_STM32F7)
-  #include "../HAL_STM32_F4_F7/Servo.h"
+  #include "../STM32_F4_F7/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_STM32)
-  #include "../HAL_STM32/Servo.h"
+  #include "../STM32/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_ESP32)
-  #include "../HAL_ESP32/Servo.h"
+  #include "../ESP32/Servo.h"
 #else
   #include <stdint.h>
 
