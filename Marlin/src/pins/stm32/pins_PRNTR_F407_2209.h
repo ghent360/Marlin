@@ -108,11 +108,13 @@
 #define UART_XYZ           SLOW_PIN(D, 8)   // UART X, Y and Z
 #define UART_Ex            SLOW_PIN(C, 6)   // UART E0 and E1
 
+#if HAS_TMC_UART
 #define X_HARDWARE_SERIAL  Serial_xyz
 #define Y_HARDWARE_SERIAL  Serial_xyz
 #define Z_HARDWARE_SERIAL  Serial_xyz
 #define E0_HARDWARE_SERIAL  Serial_ex
 #define E1_HARDWARE_SERIAL  Serial_ex
+#endif
 
 #define BLUE_LED_PIN       SLOW_PIN(B, 8)   // Blue LED control
 #define RED_LED_PIN        SLOW_PIN(D, 11)  // Red LED control

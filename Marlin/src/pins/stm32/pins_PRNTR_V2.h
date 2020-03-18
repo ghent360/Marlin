@@ -156,12 +156,14 @@
 #define UART_ST14          SLOW_PIN(B, 10)  // UART ST1-4
 #define UART_ST56          SLOW_PIN(C, 6)   // UART ST5-6
 
+#if HAS_TMC_UART
 #define X_HARDWARE_SERIAL   Serial_ST14
 #define Y_HARDWARE_SERIAL   Serial_ST14
 #define Z_HARDWARE_SERIAL   Serial_ST14
 #define E0_HARDWARE_SERIAL  Serial_ST14
 #define E1_HARDWARE_SERIAL  Serial_ST56
 #define E2_HARDWARE_SERIAL  Serial_ST56
+#endif
 
 //
 // Temperature Sensors
