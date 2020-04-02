@@ -246,10 +246,10 @@ void MarlinUI::init_lcd() {
     #if PIN_EXISTS(LCD_BACKLIGHT)
       pinMode(LCD_BACKLIGHT_PIN, OUTPUT);
       digitalWrite(LCD_BACKLIGHT_PIN, (
-        #if ENABLED(DELAYED_BACKLIGHT_INIT)
-          LOW  // Illuminate after reset
-        #else
+        #if DISABLED(DELAYED_BACKLIGHT_INIT)
           HIGH // Illuminate right away
+        #else
+          LOW  // Illuminate after reset
         #endif
       ));
     #endif
