@@ -106,9 +106,7 @@ void libServo::move(const int value) {
   if (servoIndex < NUM_SERVOS) {
     safe_delay(servo_delay[servoIndex]);
   }
-  #if ENABLED(DEACTIVATE_SERVOS_AFTER_MOVE)
-    detach();
-  #endif
+  TERN_(DEACTIVATE_SERVOS_AFTER_MOVE, detach());
 }
 
 #endif // HAS_SERVOS
