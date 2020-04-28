@@ -211,6 +211,7 @@
 #define SS_PIN -1
 
 #define I2C_EEPROM
+#define EEPROM_DEVICE_ADDRESS 0x57
 
 #define SD_DETECT_PIN       IO_PIN(D, 3)
 //if ENABLED(SD_DETECT_INVERTED)
