@@ -133,4 +133,4 @@ uint16_t HAL_adc_get_result() { return HAL_adc_result; }
 
 void flashFirmware(const int16_t) { NVIC_SystemReset(); }
 
-#endif // ARDUINO_ARCH_STM32 && !STM32GENERIC
+#endif //(HAL_PLATFORM_ID == HAL_ID_STM32)

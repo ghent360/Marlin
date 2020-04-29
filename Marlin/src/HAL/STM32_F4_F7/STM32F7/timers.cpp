@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
+#include "../../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && defined(STM32F7)
 
 #include "../HAL.h"
@@ -128,4 +128,4 @@ bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
   return NVIC->ISER[IRQ_Id >> 5] & _BV32(IRQ_Id & 0x1F);
 }
 
-#endif // STM32GENERIC && STM32F7
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && defined(STM32F7)

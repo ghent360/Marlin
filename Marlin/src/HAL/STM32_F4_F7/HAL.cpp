@@ -20,7 +20,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
@@ -114,4 +113,4 @@ uint16_t HAL_adc_get_result() {
 #ifdef USE_FAST_IO
 constexpr uint16_t FastIOPin::to_arduino_pin_[LastPort+1][16];
 #endif
-#endif // STM32GENERIC && (STM32F4 || STM32F7)
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)

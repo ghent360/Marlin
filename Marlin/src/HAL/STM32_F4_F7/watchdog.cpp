@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
@@ -46,4 +45,4 @@
   }
 
 #endif // USE_WATCHDOG
-#endif // STM32GENERIC && (STM32F4 || STM32F7)
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)

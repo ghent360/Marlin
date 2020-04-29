@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
@@ -42,4 +41,4 @@
   }
 
 #endif // USE_WATCHDOG
-#endif // ARDUINO_ARCH_STM32 && !STM32GENERIC
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32)

@@ -136,4 +136,4 @@ TIM_TypeDef * HAL_timer_device(const uint8_t timer_num) {
   return nullptr;
 }
 
-#endif // ARDUINO_ARCH_STM32 && !STM32GENERIC
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32)

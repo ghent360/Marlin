@@ -20,7 +20,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
@@ -66,4 +65,4 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, size_t size, uint16_t 
 size_t PersistentStore::capacity() { return E2END + 1; }
 
 #endif // EEPROM_SETTINGS
-#endif // HAL_PLATFORM_ID
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
