@@ -21,10 +21,18 @@
  */
 #pragma once
 
-#if ENABLED(EEPROM_SETTINGS) && defined(STM32F7)
+#if ENABLED(EEPROM_SETTINGS) 
+#if defined(STM32F7)
   #undef USE_WIRED_EEPROM
   #undef SRAM_EEPROM_EMULATION
   #undef SDCARD_EEPROM_EMULATION
   #define FLASH_EEPROM_EMULATION
   #warning "Forcing use of FLASH_EEPROM_EMULATION."
+#else // STM32F4
+#if USE_FALLBACK_EEPROM
+  #define FLASH_EEPROM_EMULATION
+#elif EITHER(I2C_EEPROM, SPI_EEPROM)
+  #define USE_SHARED_EEPROM 1
+#endif
+#endif  
 #endif

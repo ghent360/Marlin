@@ -16,13 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
 /**
- * Description: Functions for a Flash emulated EEPROM
- * Not platform dependent.
+ * Arduino-style interface for Flash emulated EEPROM
  */
 
 // Include configs and pins to get all EEPROM flags
@@ -36,6 +34,7 @@
 
 #include "HAL.h"
 #include "eeprom_emul.h"
+#include "../shared/eeprom_if.h"
 
 // ------------------------
 // Local defines
@@ -114,4 +113,4 @@ void eeprom_update_block(const void *__src, void *__dst, size_t __n) {
 }
 
 #endif // FLASH_EEPROM_EMULATION
-#endif // STM32GENERIC && (STM32F4 || STM32F7)
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)

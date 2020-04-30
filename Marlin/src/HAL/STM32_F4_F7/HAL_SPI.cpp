@@ -22,11 +22,6 @@
  */
 
 /**
- * Software SPI functions originally from Arduino Sd2Card Library
- * Copyright (c) 2009 by William Greiman
- */
-
-/**
  * Adapted to the Marlin STM32F4/7 HAL
  */
 
@@ -50,11 +45,8 @@ SPISettings spiConfig;
 // ------------------------
 
 #if ENABLED(SOFTWARE_SPI)
-  // ------------------------
-  // Software SPI
-  // ------------------------
   #error "Software SPI not supported for STM32F4/7. Use Hardware SPI."
-#else
+#endif
 
 // ------------------------
 // Hardware SPI
@@ -229,6 +221,4 @@ void spiSend(const uint8_t* buf, size_t n, SPIClass& spiInstance) {
 }
 
 #endif // SPI_EEPROM
-
-#endif // SOFTWARE_SPI
-#endif // STM32GENERIC && (STM32F4 || STM32F7)
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)

@@ -20,22 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+#include "../HAL.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
 #include "../../inc/MarlinConfig.h"
-
-#if USE_WIRED_EEPROM
-
+#if USE_WIRED_EEPROM && ANY(SPI_EEPROM, I2C_EEPROM)
+#include "../shared/eeprom_if.h"
 #include "../shared/eeprom_api.h"
-#include <avr/eeprom.h>
 
 size_t PersistentStore::capacity()    { return E2END + 1; }
 bool PersistentStore::access_start()  { return true; }
 bool PersistentStore::access_finish() { return true; }
 
-bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t size, uint16_t *crc) {
+bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc) {
   while (size--) {
-    uint8_t * const p = (uint8_t * const)pos;
+    uint8_t *p = (uint8_t *)pos;
     uint8_t v = *value;
     // EEPROM has only ~100,000 write cycles,
     // so only write bytes that have changed!
@@ -53,7 +52,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t si
   return false;
 }
 
-bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uint16_t *crc, const bool writing/*=true*/) {
+bool PersistentStore::read_data(int &pos, uint8_t* value, size_t size, uint16_t *crc, const bool writing/*=true*/) {
   do {
     uint8_t c = eeprom_read_byte((uint8_t*)pos);
     if (writing) *value = c;
@@ -65,4 +64,4 @@ bool PersistentStore::read_data(int &pos, uint8_t* value, const size_t size, uin
 }
 
 #endif // USE_WIRED_EEPROM
-#endif // __MK64FX512__ || __MK66FX1M0__
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
