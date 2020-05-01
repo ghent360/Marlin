@@ -27,10 +27,13 @@
 
 #include "../../inc/MarlinConfig.h"
 
-#if BOTH(USE_SHARED_EEPROM, SPI_EEPROM)
+#if ENABLED(SPI_EEPROM)
 
-#include "../HAL.h"
 #include "eeprom_if.h"
+
+void eeprom_init() {}
+
+#if ENABLED(USE_SHARED_EEPROM)
 
 #define CMD_WREN  6   // WREN
 #define CMD_READ  2   // WRITE
@@ -124,4 +127,5 @@ void eeprom_update_block(const void* src, void* eeprom_address, size_t n) {
 }
 #endif
 
-#endif // USE_SHARED_EEPROM && I2C_EEPROM
+#endif // ENABLED(USE_SHARED_EEPROM)
+#endif // ENABLED(SPI_EEPROM)
