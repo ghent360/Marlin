@@ -58,6 +58,7 @@ uint8_t eeprom_read_byte(uint8_t* pos) {
   return v;
 }
 
+#if 0
 void eeprom_read_block(void* dest, const void* eeprom_address, size_t n) {
   uint8_t eeprom_temp[3];
 
@@ -75,6 +76,7 @@ void eeprom_read_block(void* dest, const void* eeprom_address, size_t n) {
     *p_dest++ = spiRec();
   WRITE(SPI_EEPROM1_CS, HIGH);
 }
+#endif
 
 void eeprom_write_byte(uint8_t* pos, uint8_t value) {
   uint8_t eeprom_temp[3];
@@ -98,6 +100,7 @@ void eeprom_write_byte(uint8_t* pos, uint8_t value) {
   delay(EEPROM_WRITE_DELAY);   // wait for page write to complete
 }
 
+#if 0
 void eeprom_update_block(const void* src, void* eeprom_address, size_t n) {
   uint8_t eeprom_temp[3];
 
@@ -119,5 +122,6 @@ void eeprom_update_block(const void* src, void* eeprom_address, size_t n) {
   WRITE(SPI_EEPROM1_CS, HIGH);
   delay(EEPROM_WRITE_DELAY);   // wait for page write to complete
 }
+#endif
 
 #endif // USE_SHARED_EEPROM && I2C_EEPROM

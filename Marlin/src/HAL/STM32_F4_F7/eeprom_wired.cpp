@@ -24,7 +24,13 @@
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
 #include "../../inc/MarlinConfig.h"
-#if USE_WIRED_EEPROM && ANY(SPI_EEPROM, I2C_EEPROM)
+#if USE_WIRED_EEPROM
+
+/**
+ * PersistentStore for Arduino-style EEPROM interface
+ * with simple implementations supplied by Marlin.
+ */
+
 #include "../shared/eeprom_if.h"
 #include "../shared/eeprom_api.h"
 

@@ -50,7 +50,7 @@
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7)
 
-#include "../../inc/MarlinConfigPre.h"
+#include "../../inc/MarlinConfig.h"
 
 #if ENABLED(FLASH_EEPROM_EMULATION)
 
@@ -66,7 +66,7 @@ uint16_t DataVar = 0;
 uint16_t VirtAddVarTab[NB_OF_VAR];
 
 /* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+
 static HAL_StatusTypeDef EE_Format();
 static uint16_t EE_FindValidPage(uint8_t Operation);
 static uint16_t EE_VerifyPageFullWriteVariable(uint16_t VirtAddress, uint16_t Data);
@@ -80,6 +80,9 @@ static uint16_t EE_VerifyPageFullyErased(uint32_t Address);
   * @retval - Flash error code: on write Flash error
   *         - FLASH_COMPLETE: on success
   */
+
+/* Private functions ---------------------------------------------------------*/
+
 uint16_t EE_Initialize() {
   /* Get Page0 and Page1 status */
   uint16_t PageStatus0 = (*(__IO uint16_t*)PAGE0_BASE_ADDRESS),
