@@ -28,10 +28,6 @@
 #include "../../inc/MarlinConfig.h"
 #include "../shared/Delay.h"
 
-#if HAS_TMC_SW_SERIAL
-  #include "SoftwareSerial.h"
-#endif
-
 #if ENABLED(SRAM_EEPROM_EMULATION)
   #if STM32F7xx
     #include <stm32f7xx_ll_pwr.h>
@@ -83,11 +79,7 @@ void HAL_init() {
     while (!LL_PWR_IsActiveFlag_BRR());   // Wait until backup regulator is initialized
   #endif
 
-  #if HAS_TMC_SW_SERIAL
-    SoftwareSerial::setInterruptPriority(SWSERIAL_TIMER_IRQ_PRIO, 0);
-  #endif
-
-  TERN_(HAS_TMC_SW_SERIAL, SoftwareSerial::setInterruptPriority(SWSERIAL_TIMER_IRQ_PRIO, 0));
+  SetSoftwareSerialTimerInterruptPriority();
 }
 
 void HAL_clear_reset_source() { __HAL_RCC_CLEAR_RESET_FLAGS(); }
