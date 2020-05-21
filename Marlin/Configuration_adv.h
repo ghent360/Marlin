@@ -39,10 +39,18 @@
 //=============================Thermal Settings  ============================
 //===========================================================================
 
-#define HEATER_BED_INVERTING true
-#define HEATER_0_INVERTING true
-#define HEATER_1_INVERTING true
-#define HEATER_2_INVERTING true
+/**
+ * Thermocouple sensors are quite sensitive to noise.  Any noise induced in
+ * the sensor wires, such as by stepper motor wires run in parallel to them,
+ * may result in the thermocouple sensor reporting spurious errors.  This
+ * value is the number of errors which can occur in a row before the error
+ * is reported.  This allows us to ignore intermittent error conditions while
+ * still detecting an actual failure, which should result in a continuous
+ * stream of errors from the sensor.
+ * 
+ * Set this value to 0 to fail on the first error to occur.
+ */
+#define THERMOCOUPLE_MAX_ERRORS 15
 
 //
 // Custom Thermistor 1000 parameters
