@@ -212,6 +212,7 @@
 
 #define I2C_EEPROM
 #define EEPROM_DEVICE_ADDRESS 0x57
+#define MARLIN_EEPROM_SIZE 0x2000               // 8KB
 
 #define SD_DETECT_PIN       IO_PIN(D, 3)
 //if ENABLED(SD_DETECT_INVERTED)
