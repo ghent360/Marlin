@@ -24,6 +24,7 @@
 #if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 #include "HAL.h"
+#include "usb_serial.h"
 
 #include "../../inc/MarlinConfig.h"
 #include "../shared/Delay.h"
@@ -80,6 +81,8 @@ void HAL_init() {
   #endif
 
   SetSoftwareSerialTimerInterruptPriority();
+
+  TERN_(EMERGENCY_PARSER, USB_Hook_init());
 }
 
 void HAL_clear_reset_source() { __HAL_RCC_CLEAR_RESET_FLAGS(); }
