@@ -22,8 +22,7 @@
 #include "../../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && defined(STM32F7)
 
-#include "../HAL.h"
-#include "timers.h"
+#include "../../../inc/MarlinConfig.h"
 
 // ------------------------
 // Local defines

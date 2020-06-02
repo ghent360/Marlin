@@ -40,9 +40,15 @@
 
 #define HAL_TIMER_RATE         (HAL_RCC_GetSysClockFreq() / 2)  // frequency of timer peripherals
 
-#define STEP_TIMER_NUM 0  // index of timer to use for stepper
-#define TEMP_TIMER_NUM 1  // index of timer to use for temperature
-#define PULSE_TIMER_NUM STEP_TIMER_NUM
+#ifndef STEP_TIMER_NUM
+  #define STEP_TIMER_NUM        0  // Timer Index for Stepper
+#endif
+#ifndef PULSE_TIMER_NUM
+  #define PULSE_TIMER_NUM       STEP_TIMER_NUM
+#endif
+#ifndef TEMP_TIMER_NUM
+  #define TEMP_TIMER_NUM        1  // Timer Index for Temperature
+#endif
 
 // prescaler for setting Temp timer, 72Khz
 #define TEMP_TIMER_PRESCALE     TimerHandle[TEMP_TIMER_NUM]->getPrescaleFactor()

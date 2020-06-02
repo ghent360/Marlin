@@ -22,8 +22,6 @@
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
-#include "timers.h"
-
 #include "../../inc/MarlinConfig.h"
 
 // ------------------------
