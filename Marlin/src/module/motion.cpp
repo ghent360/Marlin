@@ -1658,9 +1658,9 @@ void homeaxis(const AxisEnum axis) {
 
           const float adj = ABS(endstops.z2_endstop_adj);
           if (adj) {
-            if (pos_dir ? (endstops.z2_endstop_adj > 0) : (endstops.z2_endstop_adj < 0)) stepper.set_z_lock(true); else stepper.set_z2_lock(true);
+            if (pos_dir ? (endstops.z2_endstop_adj > 0) : (endstops.z2_endstop_adj < 0)) stepper.set_z1_lock(true); else stepper.set_z2_lock(true);
             do_homing_move(axis, pos_dir ? -adj : adj);
-            stepper.set_z_lock(false);
+            stepper.set_z1_lock(false);
             stepper.set_z2_lock(false);
           }
 
@@ -1671,7 +1671,7 @@ void homeaxis(const AxisEnum axis) {
           typedef void (*adjustFunc_t)(const bool);
 
           adjustFunc_t lock[] = {
-            stepper.set_z_lock, stepper.set_z2_lock, stepper.set_z3_lock
+            stepper.set_z1_lock, stepper.set_z2_lock, stepper.set_z3_lock
             #if NUM_Z_STEPPER_DRIVERS >= 4
               , stepper.set_z4_lock
             #endif
@@ -1739,7 +1739,7 @@ void homeaxis(const AxisEnum axis) {
             do_homing_move(axis, adj[0] - adj[1]);
           }
 
-          stepper.set_z_lock(false);
+          stepper.set_z1_lock(false);
           stepper.set_z2_lock(false);
           stepper.set_z3_lock(false);
           #if NUM_Z_STEPPER_DRIVERS >= 4
