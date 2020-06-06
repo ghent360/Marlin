@@ -2520,4 +2520,6 @@
 
 #if !NUM_SERIAL
   #undef BAUD_RATE_GCODE
+#elif NUM_SERIAL > 1
+  #define HAS_MULTI_SERIAL 1
 #endif
