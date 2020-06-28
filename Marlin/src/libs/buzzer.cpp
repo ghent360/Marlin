@@ -66,10 +66,11 @@ void Buzzer::tick() {
         CRITICAL_SECTION_START();
         ExtUI::onPlayTone(state.tone.frequency, state.tone.duration);
         CRITICAL_SECTION_END();
-      #elif ENABLED(SPEAKER)
-        CRITICAL_SECTION_START;
+      #endif
+      #if ENABLED(SPEAKER) && (DISABLED(EXTENSIBLE_UI) || ENABLED(EXTUI_LOCAL_BEEPER))
+        CRITICAL_SECTION_START();
         ::tone(ARDUINO_PIN(BEEPER_PIN), state.tone.frequency, state.tone.duration);
-        CRITICAL_SECTION_END;
+        CRITICAL_SECTION_END();
       #else
         on();
       #endif
