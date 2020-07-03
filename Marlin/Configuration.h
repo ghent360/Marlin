@@ -2103,6 +2103,11 @@
 //
 //#define OVERLORD_OLED
 
+//
+// FYSETC OLED 2.42" 128 × 64 FULL GRAPHICS CONTROLLER with WS2812 RGB
+// Where to find : https://www.aliexpress.com/item/4000345255731.html
+//#define FYSETC_242_OLED_12864   // Uses the SSD1309 controller
+
 //=============================================================================
 //========================== Extensible UI Displays ===========================
 //=============================================================================
@@ -2147,9 +2152,12 @@
 //#define FSMC_GRAPHICAL_TFT
 
 //
-// TFT Little VGL UI
+// TFT LVGL UI
 //
-//#define TFT_LITTLE_VGL_UI
+// Default MKS icons and fonts: https://git.io/JJvzK
+// Copy mks_pic and mks_font folders to the root of your SD
+//
+//#define TFT_LVGL_UI
 
 //=============================================================================
 //============================  Other Controllers  ============================

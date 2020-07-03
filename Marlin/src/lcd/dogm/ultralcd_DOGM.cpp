@@ -253,8 +253,9 @@ void MarlinUI::init_lcd() {
       ));
     #endif
 
-    #if EITHER(MKS_12864OLED, MKS_12864OLED_SSD1306)
+    #if EITHER(MKS_12864OLED, MKS_12864OLED_SSD1306, FYSETC_242_OLED_12864)
       pinMode(LCD_PINS_DC, OUTPUT);
+      //SET_OUTPUT(LCD_PINS_DC);
       #ifndef LCD_RESET_PIN
         #define LCD_RESET_PIN LCD_PINS_RS
       #endif
