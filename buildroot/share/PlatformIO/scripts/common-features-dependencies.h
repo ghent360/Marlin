@@ -4,7 +4,6 @@
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
- * Copyright (c) 2017 Victor Perez
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,33 +21,30 @@
  */
 #pragma once
 
-#include <Servo.h>
+/**
+ * The purpose of this file is just include Marlin Configuration files,
+ * to discover which FEATURES are enabled, without any HAL include.
+ * Used by common-features-dependencies.py
+ */
 
-#include "../../core/millis_t.h"
+#ifndef __MARLIN_FIRMWARE__
+#define __MARLIN_FIRMWARE__
+#endif
 
-// Inherit and expand on the official library
-class libServo {
-  public:
-    libServo();
-    int8_t attach(const int pin = 0); // pin == 0 uses value from previous call
-    int8_t attach(const int pin, const int min, const int max);
-    void detach() { stm32_servo.detach(); }
-    int read() { return stm32_servo.read(); }
-    void move(const int value);
+//
+// Prefix header to acquire configurations
+//
+#include <stdint.h>
 
-    void pause();
-    void resume();
+#include "../../../../Marlin/src/core/boards.h"
+#include "../../../../Marlin/src/core/macros.h"
+#include "../../../../Marlin/Configuration.h"
 
-    static void pause_all_servos();
-    static void resume_all_servos();
-    static void setInterruptPriority(uint32_t preemptPriority, uint32_t subPriority);
+#include "../../../../Marlin/Version.h"
 
-  private:
-    Servo stm32_servo;
+#include "../../../../Marlin/src/inc/Conditionals_LCD.h"
 
-    int servo_pin = 0;
-    millis_t delay = 0;
+#include "../../../../Marlin/src/core/drivers.h"
+#include "../../../../Marlin/Configuration_adv.h"
 
-    bool was_attached_before_pause;
-    int value_before_pause;
-};
+#include "../../../../Marlin/src/inc/Conditionals_adv.h"
