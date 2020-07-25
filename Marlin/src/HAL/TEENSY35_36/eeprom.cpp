@@ -58,7 +58,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, const size_t si
     crc16(crc, &v, 1);
     pos++;
     value++;
-  };
+  }
   return false;
 }
 
