@@ -53,6 +53,10 @@
 #include "../../module/motion.h"
 #include "../../module/planner.h"
 
+#if ENABLED(HOST_ACTION_COMMANDS)
+  #include "../../feature/host_actions.h"
+#endif
+
 #if HAS_LEVELING
   #include "../../feature/bedlevel/bedlevel.h"
 #endif
@@ -60,8 +64,6 @@
 #if HAS_BED_PROBE
   #include "../../module/probe.h"
 #endif
-
-#include "../../libs/buzzer.h"
 
 #ifndef MACHINE_SIZE
   #define MACHINE_SIZE "220x220x250"
@@ -124,7 +126,7 @@ constexpr uint16_t TROWS = 6, MROWS = TROWS - 1,        // Total rows, and other
 
 #define MBASE(L) (49 + (L)*MLINE)
 
-#define BABY_Z_VAR TERN(HAS_LEVELING, probe.offset.z, zprobe_zoffset)
+#define BABY_Z_VAR TERN(HAS_BED_PROBE, probe.offset.z, zprobe_zoffset)
 
 /* Value Init */
 HMI_value_t HMI_ValueStruct;
@@ -931,7 +933,8 @@ void Goto_PrintProcess(void) {
 
   // Copy into filebuf string before entry
   char * const name = card.longest_filename();
-  DWIN_Draw_String(false, false, font8x16, White, Background_black, (DWIN_WIDTH - strlen(name) * MENU_CHR_W) / 2, 60, name);
+  const int8_t npos = _MAX(0, DWIN_WIDTH - strlen(name) * MENU_CHR_W) / 2;
+  DWIN_Draw_String(false, false, font8x16, White, Background_black, npos, 60, name);
 
   DWIN_ICON_Show(ICON, ICON_PrintTime, 17, 193);
   DWIN_ICON_Show(ICON, ICON_RemainTime, 150, 191);
@@ -1060,36 +1063,40 @@ void HMI_Move_Z(void) {
   }
 }
 
-void HMI_Move_E(void) {
-  ENCODER_DiffState encoder_diffState = Encoder_ReceiveAnalyze();
-  if (encoder_diffState != ENCODER_DIFF_NO) {
-    if (encoder_diffState == ENCODER_DIFF_CW) {
-      HMI_ValueStruct.Move_E_scale += EncoderRate.encoderMoveValue;
-    }
-    else if (encoder_diffState == ENCODER_DIFF_CCW) {
-      HMI_ValueStruct.Move_E_scale -= EncoderRate.encoderMoveValue;
-    }
-    else if (encoder_diffState == ENCODER_DIFF_ENTER) {
-      checkkey = AxisMove;
-      EncoderRate.encoderRateEnabled = 0;
-      last_E_scale = HMI_ValueStruct.Move_E_scale;
-      show_plus_or_minus(font8x16, Background_black, 3, 1, 216, MBASE(4), HMI_ValueStruct.Move_E_scale);
-      if (!planner.is_full()) {
-        planner.synchronize(); // Wait for planner moves to finish!
-        planner.buffer_line(current_position, MMM_TO_MMS(FEEDRATE_E), active_extruder);
+#if EXTRUDERS
+
+  void HMI_Move_E(void) {
+    ENCODER_DiffState encoder_diffState = Encoder_ReceiveAnalyze();
+    if (encoder_diffState != ENCODER_DIFF_NO) {
+      if (encoder_diffState == ENCODER_DIFF_CW) {
+        HMI_ValueStruct.Move_E_scale += EncoderRate.encoderMoveValue;
       }
+      else if (encoder_diffState == ENCODER_DIFF_CCW) {
+        HMI_ValueStruct.Move_E_scale -= EncoderRate.encoderMoveValue;
+      }
+      else if (encoder_diffState == ENCODER_DIFF_ENTER) {
+        checkkey = AxisMove;
+        EncoderRate.encoderRateEnabled = 0;
+        last_E_scale = HMI_ValueStruct.Move_E_scale;
+        show_plus_or_minus(font8x16, Background_black, 3, 1, 216, MBASE(4), HMI_ValueStruct.Move_E_scale);
+        if (!planner.is_full()) {
+          planner.synchronize(); // Wait for planner moves to finish!
+          planner.buffer_line(current_position, MMM_TO_MMS(FEEDRATE_E), active_extruder);
+        }
+        DWIN_UpdateLCD();
+        return;
+      }
+      if ((HMI_ValueStruct.Move_E_scale - last_E_scale) > (EXTRUDE_MAXLENGTH) * MINUNITMULT)
+        HMI_ValueStruct.Move_E_scale = last_E_scale + (EXTRUDE_MAXLENGTH) * MINUNITMULT;
+      else if ((last_E_scale - HMI_ValueStruct.Move_E_scale) > (EXTRUDE_MAXLENGTH) * MINUNITMULT)
+        HMI_ValueStruct.Move_E_scale = last_E_scale - (EXTRUDE_MAXLENGTH) * MINUNITMULT;
+      current_position.e = HMI_ValueStruct.Move_E_scale / 10;
+      show_plus_or_minus(font8x16, Select_Color, 3, 1, 216, MBASE(4), HMI_ValueStruct.Move_E_scale);
       DWIN_UpdateLCD();
-      return;
     }
-    if ((HMI_ValueStruct.Move_E_scale - last_E_scale) > (EXTRUDE_MAXLENGTH) * MINUNITMULT)
-      HMI_ValueStruct.Move_E_scale = last_E_scale + (EXTRUDE_MAXLENGTH) * MINUNITMULT;
-    else if ((last_E_scale - HMI_ValueStruct.Move_E_scale) > (EXTRUDE_MAXLENGTH) * MINUNITMULT)
-      HMI_ValueStruct.Move_E_scale = last_E_scale - (EXTRUDE_MAXLENGTH) * MINUNITMULT;
-    current_position.e = HMI_ValueStruct.Move_E_scale / 10;
-    show_plus_or_minus(font8x16, Select_Color, 3, 1, 216, MBASE(4), HMI_ValueStruct.Move_E_scale);
-    DWIN_UpdateLCD();
   }
-}
+
+#endif
 
 void HMI_Zoffset(void) {
   ENCODER_DiffState encoder_diffState = Encoder_ReceiveAnalyze();
@@ -1116,11 +1123,11 @@ void HMI_Zoffset(void) {
 
       if (HMI_ValueStruct.show_mode == -4) {
         checkkey = Prepare;
-        show_plus_or_minus(font8x16, Background_black, 2, 2, 202, MBASE(4 + MROWS - index_prepare), TERN(HAS_LEVELING, probe.offset.z * 100, HMI_ValueStruct.offset_value));
+        show_plus_or_minus(font8x16, Background_black, 2, 2, 202, MBASE(4 + MROWS - index_prepare), TERN(HAS_BED_PROBE, probe.offset.z * 100, HMI_ValueStruct.offset_value));
       }
       else {
         checkkey = Tune;
-        show_plus_or_minus(font8x16, Background_black, 2, 2, 202, MBASE(5 + MROWS - index_tune), TERN(HAS_LEVELING, probe.offset.z * 100, HMI_ValueStruct.offset_value));
+        show_plus_or_minus(font8x16, Background_black, 2, 2, 202, MBASE(5 + MROWS - index_tune), TERN(HAS_BED_PROBE, probe.offset.z * 100, HMI_ValueStruct.offset_value));
       }
       DWIN_UpdateLCD();
       return;
@@ -1484,7 +1491,7 @@ void update_variable(void) {
     DWIN_Draw_IntValue(true, true, 0, STAT_FONT, White, Background_black, 3, 33 + 2 * STAT_CHR_W, 429, feedrate_percentage);
     last_speed = feedrate_percentage;
   }
-  #if HAS_LEVELING
+  #if HAS_BED_PROBE
     if (last_probe_zoffset != probe.offset.z) {
       show_plus_or_minus(STAT_FONT, Background_black, 2, 2, 178 + STAT_CHR_W, 429, probe.offset.z * 100);
       last_probe_zoffset = probe.offset.z;
@@ -1519,7 +1526,7 @@ inline void make_name_without_ext(char *dst, char *src, int maxlen=MENU_CHAR_LIM
   if (!card.flag.filenameIsDir)
     while (pos && src[pos] != '.') pos--; // find last '.' (stop at 0)
 
-  int len = pos;      // nul or '.'
+  size_t len = pos;   // nul or '.'
   if (len > maxlen) { // Keep the name short
     pos        = len = maxlen; // move nul down
     dst[--pos] = '.'; // insert dots
@@ -2068,9 +2075,9 @@ void HMI_PauseOrStop(void) {
           #ifdef ACTION_ON_CANCEL
             host_action_cancel();
           #endif
-          #ifdef EVENT_GCODE_SD_STOP
+          #ifdef EVENT_GCODE_SD_ABORT
             Popup_Window_Home();
-            queue.inject_P(PSTR(EVENT_GCODE_SD_STOP)); // For Ender 3 "G28 X Y"
+            queue.inject_P(PSTR(EVENT_GCODE_SD_ABORT));
           #endif
           abort_flag = true;
         #endif
@@ -2091,7 +2098,9 @@ inline void Draw_Move_Menu() {
     DWIN_Frame_AreaCopy(1, 58, 118, 271 - 165, 479 - 347, LBLX, MBASE(1));
     DWIN_Frame_AreaCopy(1, 109, 118, 271 - 114, 479 - 347, LBLX, MBASE(2));
     DWIN_Frame_AreaCopy(1, 160, 118, 271 - 62, 479 - 347, LBLX, MBASE(3));
-    DWIN_Frame_AreaCopy(1, 212, 118, 271 - 18, 479 - 348, LBLX, MBASE(4));
+    #if HAS_HOTEND
+      DWIN_Frame_AreaCopy(1, 212, 118, 271 - 18, 479 - 348, LBLX, MBASE(4));
+    #endif
   }
   else {
     #ifdef USE_STRING_HEADINGS
@@ -2102,13 +2111,27 @@ inline void Draw_Move_Menu() {
     draw_move_en(MBASE(1)); say_x(33 + 3, MBASE(1));                    // "Move X"
     draw_move_en(MBASE(2)); say_y(33 + 3, MBASE(2));                    // "Move Y"
     draw_move_en(MBASE(3)); say_z(33 + 3, MBASE(3));                    // "Move Z"
-    DWIN_Frame_AreaCopy(1, 123, 192, 271 - 95, 479 - 277, LBLX, MBASE(4)); // "Extruder"
+    #if HAS_HOTEND
+      DWIN_Frame_AreaCopy(1, 123, 192, 271 - 95, 479 - 277, LBLX, MBASE(4)); // "Extruder"
+    #endif
   }
 
   Draw_Back_First(select_axis.now == 0);
   if (select_axis.now) Draw_Menu_Cursor(select_axis.now);
 
   LOOP_L_N(i, MROWS) Draw_Menu_Line(i + 1, ICON_MoveX + i);
+}
+
+#include "../../libs/buzzer.h"
+
+void HMI_AudioFeedback(const bool success=true) {
+  if (success) {
+    buzzer.tone(100, 659);
+    buzzer.tone(10, 0);
+    buzzer.tone(100, 698);
+  }
+  else
+    buzzer.tone(40, 440);
 }
 
 /* Prepare */
@@ -2188,7 +2211,7 @@ void HMI_Prepare(void) {
         Popup_Window_Home();
         break;
       case 4: // Z-offset
-        #if HAS_LEVELING
+        #if HAS_BED_PROBE
           checkkey = Homeoffset;
           HMI_ValueStruct.show_mode    = -4;
           HMI_ValueStruct.offset_value = probe.offset.z * 100;
@@ -2197,8 +2220,7 @@ void HMI_Prepare(void) {
         #else
           // Apply workspace offset, making the current position 0,0,0
           queue.inject_P(PSTR("G92 X0 Y0 Z0"));
-          buzzer.tone(100, 659);
-          buzzer.tone(100, 698);
+          HMI_AudioFeedback();
         #endif
         break;
       case 5: // PLA preheat
@@ -2342,27 +2364,17 @@ void HMI_Control(void) {
         select_motion.reset();
         Draw_Motion_Menu();
         break;
-      case 3: // write EEPROM
-        if (settings.save()) {
-          buzzer.tone(100, 659);
-          buzzer.tone(100, 698);
-        }
-        else
-          buzzer.tone(20, 440);
-        break;
-      case 4: // read EEPROM
-        if (settings.load()) {
-          buzzer.tone(100, 659);
-          buzzer.tone(100, 698);
-        }
-        else {buzzer.tone(20, 440);}
-        break;
+      case 3: { // write EEPROM
+        const bool success = settings.save();
+        HMI_AudioFeedback(success);
+      } break;
+      case 4: { // read EEPROM
+        const bool success = settings.load();
+        HMI_AudioFeedback(success);
+      } break;
       case 5: // resume EEPROM
         settings.reset();
-        #if HAS_BUZZER
-          buzzer.tone(100, 659);
-          buzzer.tone(100, 698);
-        #endif
+        HMI_AudioFeedback();
         break;
       case 6: // info
         checkkey = Info;
@@ -3001,14 +3013,10 @@ void HMI_PLAPreheatSetting(void) {
             EncoderRate.encoderRateEnabled = 1;
             break;
         #endif
-      case 4: // save PLA configuration
-        if (settings.save()) {
-          buzzer.tone(100, 659);
-          buzzer.tone(100, 698);
-        }
-        else
-          buzzer.tone(20, 440);
-        break;
+      case 4: { // save PLA configuration
+        const bool success = settings.save();
+        HMI_AudioFeedback(success);
+      } break;
       default: break;
     }
   }
@@ -3059,14 +3067,10 @@ void HMI_ABSPreheatSetting(void) {
             EncoderRate.encoderRateEnabled = 1;
             break;
         #endif
-      case 4: // save PLA configuration
-        if (settings.save()) {
-          buzzer.tone(100, 659);
-          buzzer.tone(100, 698);
-        }
-        else
-          buzzer.tone(20, 440);
-        break;
+      case 4: { // save ABS configuration
+        const bool success = settings.save();
+        HMI_AudioFeedback(success);
+      } break;
       default:
         break;
     }
@@ -3390,7 +3394,7 @@ void EachMomentUpdate(void) {
   else if (abort_flag && !HMI_flag.home_flag) { // Print Stop
     abort_flag = 0;
     HMI_ValueStruct.print_speed = feedrate_percentage = 100;
-    zprobe_zoffset = TERN(HAS_LEVELING, probe.offset.z, 0);
+    zprobe_zoffset = TERN(HAS_BED_PROBE, probe.offset.z, 0);
 
     planner.finish_and_disable();
 
@@ -3432,7 +3436,8 @@ void EachMomentUpdate(void) {
         Popup_Window_Resume();
         draw_first_option(false);
         char * const name = card.longest_filename();
-        DWIN_Draw_String(false, true, font8x16, Font_window, Background_window, (DWIN_WIDTH - strlen(name) * MENU_CHR_W) / 2, 252, name);
+        const int8_t npos = _MAX(0, DWIN_WIDTH - strlen(name) * (MENU_CHR_W)) / 2;
+        DWIN_Draw_String(false, true, font8x16, Font_window, Background_window, npos, 252, name);
         DWIN_UpdateLCD();
         break;
       }
@@ -3490,11 +3495,11 @@ void DWIN_HandleScreen(void) {
     case Move_X:                HMI_Move_X(); break;
     case Move_Y:                HMI_Move_Y(); break;
     case Move_Z:                HMI_Move_Z(); break;
-    case Extruder:              HMI_Move_E(); break;
-    case Homeoffset:            HMI_Zoffset(); break;
     #if HAS_HOTEND
+      case Extruder:            HMI_Move_E(); break;
       case ETemp:               HMI_ETemp(); break;
     #endif
+    case Homeoffset:            HMI_Zoffset(); break;
     #if HAS_HEATED_BED
       case BedTemp:             HMI_BedTemp(); break;
     #endif
