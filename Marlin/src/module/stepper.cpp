@@ -1583,12 +1583,11 @@ void Stepper::pulse_phase_isr() {
 
         #if STEPPER_PAGE_FORMAT == SP_4x4D_128
 
-          #define PAGE_SEGMENT_UPDATE(AXIS, VALUE, MID) do{ \
-                 if ((VALUE) == MID) {}                     \
-            else if ((VALUE) <  MID) SBI(dm, _AXIS(AXIS));  \
-            else                     CBI(dm, _AXIS(AXIS));  \
-            page_step_state.sd[_AXIS(AXIS)] = VALUE;        \
-            page_step_state.bd[_AXIS(AXIS)] += VALUE;       \
+          #define PAGE_SEGMENT_UPDATE(AXIS, VALUE) do{   \
+                 if ((VALUE) <  7) SBI(dm, _AXIS(AXIS)); \
+            else if ((VALUE) >  7) CBI(dm, _AXIS(AXIS)); \
+            page_step_state.sd[_AXIS(AXIS)] = VALUE;     \
+            page_step_state.bd[_AXIS(AXIS)] += VALUE;    \
           }while(0)
 
           #define PAGE_PULSE_PREP(AXIS) do{ \
@@ -1597,7 +1596,7 @@ void Stepper::pulse_phase_isr() {
           }while(0)
 
           switch (page_step_state.segment_steps) {
-            case 8:
+            case DirectStepping::Config::SEGMENT_STEPS:
               page_step_state.segment_idx += 2;
               page_step_state.segment_steps = 0;
               // fallthru
@@ -1606,10 +1605,10 @@ void Stepper::pulse_phase_isr() {
                            high = page_step_state.page[page_step_state.segment_idx + 1];
               uint8_t dm = last_direction_bits;
 
-              PAGE_SEGMENT_UPDATE(X, low >> 4, 7);
-              PAGE_SEGMENT_UPDATE(Y, low & 0xF, 7);
-              PAGE_SEGMENT_UPDATE(Z, high >> 4, 7);
-              PAGE_SEGMENT_UPDATE(E, high & 0xF, 7);
+              PAGE_SEGMENT_UPDATE(X, low >> 4);
+              PAGE_SEGMENT_UPDATE(Y, low & 0xF);
+              PAGE_SEGMENT_UPDATE(Z, high >> 4);
+              PAGE_SEGMENT_UPDATE(E, high & 0xF);
 
               if (dm != last_direction_bits) {
                 last_direction_bits = dm;
@@ -1620,9 +1619,9 @@ void Stepper::pulse_phase_isr() {
             default: break;
           }
 
-          PAGE_PULSE_PREP(X),
-          PAGE_PULSE_PREP(Y),
-          PAGE_PULSE_PREP(Z),
+          PAGE_PULSE_PREP(X);
+          PAGE_PULSE_PREP(Y);
+          PAGE_PULSE_PREP(Z);
           PAGE_PULSE_PREP(E);
 
           page_step_state.segment_steps++;
@@ -1639,7 +1638,7 @@ void Stepper::pulse_phase_isr() {
           }while(0)
 
           switch (page_step_state.segment_steps) {
-            case 4:
+            case DirectStepping::Config::SEGMENT_STEPS:
               page_step_state.segment_idx++;
               page_step_state.segment_steps = 0;
               // fallthru
@@ -1669,7 +1668,6 @@ void Stepper::pulse_phase_isr() {
           }while(0)
 
           uint8_t steps = page_step_state.page[page_step_state.segment_idx >> 1];
-
           if (page_step_state.segment_idx & 0x1) steps >>= 4;
 
           PAGE_PULSE_PREP(X, 3);

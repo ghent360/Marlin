@@ -606,6 +606,8 @@
   #include "stm32f4/pins_FLYF407ZG.h"           // STM32F4                                env:FLYF407ZG
 #elif MB(MKS_ROBIN2)
   #include "stm32f4/pins_MKS_ROBIN2.h"          // STM32F4                                env:MKS_ROBIN2
+#elif MB(FYSETC_S6_V2_0)
+  #include "stm32f4/pins_FYSETC_S6_V2_0.h"      // STM32F4                                env:FYSETC_S6
 #elif MB(PRNTR_V1)
   #include "stm32f4/pins_PRNTR_V1.h"            // STM32F4                                env:STM32F4
 #elif MB(PRNTR_V2)

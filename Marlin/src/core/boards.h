@@ -345,8 +345,9 @@
 #define BOARD_LERDGE_X                4215  // Lerdge X (STM32F407VE)
 #define BOARD_VAKE403D                4216  // VAkE 403D (STM32F446VET6)
 #define BOARD_FYSETC_S6               4217  // FYSETC S6 board
-#define BOARD_FLYF407ZG               4218  // FLYF407ZG board (STM32F407ZG)
-#define BOARD_MKS_ROBIN2              4219  // MKS_ROBIN2 (STM32F407ZE)
+#define BOARD_FYSETC_S6_V2_0          4218  // FYSETC S6 v2.0 board
+#define BOARD_FLYF407ZG               4219  // FLYF407ZG board (STM32F407ZG)
+#define BOARD_MKS_ROBIN2              4220  // MKS_ROBIN2 (STM32F407ZE)
 #define BOARD_PRNTR_V1                4225  // STM32F446RE NUCLEO-64 shield controller
 #define BOARD_PRNTR_F407_V1           4226  // STM32F407VE NUCLEO-64-like shield controller
 #define BOARD_PRNTR_F407_2209         4227  // STM32F407VE NUCLEO-64-like shield controller
