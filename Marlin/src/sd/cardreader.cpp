@@ -140,7 +140,7 @@ CardReader::CardReader() {
   #if ENABLED(SDSUPPORT) && PIN_EXISTS(SD_DETECT)
     SET_INPUT_PULLUP(SD_DETECT_PIN);
   #endif
-  
+
   #if PIN_EXISTS(SDPOWER)
     OUT_WRITE(SDPOWER_PIN, HIGH); // Power the SD reader
   #endif
@@ -383,10 +383,11 @@ void CardReader::mount() {
 
   if (flag.mounted)
     cdroot();
-  else {
-    spiInit(SPI_SPEED); // Return to base SPI speed
-    ui.set_status_P(GET_TEXT(MSG_SD_INIT_FAIL), -1);
-  }
+  #if ENABLED(USB_FLASH_DRIVE_SUPPORT) || PIN_EXISTS(SD_DETECT)
+    else if (marlin_state != MF_INITIALIZING)
+      ui.set_status_P(GET_TEXT(MSG_SD_INIT_FAIL), -1);
+  #endif
+
   ui.refresh();
 }
 
