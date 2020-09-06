@@ -24,6 +24,8 @@
 
 #if ENABLED(SDSUPPORT)
 
+//#define DEBUG_CARDREADER
+
 #include "cardreader.h"
 
 #include "../MarlinCore.h"
@@ -50,6 +52,9 @@
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   #include "../feature/pause.h"
 #endif
+
+#define DEBUG_OUT ENABLED(DEBUG_CARDREADER)
+#include "../core/debug_out.h"
 
 // public:
 
@@ -276,8 +281,10 @@ void CardReader::printListing(SdFile parent, const char * const prepend/*=nullpt
 // List all files on the SD card
 //
 void CardReader::ls() {
-  root.rewind();
-  printListing(root);
+  if (flag.mounted) {
+    root.rewind();
+    printListing(root);
+  }
 }
 
 #if ENABLED(LONG_FILENAME_HOST_SUPPORT)
@@ -403,6 +410,8 @@ void CardReader::manage_media() {
   uint8_t stat = uint8_t(IS_SD_INSERTED());
   if (stat == prev_stat) return;
 
+  DEBUG_ECHOLNPAIR("SD: Status changed from ", prev_stat, " to ", stat);
+
   flag.workDirIsRoot = true;          // Return to root on mount/release
 
   if (ui.detected()) {
@@ -429,12 +438,15 @@ void CardReader::manage_media() {
     if (stat) {
       TERN_(SDCARD_EEPROM_EMULATION, settings.first_load());
       if (old_stat == 2)              // First mount?
+        DEBUG_ECHOLNPGM("First mount.");
         TERN(POWER_LOSS_RECOVERY,
           recovery.check(),           // Check for PLR file. (If not there it will beginautostart)
           beginautostart()            // Look for auto0.g on the next loop
         );
     }
   }
+  else
+    DEBUG_ECHOLNPGM("SD: No UI Detected.");
 }
 
 void CardReader::release() {
