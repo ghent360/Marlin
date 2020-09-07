@@ -17,7 +17,8 @@
  *
  */
 
-#if defined(ARDUINO_ARCH_STM32) && !defined(STM32GENERIC)
+#include "../HAL.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 #include "../../inc/MarlinConfigPre.h"
 

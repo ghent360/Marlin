@@ -110,6 +110,7 @@ tags
 *.i*86
 *.x86_64
 *.hex
+*.bin
 
 # Debug files
 *.dSYM/
@@ -145,6 +146,7 @@ Marlin/*/readme.txt
 Marlin/*/*/readme.txt
 Marlin/*/*/*/readme.txt
 Marlin/*/*/*/*/readme.txt
+Marlin/build
 
 # Secure Credentials
 Configuration_Secure.h
