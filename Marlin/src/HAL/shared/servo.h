@@ -73,6 +73,8 @@
   #include "../TEENSY31_32/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_TEENSY35_36)
   #include "../TEENSY35_36/Servo.h"
+#elif (HAL_PLATFORM_ID == HAL_ID_TEENSY41)
+  #include "../TEENSY40_41/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_LPC1768)
   #include "../LPC1768/Servo.h"
 #elif (HAL_PLATFORM_ID == HAL_ID_STM32F1)
