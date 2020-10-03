@@ -51,5 +51,4 @@ uint8_t eeprom_read_byte(uint8_t *pos) {
 }
 
 #endif // IIC_BL24CXX_EEPROM
-
-#endif __STM32F1__
+#endif // __STM32F1__
