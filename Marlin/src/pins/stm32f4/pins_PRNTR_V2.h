@@ -249,7 +249,10 @@
 #define EXP2_BTN_B     IO_PIN(B, 14)
 #define EXP2_BTN_A     IO_PIN(B, 15)
 
-#if HAS_SPI_LCD
+//
+// LCD / Controller
+//
+#if HAS_WIRED_LCD
   #define BEEPER_PIN       EXP1_BEEPER   // (37) not 5V tolerant
   #define BTN_ENC          EXP1_BTN_ENC   // (58) open-drain
 
@@ -262,31 +265,32 @@
     #define LCD_PINS_ENABLE EXP1_LCD_D7
     #define LCD_PINS_D4    EXP1_LCD_D5
 
+    // CR10_STOCKDISPLAY default timing is too fast
+    //#undef BOARD_ST7920_DELAY_1
+    //#undef BOARD_ST7920_DELAY_2
+    //#undef BOARD_ST7920_DELAY_3
+
   #else
     #define LCD_PINS_RS    EXP1_LCD_RS
 
     #define BTN_EN1        EXP2_BTN_A
     #define BTN_EN2        EXP2_BTN_B
 
-    #define LCD_PINS_ENABLE EXP1_LCD_E
-    #define LCD_PINS_D4    EXP1_LCD_D4
-
     #define LCD_SDSS       EXP2_SD_SS
     //#define SD_DETECT_PIN  EXP2_SD_DETECT
+
+    #define LCD_PINS_ENABLE EXP1_LCD_E
+    #define LCD_PINS_D4    EXP1_LCD_D4
 
     #if ENABLED(FYSETC_MINI_12864)
       #define DOGLCD_CS    EXP1_LCD_E
       #define DOGLCD_A0    EXP1_LCD_RS
       #define DOGLCD_SCK   EXP2_SCK
       #define DOGLCD_MOSI  EXP2_MOSI
-
-      #define LCD_BACKLIGHT_PIN -1
-
-      //#define FORCE_SOFT_SPI      // Use this if default of hardware SPI causes display problems
-                                  //   results in LCD soft SPI mode 3, SD soft SPI mode 0
-
-      #define LCD_RESET_PIN EXP1_LCD_D4 // Must be high or open for LCD to operate normally.
-
+      #if ENABLED(FYSETC_GENERIC_12864_1_1)
+        #define LCD_BACKLIGHT_PIN     EXP1_LCD_RS
+      #endif
+      #define LCD_RESET_PIN           EXP1_LCD_D4  // Must be high or open for LCD to operate normally.
       #if EITHER(FYSETC_MINI_12864_1_2, FYSETC_MINI_12864_2_0)
         #ifndef RGB_LED_R_PIN
           #define RGB_LED_R_PIN EXP1_LCD_D5
@@ -300,22 +304,32 @@
       #elif ENABLED(FYSETC_MINI_12864_2_1)
         #define NEOPIXEL_PIN    EXP1_LCD_D5
       #endif
-
-    #else // !FYSETC_MINI_12864
-
-      #if ENABLED(MKS_MINI_12864)
-        #define DOGLCD_CS  EXP1_LCD_D5
-        #define DOGLCD_A0  EXP1_LCD_D6
-      #endif
-
-      #if ENABLED(ULTIPANEL)
-        #define LCD_PINS_D5 EXP1_LCD_D5
-        #define LCD_PINS_D6 EXP1_LCD_D6
-        #define LCD_PINS_D7 EXP1_LCD_D7
-      #endif
-
     #endif // !FYSETC_MINI_12864
+
+    #if ENABLED(MKS_MINI_12864)
+      #define DOGLCD_CS  EXP1_LCD_D5
+      #define DOGLCD_A0  EXP1_LCD_D6
+    #endif
+
+    #if ENABLED(ULTIPANEL)
+      #define LCD_PINS_D5 EXP1_LCD_D5
+      #define LCD_PINS_D6 EXP1_LCD_D6
+      #define LCD_PINS_D7 EXP1_LCD_D7
+    #endif
 
   #endif
 
-#endif // HAS_SPI_LCD
+  // Alter timing for graphical display
+  #if HAS_MARLINUI_U8GLIB
+    #ifndef BOARD_ST7920_DELAY_1
+      #define BOARD_ST7920_DELAY_1  DELAY_NS(96)
+    #endif
+    #ifndef BOARD_ST7920_DELAY_2
+      #define BOARD_ST7920_DELAY_2  DELAY_NS(48)
+    #endif
+    #ifndef BOARD_ST7920_DELAY_3
+      #define BOARD_ST7920_DELAY_3 DELAY_NS(600)
+    #endif
+  #endif
+
+#endif // HAS_WIRED_LCD

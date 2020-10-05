@@ -223,7 +223,7 @@
 #endif
 #define EXP2_MISO      SLOW_PIN(C, 2)
 
-#if HAS_SPI_LCD
+#if HAS_WIRED_LCD
   #define BEEPER_PIN       EXP1_BEEPER   // (37) not 5V tolerant
   #define BTN_ENC          EXP1_BTN_ENC   // (58) open-drain
 
@@ -292,4 +292,4 @@
 
   #endif
 
-#endif // HAS_SPI_LCD
+#endif // HAS_WIRED_LCD

@@ -12,8 +12,6 @@
  */
 #ifdef __STM32F1__
 
-#ifdef __STM32F1__
-
 #include "../../inc/MarlinConfig.h"
 
 #if SD_CONNECTION_IS(ONBOARD)
