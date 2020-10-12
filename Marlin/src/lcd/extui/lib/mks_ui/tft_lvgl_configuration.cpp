@@ -198,10 +198,10 @@ void SysTick_Callback() {
       LCD_WriteReg(0x0046, xEnd);
     }
     else if (DeviceCode == 0x9488) {
-      s_h = (StartX >> 8) & 0x00ff;
-      s_l = StartX & 0x00ff;
-      e_h = ((StartX + width - 1) >> 8) & 0x00ff;
-      e_l = (StartX + width - 1) & 0x00ff;
+      s_h = (StartX >> 8) & 0x00FF;
+      s_l = StartX & 0x00FF;
+      e_h = ((StartX + width - 1) >> 8) & 0x00FF;
+      e_l = (StartX + width - 1) & 0x00FF;
 
       LCD_IO_WriteReg(0x002A);
       LCD_IO_WriteData(s_h);
@@ -209,10 +209,10 @@ void SysTick_Callback() {
       LCD_IO_WriteData(e_h);
       LCD_IO_WriteData(e_l);
 
-      s_h = (StartY >> 8) & 0x00ff;
-      s_l = StartY & 0x00ff;
-      e_h = ((StartY + heigh - 1) >> 8) & 0x00ff;
-      e_l = (StartY + heigh - 1) & 0x00ff;
+      s_h = (StartY >> 8) & 0x00FF;
+      s_l = StartY & 0x00FF;
+      e_h = ((StartY + heigh - 1) >> 8) & 0x00FF;
+      e_l = (StartY + heigh - 1) & 0x00FF;
 
       LCD_IO_WriteReg(0x002B);
       LCD_IO_WriteData(s_h);
@@ -275,18 +275,18 @@ void SysTick_Callback() {
       //while(index --) LCD_IO_WriteData(Color);
     }
     else if (DeviceCode == 0x5761) {
-      LCD_IO_WriteReg(0x002a);
+      LCD_IO_WriteReg(0x002A);
       LCD_IO_WriteData(0);
       LCD_IO_WriteData(0);
       LCD_IO_WriteData(HDP >> 8);
-      LCD_IO_WriteData(HDP & 0x00ff);
-      LCD_IO_WriteReg(0x002b);
+      LCD_IO_WriteData(HDP & 0x00FF);
+      LCD_IO_WriteReg(0x002B);
       LCD_IO_WriteData(0);
       LCD_IO_WriteData(0);
       LCD_IO_WriteData(VDP >> 8);
-      LCD_IO_WriteData(VDP & 0x00ff);
-      LCD_IO_WriteReg(0x002c);
-      LCD_IO_WriteReg(0x002c);
+      LCD_IO_WriteData(VDP & 0x00FF);
+      LCD_IO_WriteReg(0x002C);
+      LCD_IO_WriteReg(0x002C);
       for (count = 0; count < (HDP + 1) * (VDP + 1); count++)
         LCD_IO_WriteData(Color);
     }
@@ -323,19 +323,19 @@ void SysTick_Callback() {
       LCD_IO_WriteReg(0x00E0);
       LCD_IO_WriteData(0x0000);
       LCD_IO_WriteData(0x0007);
-      LCD_IO_WriteData(0x000f);
+      LCD_IO_WriteData(0x000F);
       LCD_IO_WriteData(0x000D);
       LCD_IO_WriteData(0x001B);
       LCD_IO_WriteData(0x000A);
-      LCD_IO_WriteData(0x003c);
+      LCD_IO_WriteData(0x003C);
       LCD_IO_WriteData(0x0078);
       LCD_IO_WriteData(0x004A);
       LCD_IO_WriteData(0x0007);
       LCD_IO_WriteData(0x000E);
       LCD_IO_WriteData(0x0009);
       LCD_IO_WriteData(0x001B);
-      LCD_IO_WriteData(0x001e);
-      LCD_IO_WriteData(0x000f);
+      LCD_IO_WriteData(0x001E);
+      LCD_IO_WriteData(0x000F);
 
       LCD_IO_WriteReg(0x00E1);
       LCD_IO_WriteData(0x0000);
@@ -348,11 +348,11 @@ void SysTick_Callback() {
       LCD_IO_WriteData(0x0047);
       LCD_IO_WriteData(0x0047);
       LCD_IO_WriteData(0x0006);
-      LCD_IO_WriteData(0x000a);
+      LCD_IO_WriteData(0x000A);
       LCD_IO_WriteData(0x0007);
       LCD_IO_WriteData(0x0030);
       LCD_IO_WriteData(0x0037);
-      LCD_IO_WriteData(0x000f);
+      LCD_IO_WriteData(0x000F);
 
       LCD_IO_WriteReg(0x00C0);
       LCD_IO_WriteData(0x0010);
@@ -799,39 +799,39 @@ void lv_encoder_pin_init() {
   //static const int8_t encoderDirection = 1;
   //static int16_t enc_Direction;
   void lv_update_encoder() {
-    static uint8_t buttons;
     static uint32_t encoder_time1;
     uint32_t tmpTime, diffTime = 0;
     tmpTime = millis();
     diffTime = getTickDiff(tmpTime, encoder_time1);
     if (diffTime > 50) {
 
-      #if ANY_BUTTON(EN1, EN2, ENC, BACK)
-
-        uint8_t newbutton = 0;
-
-        #if BUTTON_EXISTS(EN1)
-          if (BUTTON_PRESSED(EN1)) newbutton |= EN_A;
-        #endif
-        #if BUTTON_EXISTS(EN2)
-          if (BUTTON_PRESSED(EN2)) newbutton |= EN_B;
-        #endif
-        #if BUTTON_EXISTS(ENC)
-          if (BUTTON_PRESSED(ENC)) newbutton |= EN_C;
-        #endif
-        #if BUTTON_EXISTS(BACK)
-          if (BUTTON_PRESSED(BACK)) newbutton |= EN_D;
-        #endif
-
-      #else
-
-        constexpr uint8_t newbutton = 0;
-
-      #endif
-
-      buttons = newbutton;
-
       #if HAS_ENCODER_WHEEL
+
+        #if ANY_BUTTON(EN1, EN2, ENC, BACK)
+
+          uint8_t newbutton = 0;
+
+          #if BUTTON_EXISTS(EN1)
+            if (BUTTON_PRESSED(EN1)) newbutton |= EN_A;
+          #endif
+          #if BUTTON_EXISTS(EN2)
+            if (BUTTON_PRESSED(EN2)) newbutton |= EN_B;
+          #endif
+          #if BUTTON_EXISTS(ENC)
+            if (BUTTON_PRESSED(ENC)) newbutton |= EN_C;
+          #endif
+          #if BUTTON_EXISTS(BACK)
+            if (BUTTON_PRESSED(BACK)) newbutton |= EN_D;
+          #endif
+
+        #else
+
+          constexpr uint8_t newbutton = 0;
+
+        #endif
+
+
+        static uint8_t buttons = newbutton;
         static uint8_t lastEncoderBits;
 
         #define encrot0 0
