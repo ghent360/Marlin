@@ -26,7 +26,7 @@ include_dir  = Marlin
 #
 [common]
 default_src_filter = +<src/*> -<src/config> -<src/HAL> +<src/HAL/shared>
-  -<src/lcd/HD44780> -<src/lcd/TFTGLCD> -<src/lcd/dwin> -<src/lcd/dogm> -<src/lcd/tft>
+  -<src/lcd/HD44780> -<src/lcd/TFTGLCD> -<src/lcd/dwin> -<src/lcd/dogm> -<src/lcd/tft> -<src/lcd/tft_io>
   -<src/HAL/STM32/tft> -<src/HAL/STM32F1/tft>
   -<src/lcd/menu>
   -<src/lcd/menu/game/game.cpp> -<src/lcd/menu/game/brickout.cpp> -<src/lcd/menu/game/invaders.cpp>
@@ -227,7 +227,7 @@ HAS_WIRED_LCD           = src_filter=+<src/lcd/lcdprint.cpp>
 HAS_MARLINUI_HD44780    = src_filter=+<src/lcd/HD44780>
 HAS_MARLINUI_U8GLIB     = U8glib-HAL@~0.4.1
                           src_filter=+<src/lcd/dogm>
-HAS_(FSMC|SPI)_TFT      = src_filter=+<src/HAL/STM32/tft> +<src/HAL/STM32F1/tft>
+HAS_(FSMC|SPI)_TFT      = src_filter=+<src/HAL/STM32/tft> +<src/HAL/STM32F1/tft> +<src/lcd/tft_io>
 HAS_FSMC_TFT            = src_filter=+<src/HAL/STM32/tft/tft_fsmc.cpp> +<src/HAL/STM32F1/tft/tft_fsmc.cpp>
 HAS_SPI_TFT             = src_filter=+<src/HAL/STM32/tft/tft_spi.cpp> +<src/HAL/STM32F1/tft/tft_spi.cpp>
 HAS_GRAPHICAL_TFT       = src_filter=+<src/lcd/tft>
@@ -445,7 +445,7 @@ board               = megaatmega2560
 #
 [env:mega2560ext]
 platform            = atmelavr
-extends             = mega2560
+extends             = env:mega2560
 board               = megaatmega2560
 board_build.variant = megaextendedpins
 extra_scripts       = ${common.extra_scripts}
@@ -857,6 +857,17 @@ build_flags   = ${common.build_flags} -DUSE_STM32GENERIC -DSTM32GENERIC -DSTM32F
 src_filter    = ${common.default_src_filter} +<src/HAL/STM32_F4_F7> -<src/HAL/STM32_F4_F7/STM32F4>
 
 #
+# ST NUCLEO-F767ZI Development Board
+# This environment is for testing purposes prior to control boards
+# being readily available based on STM32F7 MCUs
+#
+[env:NUCLEO_F767ZI]
+platform      = ${common_stm32.platform}
+extends       = common_stm32
+board         = nucleo_f767zi
+build_flags   = ${common_stm32.build_flags} -DTIMER_SERIAL=TIM9
+
+#
 # ARMED (STM32)
 #
 [env:ARMED]
@@ -909,8 +920,6 @@ build_flags   = ${common_stm32f1.build_flags}
 
 #
 # MKS Robin Nano (STM32F103VET6)
-# v1.2 - Emulated Graphical 128x64 (DOGM) UI and LVGL UI
-# v2.0 - LVGL UI
 #
 [env:mks_robin_nano35]
 platform        = ${common_stm32f1.platform}

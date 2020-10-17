@@ -38,9 +38,10 @@
 
 void GcodeSuite::G34() {
 
-  if (homing_needed()) return;
+  // Home before the alignment procedure
+  if (!all_axes_known()) home_all_axes();
 
-  TEMPORARY_SOFT_ENDSTOP_STATE(false);
+  SET_SOFT_ENDSTOP_LOOSE(true);
   TEMPORARY_BED_LEVELING_STATE(false);
   TemporaryGlobalEndstopsState unlock_z(false);
 
@@ -148,6 +149,8 @@ void GcodeSuite::G34() {
     if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Running Post Commands");
     gcode.process_subcommands_now_P(PSTR(GANTRY_CALIBRATION_COMMANDS_POST));
   #endif
+
+  SET_SOFT_ENDSTOP_LOOSE(false);
 }
 
 #endif // MECHANICAL_GANTRY_CALIBRATION
