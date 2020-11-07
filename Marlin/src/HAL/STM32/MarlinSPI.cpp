@@ -21,6 +21,7 @@
  */
 
 #include "MarlinSPI.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 static void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb, uint32_t dataSize) {
   spi_init(obj, speed, mode, msb);
@@ -159,3 +160,5 @@ uint8_t MarlinSPI::dmaSend(const void * transmitBuf, uint16_t length, bool minc)
   HAL_DMA_DeInit(&_dmaTx);
   return 1;
 }
+
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32)
