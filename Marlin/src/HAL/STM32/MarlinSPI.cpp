@@ -20,8 +20,9 @@
  *
  */
 
-#include "MarlinSPI.h"
+#include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32)
+#include "MarlinSPI.h"
 
 static void spi_init(spi_t *obj, uint32_t speed, spi_mode_e mode, uint8_t msb, uint32_t dataSize) {
   spi_init(obj, speed, mode, msb);

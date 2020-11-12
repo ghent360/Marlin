@@ -209,7 +209,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #if THERMISTOR_HEATER_0
   #define HEATER_0_TEMPTABLE TT_NAME(THERMISTOR_HEATER_0)
   #define HEATER_0_TEMPTABLE_LEN COUNT(HEATER_0_TEMPTABLE)
-#elif defined(HEATER_0_USES_THERMISTOR)
+#elif HEATER_0_USES_THERMISTOR
   #error "No heater 0 thermistor table specified"
 #else
   #define HEATER_0_TEMPTABLE nullptr
@@ -219,7 +219,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #if THERMISTOR_HEATER_1
   #define HEATER_1_TEMPTABLE TT_NAME(THERMISTOR_HEATER_1)
   #define HEATER_1_TEMPTABLE_LEN COUNT(HEATER_1_TEMPTABLE)
-#elif defined(HEATER_1_USES_THERMISTOR)
+#elif HEATER_1_USES_THERMISTOR
   #error "No heater 1 thermistor table specified"
 #else
   #define HEATER_1_TEMPTABLE nullptr
@@ -229,7 +229,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #if THERMISTOR_HEATER_2
   #define HEATER_2_TEMPTABLE TT_NAME(THERMISTOR_HEATER_2)
   #define HEATER_2_TEMPTABLE_LEN COUNT(HEATER_2_TEMPTABLE)
-#elif defined(HEATER_2_USES_THERMISTOR)
+#elif HEATER_2_USES_THERMISTOR
   #error "No heater 2 thermistor table specified"
 #else
   #define HEATER_2_TEMPTABLE nullptr
@@ -239,7 +239,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #if THERMISTOR_HEATER_3
   #define HEATER_3_TEMPTABLE TT_NAME(THERMISTOR_HEATER_3)
   #define HEATER_3_TEMPTABLE_LEN COUNT(HEATER_3_TEMPTABLE)
-#elif defined(HEATER_3_USES_THERMISTOR)
+#elif HEATER_3_USES_THERMISTOR
   #error "No heater 3 thermistor table specified"
 #else
   #define HEATER_3_TEMPTABLE nullptr
@@ -249,7 +249,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #if THERMISTOR_HEATER_4
   #define HEATER_4_TEMPTABLE TT_NAME(THERMISTOR_HEATER_4)
   #define HEATER_4_TEMPTABLE_LEN COUNT(HEATER_4_TEMPTABLE)
-#elif defined(HEATER_4_USES_THERMISTOR)
+#elif HEATER_4_USES_THERMISTOR
   #error "No heater 4 thermistor table specified"
 #else
   #define HEATER_4_TEMPTABLE nullptr
@@ -259,7 +259,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #if THERMISTOR_HEATER_5
   #define HEATER_5_TEMPTABLE TT_NAME(THERMISTOR_HEATER_5)
   #define HEATER_5_TEMPTABLE_LEN COUNT(HEATER_5_TEMPTABLE)
-#elif defined(HEATER_5_USES_THERMISTOR)
+#elif HEATER_5_USES_THERMISTOR
   #error "No heater 5 thermistor table specified"
 #else
   #define HEATER_5_TEMPTABLE nullptr
@@ -269,7 +269,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #if THERMISTOR_HEATER_6
   #define HEATER_6_TEMPTABLE TT_NAME(THERMISTOR_HEATER_6)
   #define HEATER_6_TEMPTABLE_LEN COUNT(HEATER_6_TEMPTABLE)
-#elif defined(HEATER_6_USES_THERMISTOR)
+#elif HEATER_6_USES_THERMISTOR
   #error "No heater 6 thermistor table specified"
 #else
   #define HEATER_6_TEMPTABLE nullptr
@@ -279,7 +279,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #if THERMISTOR_HEATER_7
   #define HEATER_7_TEMPTABLE TT_NAME(THERMISTOR_HEATER_7)
   #define HEATER_7_TEMPTABLE_LEN COUNT(HEATER_7_TEMPTABLE)
-#elif defined(HEATER_7_USES_THERMISTOR)
+#elif HEATER_7_USES_THERMISTOR
   #error "No heater 7 thermistor table specified"
 #else
   #define HEATER_7_TEMPTABLE nullptr
@@ -289,7 +289,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #ifdef THERMISTORBED
   #define BED_TEMPTABLE TT_NAME(THERMISTORBED)
   #define BED_TEMPTABLE_LEN COUNT(BED_TEMPTABLE)
-#elif defined(HEATER_BED_USES_THERMISTOR)
+#elif HEATER_BED_USES_THERMISTOR
   #error "No bed thermistor table specified"
 #else
   #define BED_TEMPTABLE_LEN 0
@@ -298,7 +298,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #ifdef THERMISTORCHAMBER
   #define CHAMBER_TEMPTABLE TT_NAME(THERMISTORCHAMBER)
   #define CHAMBER_TEMPTABLE_LEN COUNT(CHAMBER_TEMPTABLE)
-#elif defined(HEATER_CHAMBER_USES_THERMISTOR)
+#elif HEATER_CHAMBER_USES_THERMISTOR
   #error "No chamber thermistor table specified"
 #else
   #define CHAMBER_TEMPTABLE_LEN 0
@@ -307,7 +307,7 @@ typedef struct { int16_t value, celsius; } temp_entry_t;
 #ifdef THERMISTORPROBE
   #define PROBE_TEMPTABLE TT_NAME(THERMISTORPROBE)
   #define PROBE_TEMPTABLE_LEN COUNT(PROBE_TEMPTABLE)
-#elif defined(HEATER_PROBE_USES_THERMISTOR)
+#elif HEATER_PROBE_USES_THERMISTOR
   #error "No probe thermistor table specified"
 #else
   #define PROBE_TEMPTABLE_LEN 0
@@ -405,7 +405,7 @@ static_assert(
 #endif
 
 #ifndef HEATER_0_RAW_HI_TEMP
-  #if TT_REV(THERMISTOR_HEATER_0) || !defined(HEATER_0_USES_THERMISTOR)
+  #if TT_REV(THERMISTOR_HEATER_0) || !HEATER_0_USES_THERMISTOR
     #define HEATER_0_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_0_RAW_LO_TEMP 0
   #else
@@ -414,7 +414,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_1_RAW_HI_TEMP
-  #if TT_REV(THERMISTOR_HEATER_1) || !defined(HEATER_1_USES_THERMISTOR)
+  #if TT_REV(THERMISTOR_HEATER_1) || !HEATER_1_USES_THERMISTOR
     #define HEATER_1_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_1_RAW_LO_TEMP 0
   #else
@@ -423,7 +423,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_2_RAW_HI_TEMP
-  #if TT_REV(THERMISTOR_HEATER_2) || !defined(HEATER_2_USES_THERMISTOR)
+  #if TT_REV(THERMISTOR_HEATER_2) || !HEATER_2_USES_THERMISTOR
     #define HEATER_2_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_2_RAW_LO_TEMP 0
   #else
@@ -432,7 +432,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_3_RAW_HI_TEMP
-  #if TT_REV(THERMISTOR_HEATER_3) || !defined(HEATER_3_USES_THERMISTOR)
+  #if TT_REV(THERMISTOR_HEATER_3) || !HEATER_3_USES_THERMISTOR
     #define HEATER_3_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_3_RAW_LO_TEMP 0
   #else
@@ -441,7 +441,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_4_RAW_HI_TEMP
-  #if TT_REV(THERMISTOR_HEATER_4) || !defined(HEATER_4_USES_THERMISTOR)
+  #if TT_REV(THERMISTOR_HEATER_4) || !HEATER_4_USES_THERMISTOR
     #define HEATER_4_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_4_RAW_LO_TEMP 0
   #else
@@ -450,7 +450,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_5_RAW_HI_TEMP
-  #if TT_REV(THERMISTOR_HEATER_5) || !defined(HEATER_5_USES_THERMISTOR)
+  #if TT_REV(THERMISTOR_HEATER_5) || !HEATER_5_USES_THERMISTOR
     #define HEATER_5_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_5_RAW_LO_TEMP 0
   #else
@@ -459,7 +459,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_6_RAW_HI_TEMP
-  #if TT_REV(THERMISTOR_HEATER_6) || !defined(HEATER_6_USES_THERMISTOR)
+  #if TT_REV(THERMISTOR_HEATER_6) || !HEATER_6_USES_THERMISTOR
     #define HEATER_6_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_6_RAW_LO_TEMP 0
   #else
@@ -468,7 +468,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_7_RAW_HI_TEMP
-  #if TT_REV(THERMISTOR_HEATER_7) || !defined(HEATER_7_USES_THERMISTOR)
+  #if TT_REV(THERMISTOR_HEATER_7) || !HEATER_7_USES_THERMISTOR
     #define HEATER_7_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_7_RAW_LO_TEMP 0
   #else
@@ -477,7 +477,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_BED_RAW_HI_TEMP
-  #if TT_REV(THERMISTORBED) || !defined(HEATER_BED_USES_THERMISTOR)
+  #if TT_REV(THERMISTORBED) || !HEATER_BED_USES_THERMISTOR
     #define HEATER_BED_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_BED_RAW_LO_TEMP 0
   #else
@@ -486,7 +486,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_CHAMBER_RAW_HI_TEMP
-  #if TT_REV(THERMISTORCHAMBER) || !defined(HEATER_CHAMBER_USES_THERMISTOR)
+  #if TT_REV(THERMISTORCHAMBER) || !HEATER_CHAMBER_USES_THERMISTOR
     #define HEATER_CHAMBER_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_CHAMBER_RAW_LO_TEMP 0
   #else
@@ -495,7 +495,7 @@ static_assert(
   #endif
 #endif
 #ifndef HEATER_PROBE_RAW_HI_TEMP
-  #if TT_REV(THERMISTORPROBE) || !defined(HEATER_PROBE_USES_THERMISTOR)
+  #if TT_REV(THERMISTORPROBE) || !HEATER_PROBE_USES_THERMISTOR
     #define HEATER_PROBE_RAW_HI_TEMP MAX_RAW_THERMISTOR_VALUE
     #define HEATER_PROBE_RAW_LO_TEMP 0
   #else
