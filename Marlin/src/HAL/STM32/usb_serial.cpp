@@ -52,5 +52,5 @@ void USB_Hook_init() {
   USBD_CDC_fops.Receive = USBD_CDC_Receive_hook;
 }
 
-#endif // EMERGENCY_PARSER
+#endif // EMERGENCY_PARSER && USBD_USE_CDC
 #endif // ARDUINO_ARCH_STM32 && !STM32GENERIC

@@ -24,7 +24,7 @@
 
 #include "../../inc/MarlinConfig.h"
 
-#if ENABLED(SDIO_SUPPORT) && !defined(STM32GENERIC)
+#if ENABLED(SDIO_SUPPORT)
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -321,5 +321,9 @@
 
 #endif // !USBD_USE_CDC_COMPOSITE
 #endif // SDIO_SUPPORT
+<<<<<<< HEAD
 
 #endif // (HAL_PLATFORM_ID == HAL_ID_STM32)
+=======
+#endif // ARDUINO_ARCH_STM32 && !STM32GENERIC
+>>>>>>> 5cae4e9f55a851d27efce52b7d67bc9b231a0654
