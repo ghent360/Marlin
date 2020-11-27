@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Build tests for REMRAM_V1
+# Build tests for STM32F7
 #
 
 # exit on first failure

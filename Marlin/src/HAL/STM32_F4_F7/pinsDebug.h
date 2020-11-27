@@ -23,5 +23,5 @@
 #elif defined(BOARD_NR_GPIO_PINS)   // Only in STM32GENERIC (Maple)
   #include "../STM32/pinsDebug_STM32GENERIC.h"
 #else
-  #error "M43 not supported for this board"
+  #error "M43 Pins Debugging not supported for this board."
 #endif

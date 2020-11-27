@@ -1,6 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
+ *
  * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2016 Bob Cousins bobcousins42@googlemail.com
+ * Copyright (c) 2017 Victor Perez
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +21,8 @@
  */
 #pragma once
 
-#ifdef NUM_DIGITAL_PINS             // Only in ST's Arduino core (STM32duino, STM32Core)
-  #include "../STM32/pinsDebug_STM32duino.h"
-#elif defined(BOARD_NR_GPIO_PINS)   // Only in STM32GENERIC (Maple)
-  #include "../STM32/pinsDebug_STM32GENERIC.h"
+#ifdef STM32F4
+  #include "STM32F4/timers.h"
 #else
-  #error "M43 not supported for this board"
+  #include "STM32F7/timers.h"
 #endif

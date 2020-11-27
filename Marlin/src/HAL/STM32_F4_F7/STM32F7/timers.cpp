@@ -93,11 +93,6 @@ extern "C" void TIM8_IRQHandler() {
 
 void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
   __HAL_TIM_SetAutoreload(&timerConfig[timer_num].timerdef, compare);
-}
-
-void HAL_timer_enable_interrupt(const uint8_t timer_num) {
-  HAL_NVIC_EnableIRQ(timerConfig[timer_num].IRQ_Id);
-}
 
 void HAL_timer_disable_interrupt(const uint8_t timer_num) {
   HAL_NVIC_DisableIRQ(timerConfig[timer_num].IRQ_Id);

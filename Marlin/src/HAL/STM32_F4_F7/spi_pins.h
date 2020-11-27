@@ -18,10 +18,18 @@
  */
 #pragma once
 
-#ifdef NUM_DIGITAL_PINS             // Only in ST's Arduino core (STM32duino, STM32Core)
-  #include "../STM32/pinsDebug_STM32duino.h"
-#elif defined(BOARD_NR_GPIO_PINS)   // Only in STM32GENERIC (Maple)
-  #include "../STM32/pinsDebug_STM32GENERIC.h"
-#else
-  #error "M43 not supported for this board"
+/**
+ * Define SPI Pins: SCK, MISO, MOSI, SS
+ */
+#ifndef SCK_PIN
+  #define SCK_PIN   PA5
+#endif
+#ifndef MISO_PIN
+  #define MISO_PIN  PA6
+#endif
+#ifndef MOSI_PIN
+  #define MOSI_PIN  PA7
+#endif
+#ifndef SS_PIN
+  #define SS_PIN    PA8
 #endif
