@@ -143,6 +143,11 @@
 
 #define HEATER_BED_PIN     PWM1    // BED
 
+#define HEATER_0_INVERTING true
+#define HEATER_1_INVERTING true
+#define HEATER_2_INVERTING true
+#define HEATER_BED_INVERTING true
+
 #ifndef FAN_PIN
 #define FAN_PIN            PWM5  // E0 Part
 #endif
@@ -311,7 +316,7 @@
       #define DOGLCD_A0  EXP1_LCD_D6
     #endif
 
-    #if ENABLED(ULTIPANEL)
+    #if IS_ULTIPANEL
       #define LCD_PINS_D5 EXP1_LCD_D5
       #define LCD_PINS_D6 EXP1_LCD_D6
       #define LCD_PINS_D7 EXP1_LCD_D7

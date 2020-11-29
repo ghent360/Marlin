@@ -410,7 +410,7 @@
 #warning temp_sensor set to 998/999 (fake)
 //#define TEMP_SENSOR_0 510 //510
 //#define TEMP_SENSOR_1 510 //510
-#define TEMP_SENSOR_0 999
+#define TEMP_SENSOR_0 5
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
@@ -418,7 +418,7 @@
 #define TEMP_SENSOR_5 0
 #define TEMP_SENSOR_6 0
 #define TEMP_SENSOR_7 0
-#define TEMP_SENSOR_BED 0
+#define TEMP_SENSOR_BED 5
 #define TEMP_SENSOR_PROBE 0
 #define TEMP_SENSOR_CHAMBER 0
 
