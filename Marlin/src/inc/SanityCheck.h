@@ -189,7 +189,9 @@
 #elif defined(ENDSTOPS_ONLY_FOR_HOMING)
   #error "ENDSTOPS_ONLY_FOR_HOMING is deprecated. Use (disable) ENDSTOPS_ALWAYS_ON_DEFAULT instead."
 #elif defined(HOMING_FEEDRATE)
-  #error "HOMING_FEEDRATE is deprecated. Set individual rates with HOMING_FEEDRATE_(XY|Z|E) instead."
+  #error "HOMING_FEEDRATE is now set using the HOMING_FEEDRATE_MM_M array instead."
+#elif defined(HOMING_FEEDRATE_XY) || defined(HOMING_FEEDRATE_Z)
+  #error "HOMING_FEEDRATE_XY and HOMING_FEEDRATE_Z are now set using the HOMING_FEEDRATE_MM_M array instead."
 #elif defined(MANUAL_HOME_POSITIONS)
   #error "MANUAL_HOME_POSITIONS is deprecated. Set MANUAL_[XYZ]_HOME_POS as-needed instead."
 #elif defined(PID_ADD_EXTRUSION_RATE)
@@ -531,6 +533,8 @@
   #error "PROBE_OFFSET_START is now PROBE_OFFSET_WIZARD_START_Z."
 #elif defined(POWER_LOSS_PULL)
   #error "POWER_LOSS_PULL is now specifically POWER_LOSS_PULL(UP|DOWN)."
+#elif defined(SHORT_MANUAL_Z_MOVE)
+  #error "SHORT_MANUAL_Z_MOVE is now FINE_MANUAL_MOVE, applying to Z on most printers."
 #elif defined(FIL_RUNOUT_INVERTING)
   #if FIL_RUNOUT_INVERTING
     #error "FIL_RUNOUT_INVERTING true is now FIL_RUNOUT_STATE HIGH."
@@ -1447,7 +1451,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #error "AUTO_BED_LEVELING_UBL requires EEPROM_SETTINGS."
   #elif !WITHIN(GRID_MAX_POINTS_X, 3, 15) || !WITHIN(GRID_MAX_POINTS_Y, 3, 15)
     #error "GRID_MAX_POINTS_[XY] must be a whole number between 3 and 15."
-  #elif !defined(RESTORE_LEVELING_AFTER_G28)
+  #elif !defined(RESTORE_LEVELING_AFTER_G28) && !defined(ENABLE_LEVELING_AFTER_G28)
     #error "AUTO_BED_LEVELING_UBL used to enable RESTORE_LEVELING_AFTER_G28. To keep this behavior enable RESTORE_LEVELING_AFTER_G28. Otherwise define it as 'false'."
   #endif
 
@@ -1473,6 +1477,10 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #error "GRID_MAX_POINTS_X and GRID_MAX_POINTS_Y must be less than 10 for MBL."
   #endif
 
+#endif
+
+#if ALL(HAS_LEVELING, RESTORE_LEVELING_AFTER_G28, ENABLE_LEVELING_AFTER_G28)
+  #error "Only enable RESTORE_LEVELING_AFTER_G28 or ENABLE_LEVELING_AFTER_G28, but not both."
 #endif
 
 #if HAS_MESH && HAS_CLASSIC_JERK
@@ -1912,7 +1920,7 @@ static_assert(hbm[Z_AXIS] >= 0, "HOMING_BUMP_MM.Z must be greater than or equal 
 /**
  * LED Backlight Timeout
  */
-#if defined(LED_BACKLIGHT_TIMEOUT) && !(ENABLED(PSU_CONTROL) && EITHER(FYSETC_MINI_12864_2_0, FYSETC_MINI_12864_2_1))
+#if defined(LED_BACKLIGHT_TIMEOUT) && !(ENABLED(PSU_CONTROL) && ANY(FYSETC_MINI_12864_2_0, FYSETC_MINI_12864_2_1, FYSETC_242_OLED_12864))
   #error "LED_BACKLIGHT_TIMEOUT requires a FYSETC Mini Panel and a Power Switch."
 #endif
 
@@ -2667,7 +2675,7 @@ static_assert(hbm[Z_AXIS] >= 0, "HOMING_BUMP_MM.Z must be greater than or equal 
   #elif ENABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN)
     #error "SENSORLESS_PROBING cannot be used with Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN."
   #elif ENABLED(USE_PROBE_FOR_Z_HOMING)
-    #error "SENSORLESS_PROBING cannot be used with USE_PROBE_FOR_Z_HOMING."   
+    #error "SENSORLESS_PROBING cannot be used with USE_PROBE_FOR_Z_HOMING."
   #elif !Z_SENSORLESS
     #error "SENSORLESS_PROBING requires a TMC stepper driver with StallGuard on Z."
   #endif
