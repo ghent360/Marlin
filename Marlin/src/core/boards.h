@@ -367,6 +367,7 @@
 #define BOARD_FLYF407ZG               4217  // FLYF407ZG board (STM32F407ZG)
 #define BOARD_MKS_ROBIN2              4218  // MKS_ROBIN2 (STM32F407ZE)
 #define BOARD_MKS_ROBIN_PRO_V2        4219  // MKS Robin Pro V2 (STM32F407VE)
+#define BOARD_MKS_ROBIN_NANO_V3       4220  // MKS Robin Nano V3 (STM32F407VG)
 #define BOARD_PRNTR_V1                4225  // STM32F446RE NUCLEO-64 shield controller
 #define BOARD_PRNTR_F407_V1           4226  // STM32F407VE NUCLEO-64-like shield controller
 #define BOARD_PRNTR_F407_2209         4227  // STM32F407VE NUCLEO-64-like shield controller
