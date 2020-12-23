@@ -1603,8 +1603,11 @@ void homeaxis(const AxisEnum axis) {
   // Fast move towards endstop until triggered
   if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Home 1 Fast:");
 
-  #if BOTH(HOMING_Z_WITH_PROBE, BLTOUCH)
-    if (axis == Z_AXIS && bltouch.deploy()) return; // The initial DEPLOY
+  #if HOMING_Z_WITH_PROBE
+    if (axis == Z_AXIS) {
+      if (TERN0(BLTOUCH, bltouch.deploy())) return;
+      if (TERN0(PROBE_TARE, probe.tare())) return;
+    }
   #endif
 
   #if DISABLED(DELTA) && defined(SENSORLESS_BACKOFF_MM)
@@ -1615,7 +1618,7 @@ void homeaxis(const AxisEnum axis) {
 
   do_homing_move(axis, 1.5f * max_length(TERN(DELTA, Z_AXIS, axis)) * axis_home_dir);
 
-  #if BOTH(HOMING_Z_WITH_PROBE, BLTOUCH) && DISABLED(BLTOUCH_HS_MODE)
+  #if BOTH(HOMING_Z_WITH_PROBE, BLTOUCH_SLOW_MODE)
     if (axis == Z_AXIS) bltouch.stow(); // Intermediate STOW (in LOW SPEED MODE)
   #endif
 
@@ -1653,7 +1656,7 @@ void homeaxis(const AxisEnum axis) {
     // Slow move towards endstop until triggered
     if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Home 2 Slow:");
 
-    #if BOTH(HOMING_Z_WITH_PROBE, BLTOUCH) && DISABLED(BLTOUCH_HS_MODE)
+    #if BOTH(HOMING_Z_WITH_PROBE, BLTOUCH_SLOW_MODE)
       if (axis == Z_AXIS && bltouch.deploy()) return; // Intermediate DEPLOY (in LOW SPEED MODE)
     #endif
 
