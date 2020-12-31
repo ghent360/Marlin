@@ -58,7 +58,7 @@
 
 #include "../../../inc/MarlinConfig.h"
 
-#if HAS_GRAPHICAL_LCD
+#if HAS_MARLINUI_U8GLIB
 
 #include <U8glib.h>
 #include "../../shared/HAL_SPI.h"
