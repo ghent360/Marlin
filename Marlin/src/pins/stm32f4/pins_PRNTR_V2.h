@@ -215,11 +215,15 @@
 // Prevent the default SS_PIN definition
 #define SS_PIN -1
 
+#if !defined(PRNTR_V2_REV) || PRNTR_V2_REV > 2
+// Rev 1 and Rev 2 boards have a bug and the EEPROM is not usable.
 #define I2C_EEPROM
 #define EEPROM_DEVICE_ADDRESS 0x57
 #define MARLIN_EEPROM_SIZE 0x2000               // 8KB
+#endif
 
 #define SD_DETECT_PIN       IO_PIN(D, 3)
+#define DISABLE_WIDE_SDIO
 //if ENABLED(SD_DETECT_INVERTED)
 //  #error "SD_DETECT_INVERTED must be disabled for the PRNTR_V2 board."
 //#endif

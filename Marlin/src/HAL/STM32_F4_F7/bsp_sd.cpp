@@ -39,6 +39,7 @@
 #include "../HAL.h"
 #if (HAL_PLATFORM_ID == HAL_ID_STM32_F4_F7) && ENABLED(SDIO_SUPPORT)
 #include "bsp_sd.h"
+#include "../../inc/MarlinConfig.h"
 
 #ifdef SDMMC1
 /* Definition for BSP SD */
@@ -134,6 +135,7 @@ uint8_t BSP_SD_Init(void) {
     sd_state = MSD_ERROR;
   }
 
+#ifndef DISABLE_WIDE_SDIO
   /* Configure SD Bus width */
   if (sd_state == MSD_OK) {
     /* Enable wide operation */
@@ -143,6 +145,7 @@ uint8_t BSP_SD_Init(void) {
       sd_state = MSD_OK;
     }
   }
+#endif
   return  sd_state;
 }
 
