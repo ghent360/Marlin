@@ -35,6 +35,10 @@
 
 uint16_t HAL_adc_result;
 
+#if defined(STM32F4) && USBCON
+  DefaultSerial MSerial(false, SerialUSB);
+#endif
+
 // ------------------------
 // Public functions
 // ------------------------

@@ -20,7 +20,8 @@
  *
  */
 
-#if defined(ARDUINO_ARCH_STM32) && !defined(STM32GENERIC)
+#include "../HAL.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 #include "../../inc/MarlinConfig.h"
 
@@ -114,4 +115,4 @@ uint8_t BulkStorage::Write(uint8_t lun, uint32_t addr, uint16_t bsize, uint8_t b
 }
 
 #endif // USE_OTG_USB_HOST && USBHOST
-#endif // ARDUINO_ARCH_STM32 && !STM32GENERIC
+#endif // (HAL_PLATFORM_ID == HAL_ID_STM32)

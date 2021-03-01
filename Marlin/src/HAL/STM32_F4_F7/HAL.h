@@ -32,24 +32,66 @@
 
 #include "fastio.h"
 #include "watchdog.h"
+#include "MarlinSerial.h"
 
 #include <stdint.h>
 
 #if defined(STM32F4) && USBCON
   #include <USBSerial.h>
+  #include "../../core/serial_hook.h"
+  typedef ForwardSerial0Type< decltype(SerialUSB) > DefaultSerial;
+  extern DefaultSerial MSerial;
 #endif
 
 // ------------------------
 // Defines
 // ------------------------
 
-// Serial override
-//extern HalSerial usb_serial;
-
-#define _MSERIAL(X) SerialUART##X
+#define _MSERIAL(X) MSerial##X
 #define MSERIAL(X) _MSERIAL(X)
-#define SerialUART0 Serial1
 
+#if SERIAL_PORT == -1
+  #define MYSERIAL0 MSerial
+#elif WITHIN(SERIAL_PORT, 1, 6)
+  #define MYSERIAL0 MSERIAL(SERIAL_PORT)
+#else
+  #error "SERIAL_PORT must be -1 or from 1 to 6. Please update your configuration."
+#endif
+
+#ifdef SERIAL_PORT_2
+  #if SERIAL_PORT_2 == -1
+    #define MYSERIAL1 MSerial
+  #elif WITHIN(SERIAL_PORT_2, 1, 6)
+    #define MYSERIAL1 MSERIAL(SERIAL_PORT_2)
+  #else
+    #error "SERIAL_PORT_2 must be -1 or from 1 to 6. Please update your configuration."
+  #endif
+#endif
+
+#ifdef MMU2_SERIAL_PORT
+  #if MMU2_SERIAL_PORT == -1
+    #define MMU2_SERIAL MSerial
+  #elif WITHIN(MMU2_SERIAL_PORT, 1, 6)
+    #define MMU2_SERIAL MSERIAL(MMU2_SERIAL_PORT)
+  #else
+    #error "MMU2_SERIAL_PORT must be -1 or from 1 to 6. Please update your configuration."
+  #endif
+#endif
+
+#ifdef LCD_SERIAL_PORT
+  #if LCD_SERIAL_PORT == -1
+    #define LCD_SERIAL MSerial
+  #elif WITHIN(LCD_SERIAL_PORT, 1, 6)
+    #define LCD_SERIAL MSERIAL(LCD_SERIAL_PORT)
+  #else
+    #error "LCD_SERIAL_PORT must be -1 or from 1 to 6. Please update your configuration."
+  #endif
+  #if HAS_DGUS_LCD
+    #define SERIAL_GET_TX_BUFFER_FREE() LCD_SERIAL.availableForWrite()
+  #endif
+#endif
+
+/*
 #if defined(STM32F4) && SERIAL_PORT == 0
   #error "SERIAL_PORT cannot be 0. (Port 0 does not exist.) Please update your configuration."
 #elif SERIAL_PORT == -1
@@ -71,42 +113,7 @@
 #else
   #error "SERIAL_PORT must be from -1 to 6. Please update your configuration."
 #endif
-
-#ifdef SERIAL_PORT_2
-  #if defined(STM32F4) && SERIAL_PORT_2 == 0
-    #error "SERIAL_PORT_2 cannot be 0. (Port 0 does not exist.) Please update your configuration."
-  #elif SERIAL_PORT_2 == -1
-    #define MYSERIAL1 SerialUSB
-  #elif SERIAL_PORT_2 == 0
-    #define MYSERIAL1 Serial1
-  #elif SERIAL_PORT_2 == 1
-    #define MYSERIAL1 Serial1
-  #elif SERIAL_PORT_2 == 2
-    #define MYSERIAL1 Serial2
-  #elif SERIAL_PORT_2 == 3
-    #define MYSERIAL1 Serial3
-  #elif SERIAL_PORT_2 == 4
-    #define MYSERIAL1 Serial4
-  #elif SERIAL_PORT_2 == 5
-    #define MYSERIAL1 Serial5
-  #elif SERIAL_PORT_2 == 6
-    #define MYSERIAL1 SerialUART6
-  #else
-    #error "SERIAL_PORT_2 must be from -1 to 6. Please update your configuration."
-  #endif
-#endif
-
-#ifdef LCD_SERIAL_PORT
-  #if defined(STM32F4) && LCD_SERIAL_PORT == 0
-    #error "LCD_SERIAL_PORT cannot be 0. (Port 0 does not exist.) Please update your configuration."
-  #elif LCD_SERIAL_PORT == -1
-    #define LCD_SERIAL SerialUSB
-  #elif WITHIN(LCD_SERIAL_PORT, 0, 6)
-    #define LCD_SERIAL MSERIAL(LCD_SERIAL_PORT)
-  #else
-    #error "LCD_SERIAL_PORT must be from -1 to 6. Please update your configuration."
-  #endif
-#endif
+*/
 
 /**
  * TODO: review this to return 1 for pins that are not analog input
