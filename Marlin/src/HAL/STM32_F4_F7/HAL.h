@@ -39,8 +39,8 @@
 #if defined(STM32F4) && USBCON
   #include <USBSerial.h>
   #include "../../core/serial_hook.h"
-  typedef ForwardSerial0Type< decltype(SerialUSB) > DefaultSerial;
-  extern DefaultSerial MSerial;
+  typedef ForwardSerial1Class< decltype(SerialUSB) > DefaultSerial1;
+  extern DefaultSerial1 MSerial0;
 #endif
 
 // ------------------------
@@ -51,18 +51,18 @@
 #define MSERIAL(X) _MSERIAL(X)
 
 #if SERIAL_PORT == -1
-  #define MYSERIAL0 MSerial
+  #define MYSERIAL1 MSerial0
 #elif WITHIN(SERIAL_PORT, 1, 6)
-  #define MYSERIAL0 MSERIAL(SERIAL_PORT)
+  #define MYSERIAL1 MSERIAL(SERIAL_PORT)
 #else
   #error "SERIAL_PORT must be -1 or from 1 to 6. Please update your configuration."
 #endif
 
 #ifdef SERIAL_PORT_2
   #if SERIAL_PORT_2 == -1
-    #define MYSERIAL1 MSerial
+    #define MYSERIAL2 MSerial0
   #elif WITHIN(SERIAL_PORT_2, 1, 6)
-    #define MYSERIAL1 MSERIAL(SERIAL_PORT_2)
+    #define MYSERIAL2 MSERIAL(SERIAL_PORT_2)
   #else
     #error "SERIAL_PORT_2 must be -1 or from 1 to 6. Please update your configuration."
   #endif
@@ -70,7 +70,7 @@
 
 #ifdef MMU2_SERIAL_PORT
   #if MMU2_SERIAL_PORT == -1
-    #define MMU2_SERIAL MSerial
+    #define MMU2_SERIAL MSerial0
   #elif WITHIN(MMU2_SERIAL_PORT, 1, 6)
     #define MMU2_SERIAL MSERIAL(MMU2_SERIAL_PORT)
   #else
@@ -80,7 +80,7 @@
 
 #ifdef LCD_SERIAL_PORT
   #if LCD_SERIAL_PORT == -1
-    #define LCD_SERIAL MSerial
+    #define LCD_SERIAL MSerial0
   #elif WITHIN(LCD_SERIAL_PORT, 1, 6)
     #define LCD_SERIAL MSERIAL(LCD_SERIAL_PORT)
   #else
@@ -90,30 +90,6 @@
     #define SERIAL_GET_TX_BUFFER_FREE() LCD_SERIAL.availableForWrite()
   #endif
 #endif
-
-/*
-#if defined(STM32F4) && SERIAL_PORT == 0
-  #error "SERIAL_PORT cannot be 0. (Port 0 does not exist.) Please update your configuration."
-#elif SERIAL_PORT == -1
-  #define MYSERIAL0 SerialUSB
-#elif SERIAL_PORT == 0
-  #define MYSERIAL0 Serial1
-#elif SERIAL_PORT == 1
-  #define MYSERIAL0 Serial1
-#elif SERIAL_PORT == 2
-  #define MYSERIAL0 Serial2
-#elif SERIAL_PORT == 3
-  #define MYSERIAL0 Serial3
-#elif SERIAL_PORT == 4
-  #define MYSERIAL0 Serial4
-#elif SERIAL_PORT == 5
-  #define MYSERIAL0 Serial5
-#elif SERIAL_PORT == 6
-  #define MYSERIAL0 SerialUART6
-#else
-  #error "SERIAL_PORT must be from -1 to 6. Please update your configuration."
-#endif
-*/
 
 /**
  * TODO: review this to return 1 for pins that are not analog input

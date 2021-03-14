@@ -36,7 +36,7 @@
 uint16_t HAL_adc_result;
 
 #if defined(STM32F4) && USBCON
-  DefaultSerial MSerial(false, SerialUSB);
+  DefaultSerial1 MSerial0(false, SerialUSB);
 #endif
 
 // ------------------------
