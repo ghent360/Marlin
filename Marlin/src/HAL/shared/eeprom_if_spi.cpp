@@ -43,66 +43,6 @@ void eeprom_init() {}
   #define EEPROM_WRITE_DELAY    7
 #endif
 
-<<<<<<< HEAD
-uint8_t eeprom_read_byte(uint8_t* pos) {
-  uint8_t v;
-  uint8_t eeprom_temp[3];
-
-  // set read location
-  // begin transmission from device
-  eeprom_temp[0] = CMD_READ;
-  eeprom_temp[1] = ((unsigned)pos>>8) & 0xFF; // addr High
-  eeprom_temp[2] = (unsigned)pos& 0xFF;       // addr Low
-  WRITE(SPI_EEPROM1_CS, HIGH);
-  WRITE(SPI_EEPROM1_CS, LOW);
-  spiSend(eeprom_temp, 3);
-
-  v = spiRec();
-  WRITE(SPI_EEPROM1_CS, HIGH);
-  return v;
-}
-
-#if 0
-void eeprom_read_block(void* dest, const void* eeprom_address, size_t n) {
-  uint8_t eeprom_temp[3];
-
-  // set read location
-  // begin transmission from device
-  eeprom_temp[0] = CMD_READ;
-  eeprom_temp[1] = ((unsigned)eeprom_address>>8) & 0xFF; // addr High
-  eeprom_temp[2] = (unsigned)eeprom_address& 0xFF;       // addr Low
-  WRITE(SPI_EEPROM1_CS, HIGH);
-  WRITE(SPI_EEPROM1_CS, LOW);
-  spiSend(eeprom_temp, 3);
-
-  uint8_t *p_dest = (uint8_t *)dest;
-  while (n--)
-    *p_dest++ = spiRec();
-  WRITE(SPI_EEPROM1_CS, HIGH);
-}
-#endif
-
-void eeprom_write_byte(uint8_t* pos, uint8_t value) {
-  uint8_t eeprom_temp[3];
-
-  /*write enable*/
-  eeprom_temp[0] = CMD_WREN;
-  WRITE(SPI_EEPROM1_CS, LOW);
-  spiSend(eeprom_temp, 1);
-  WRITE(SPI_EEPROM1_CS, HIGH);
-  delay(1);
-
-  /*write addr*/
-  eeprom_temp[0] = CMD_WRITE;
-  eeprom_temp[1] = ((unsigned)pos>>8) & 0xFF;  //addr High
-  eeprom_temp[2] = (unsigned)pos & 0xFF;       //addr Low
-  WRITE(SPI_EEPROM1_CS, LOW);
-  spiSend(eeprom_temp, 3);
-
-  spiSend(value);
-  WRITE(SPI_EEPROM1_CS, HIGH);
-  delay(EEPROM_WRITE_DELAY);   // wait for page write to complete
-=======
 static void _eeprom_begin(uint8_t * const pos, const uint8_t cmd) {
   const uint8_t eeprom_temp[3] = {
     cmd,
@@ -138,7 +78,6 @@ void eeprom_write_byte(uint8_t *pos, uint8_t value) {
   spiSend(SPI_CHAN_EEPROM1, value); // Send the value to be written
   WRITE(SPI_EEPROM1_CS, HIGH);      // Done with the Bus
   delay(EEPROM_WRITE_DELAY);        // Give page write time to complete
->>>>>>> d0ea2b286739379ff2524ecc1c8dcbb057e98c0b
 }
 
 #if 0
