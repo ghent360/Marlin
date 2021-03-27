@@ -19,6 +19,8 @@
  *   location: <https://www.gnu.org/licenses/>.                             *
  ****************************************************************************/
 
+#if 0
+
 #include "../ftdi_eve_lib.h"
 #include "../extended/grid_layout.h"
 
@@ -52,3 +54,5 @@ void draw_adjuster(CommandProcessor& cmd, int16_t x, int16_t y, int16_t w, int16
          .tag(tag+1).button(DEC_POS, F("+"));
     }
 }
+
+#endif
