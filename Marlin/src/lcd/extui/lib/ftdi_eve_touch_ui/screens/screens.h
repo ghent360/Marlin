@@ -263,4 +263,4 @@ enum {
   #include "language_menu.h"
 #endif
 
-#endif // ENABLED(TOUCH_UI_FTDI_EVE)
+#endif // TOUCH_UI_FTDI_EVE

@@ -86,3 +86,6 @@ void spiBeginTransaction(uint32_t spiClock, uint8_t bitOrder, uint8_t dataMode, 
 
 // Write buffer to specified SPI channel
 void spiSend(const uint8_t* buf, size_t n, SPIClass& spiInstance = SPI);
+
+// Read single byte from specified SPI channel
+uint8_t spiRec(uint32_t chan, SPIClass& spiInstance = SPI);
