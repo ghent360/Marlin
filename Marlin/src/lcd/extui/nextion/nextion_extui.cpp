@@ -26,7 +26,7 @@
  * Nextion TFT support for Marlin
  */
 
-#include "../../inc/MarlinConfigPre.h"
+#include "../../../inc/MarlinConfigPre.h"
 
 #if ENABLED(NEXTION_TFT)
 
