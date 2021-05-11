@@ -2913,6 +2913,8 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
     #error "POWER_LOSS_RECOVER_ZHOME cannot be used with Z_SAFE_HOMING."
   #elif BOTH(POWER_LOSS_PULLUP, POWER_LOSS_PULLDOWN)
     #error "You can't enable POWER_LOSS_PULLUP and POWER_LOSS_PULLDOWN at the same time."
+  #elif ENABLED(POWER_LOSS_RECOVER_ZHOME) && Z_HOME_DIR > 0
+    #error "POWER_LOSS_RECOVER_ZHOME is not needed on a machine that homes to ZMAX."
   #elif BOTH(IS_CARTESIAN, POWER_LOSS_RECOVER_ZHOME) && Z_HOME_DIR < 0 && !defined(POWER_LOSS_ZHOME_POS)
     #error "POWER_LOSS_RECOVER_ZHOME requires POWER_LOSS_ZHOME_POS for a Cartesian that homes to ZMIN."
   #endif
@@ -3190,21 +3192,11 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
 #endif
 
 /**
- * Touch Buttons
+ * Touch Screen Calibration
  */
-#if ENABLED(TOUCH_SCREEN) && DISABLED(TOUCH_SCREEN_CALIBRATION)
-  #ifndef TOUCH_CALIBRATION_X
-    #error "TOUCH_CALIBRATION_X must be defined with TOUCH_SCREEN."
-  #endif
-  #ifndef TOUCH_CALIBRATION_Y
-    #error "TOUCH_CALIBRATION_Y must be defined with TOUCH_SCREEN."
-  #endif
-  #ifndef TOUCH_OFFSET_X
-    #error "TOUCH_OFFSET_X must be defined with TOUCH_SCREEN."
-  #endif
-  #ifndef TOUCH_OFFSET_Y
-    #error "TOUCH_OFFSET_Y must be defined with TOUCH_SCREEN."
-  #endif
+#if ENABLED(TFT_TOUCH_DEVICE_XPT2046) && DISABLED(TOUCH_SCREEN_CALIBRATION) \
+    && (!defined(TOUCH_CALIBRATION_X) || !defined(TOUCH_CALIBRATION_Y) || !defined(TOUCH_OFFSET_X) || !defined(TOUCH_OFFSET_Y))
+  #error "TOUCH_CALIBRATION_[XY] and TOUCH_OFFSET_[XY] are required for resistive touch screens with TOUCH_SCREEN_CALIBRATION disabled."
 #endif
 
 /**
