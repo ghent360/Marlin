@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/<>.
  *
  */
 #pragma once
@@ -2924,6 +2924,11 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #if LINEAR_AXES >= 6
     #define K_ENDSTOP_INVERTING !AXIS_DRIVER_TYPE(K,TMC2209)
   #endif
+  #else
+    #define X_ENDSTOP_INVERTING true
+    #define Y_ENDSTOP_INVERTING true
+    #define Z_ENDSTOP_INVERTING true
+  #endif // TMC2209_INVERT_DIAG
 
   #if NONE(SPI_ENDSTOPS, ONBOARD_ENDSTOPPULLUPS, ENDSTOPPULLUPS)
     #if   X_SENSORLESS && X_HOME_TO_MIN && DISABLED(ENDSTOPPULLUP_XMIN)
