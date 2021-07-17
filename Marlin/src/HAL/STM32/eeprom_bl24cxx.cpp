@@ -19,7 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifdef STM32F1
+#include "../HAL.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 /**
  * PersistentStore for Arduino-style EEPROM interface

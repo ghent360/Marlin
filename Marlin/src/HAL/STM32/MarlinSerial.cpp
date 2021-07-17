@@ -103,4 +103,4 @@ void MarlinSerial::_rx_complete_irq(serial_t *obj) {
   }
 }
 
-#endif // ARDUINO_ARCH_STM32 && !STM32GENERIC
+#endif // ARDUINO_ARCH_STM32 && !STM32GENERIC && !MAPLE_STM32F1

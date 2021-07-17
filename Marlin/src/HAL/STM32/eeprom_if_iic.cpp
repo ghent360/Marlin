@@ -25,7 +25,8 @@
  * Enable USE_SHARED_EEPROM if not supplied by the framework.
  */
 
-#ifdef STM32F1
+#include "../HAL.h"
+#if (HAL_PLATFORM_ID == HAL_ID_STM32)
 
 #include "../../inc/MarlinConfig.h"
 
